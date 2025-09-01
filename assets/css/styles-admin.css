@@ -1,4 +1,4 @@
-main.play {
+main.admin {
       width:100%;
       max-width:var(--container-max);
       margin:0 auto;
@@ -8,19 +8,6 @@ main.play {
       align-items:center;
       gap:1rem;
     }
-
-    .play-hero {
+    .admin-hero {
       text-align:center;
     }
-
-    #video {
-      width:100%;
-      max-width:420px;
-      height:auto;
-      border-radius:12px;
-    }
-
-    
-
-    .status-line { color:var(--muted); font-size:0.95rem; margin-top:0.35rem; }
-
