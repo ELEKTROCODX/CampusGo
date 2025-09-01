@@ -10,7 +10,6 @@ function renderStations() {
         container.innerHTML += `
           <div class="station-card">
           <strong>${obj.name}</strong>
-          <div class="station-state">${obj.status}</div>
             <div class="station-actions">
                 <button class="btn btn-view" onclick="seeStationInfo('${obj._uuid}')"><i class="fa-solid fa-eye"></i></button>
                 <button class="btn btn-edit" onclick="editStation('${obj._uuid}')"><i class="fa-solid fa-pencil"></i></button>
