@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<title>CampusGo - Admin</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+	<link rel="stylesheet" href="/assets/css/styles-admin.css" />
+	<link rel="stylesheet" href="/assets/css/styles.css" />
+	<link rel="icon" href="/assets/favicon.ico" />
+	<script src="../assets/js/jquery.min.js"></script>
+	<script src="../assets/js/qrcode.js"></script>
+</head>
+
+<body>
+	<header class="site-header" role="banner">
+		<div class="container header-inner">
+			<div class="logo" aria-hidden="false">
+				<img src="/assets/logo.png" alt="CampusGo" />
+			</div>
+
+			<div class="brand">
+				<h1 class="site-title">CampusGo</h1>
+				<p class="site-tagline">Sección administrativa de CampusGo.</p>
+			</div>
+		</div>
+	</header>
+	<main class="admin" role="main" aria-labelledby="admin-title">
+		<section class="admin-hero">
+			<h2 id="stationgenerator-title">Generador de estaciones</h2>
+			<p class="hero-sub">
+				En esta sección podrás generar las estaciones de CampusGo.
+			</p>
+			<div>
+				<button id="btn-gen-station" class="cta" onclick="showCreateForm()">
+					Generar estación
+				</button>
+			</div>
+		</section>
+		<section aria-labelledby="stations-title" style="width: 100%">
+			<h3 id="stations-title" class="section-title">
+				Estaciones disponibles
+			</h3>
+			<div class="stations-grid" id="stations-grid"></div>
+		</section>
+		<section id="new-station-form">
+			<input type="hidden" id="edit-uuid" />
+			<input type="text" class="inputForm" id="station-name-form" placeholder="Nombre de la estación" required />
+			<button class="btn btn-primary" onclick="saveStation()">Guardar</button>
+			<button class="btn btn-secondary" onclick="cancelForm()">
+				Cancelar
+			</button>
+		</section>
+		<section id="see-station-info" style="display: none">
+			<h2 id="no-station-found-msg">
+				No se encontró la estación proporcionada
+			</h2>
+			<h2 id="station-name-info"></h2>
+			<p id="station-id-info" style="display: none"></p>
+			<div id="qrcode"></div>
+			<button class="btn btn-download" onclick="downloadQR()" id="download-QR">
+				Descargar QR
+			</button>
+			<button class="btn btn-back" onclick="hideStationInfo()">
+				Ocultar
+			</button>
+		</section>
+		<section class="contact-info">
+			<hr />
+			<p style="margin-top: 1rem; color: var(--muted); font-size: 0.9rem">
+				¿Tienes problemas? Escribenos al correo: naldana@uca.edu.sv
+			</p>
+		</section>
+	</main>
+
+	<footer class="site-footer" role="contentinfo">
+		<div class="container footer-inner">
+			<small>© <span id="year"></span> ElektroCodx</small>
+			<nav class="footer-nav" aria-label="Enlaces secundarios">
+				<a href="/privacy">Privacidad</a>
+				<a href="/terms">Términos</a>
+			</nav>
+		</div>
+	</footer>
+	<script src="../assets/js/main.js"></script>
+	<script src="../assets/js/admin.js"></script>
+</body>
+</html>

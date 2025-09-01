@@ -1,64 +1,27 @@
 main.play {
-      width:100%;
-      max-width:var(--container-max);
-      margin:0 auto;
-      padding:1rem;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:1rem;
-    }
+	width: 100%;
+	max-width: var(--container-max);
+	margin: 0 auto;
+	padding: 1rem;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1rem;
+}
 
-    .play-hero {
-      text-align:center;
-    }
+.play-hero {
+	text-align: center;
+}
 
-    #video {
-      width:100%;
-      max-width:420px;
-      height:auto;
-      border-radius:12px;
-    }
+#video {
+	width: 100%;
+	max-width: 420px;
+	height: auto;
+	border-radius: 12px;
+}
 
-    .tasks-grid {
-      display:grid;
-      grid-template-columns: 1fr;
-      gap:0.9rem;
-      width:100%;
-      max-width:960px;
-      margin-top:0.5rem;
-    }
-    @media(min-width:560px){ .tasks-grid{ grid-template-columns: repeat(2,1fr); } }
-    @media(min-width:760px){ .tasks-grid{ grid-template-columns: repeat(4,1fr); } }
-
-    .task-card {
-      background:var(--card);
-      border-radius:10px;
-      padding:0.9rem;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      align-items:center;
-      gap:0.35rem;
-      box-shadow:0 6px 18px rgba(9,30,66,0.04);
-      border:1px solid #e6eef8;
-      min-height:92px;
-    }
-    .task-card.done {
-      border-color:#2f9e44;
-      background:linear-gradient(180deg,#f0fff5,#e6ffe8);
-    }
-    .task-card strong { display:block; font-size:1rem; }
-    .task-state { color:var(--muted); font-weight:600; margin-top:0.2rem; }
-    .task-state.done { color:#2f9e44; }
-
-    .status-line { color:var(--muted); font-size:0.95rem; margin-top:0.35rem; }
-
-    .small-btn{
-      margin-left:0.5rem;
-      background:transparent;
-      padding:0.45rem 0.7rem;
-      border-radius:8px;
-      cursor:pointer;
-    }
-    .small-btn:focus { outline:3px solid rgba(0,102,204,0.12); outline-offset:3px; }
+.status-line {
+	color: var(--muted);
+	font-size: 0.95rem;
+	margin-top: 0.35rem;
+}
