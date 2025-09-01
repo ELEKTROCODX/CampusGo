@@ -1,66 +1,71 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>CampusGo!</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-    <link rel="stylesheet" href="/assets/css/styles-play.css" />
-    <link rel="stylesheet" href="/assets/css/styles.css" />
-    <link rel="icon" href="/assets/favicon.ico" />
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js" defer></script>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<title>CampusGo!</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+	<link rel="stylesheet" href="/assets/css/styles-play.css" />
+	<link rel="stylesheet" href="/assets/css/styles.css" />
+	<link rel="icon" href="/assets/favicon.ico" />
+	<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js" defer></script>
 </head>
+
 <body>
-  <header class="site-header" role="banner">
-    <div class="container header-inner">
-      <div class="logo" aria-hidden="false">
-        <img src="/assets/logo.png" alt="CampusGo" />
-      </div>
+	<header class="site-header" role="banner">
+		<div class="container header-inner">
+			<div class="logo" aria-hidden="false">
+				<img src="/assets/logo.png" alt="CampusGo" />
+			</div>
 
-      <div class="brand">
-        <h1 class="site-title">CampusGo</h1>
-        <p class="site-tagline">Explora la UCA, escanea QR y completa la aventura.</p>
-      </div>
-    </div>
-  </header>
+			<div class="brand">
+				<h1 class="site-title">CampusGo</h1>
+				<p class="site-tagline">Explora la UCA, escanea QR y completa la aventura.</p>
+			</div>
+		</div>
+	</header>
 
-  <main class="play" role="main" aria-labelledby="play-title">
-    <section class="play-hero">
-      <h2 id="play-title">Juega: escanea y registra tus visitas</h2>
-      <p class="hero-sub">Apunta tu cámara al QR de cada estación para marcarla como visitada.</p>
+	<main class="play" role="main" aria-labelledby="play-title">
+		<section class="play-hero">
+			<h2 id="play-title">Juega: escanea y registra tus visitas</h2>
+			<p class="hero-sub">Apunta tu cámara al QR de cada estación para marcarla como visitada.</p>
 
-      <div>
-        <button id="btn-scan-qr" class="cta" aria-pressed="false">Iniciar escaneo</button>
-        <button id="btn-stop-qr" class="small-btn" aria-hidden="true" hidden>Detener</button>
-      </div>
+			<div>
+				<button id="btn-scan-qr" class="cta" aria-pressed="false">Iniciar escaneo</button>
+				<button id="btn-stop-qr" class="small-btn" aria-hidden="true" hidden>Detener</button>
+			</div>
 
-      <p class="status-line" id="status-line">Estado: listo. Pulsa <strong>Iniciar escaneo</strong> y permite el acceso a la cámara.</p>
-    </section>
+			<p class="status-line" id="status-line">Estado: listo. Pulsa <strong>Iniciar escaneo</strong> y permite el
+				acceso a la cámara.</p>
+		</section>
 
-    <video id="video" autoplay muted playsinline hidden aria-label="Vista previa de cámara para escaneo"></video>
-    <canvas id="qr-canvas" hidden></canvas>
+		<video id="video" autoplay muted playsinline hidden aria-label="Vista previa de cámara para escaneo"></video>
+		<canvas id="qr-canvas" hidden></canvas>
 
-    <section aria-labelledby="stations-title" style="width:100%;">
-		<h3 id="stations-title" class="section-title">Estaciones</h3>
-      <div class="stations-grid" id="stations-grid">
-    </section>
+		<section aria-labelledby="stations-title" style="width:100%;">
+			<h3 id="stations-title" class="section-title">Estaciones</h3>
+			<div class="stations-grid" id="stations-grid">
+		</section>
 
-    <section class="contact-info">
-      <hr>
-      <p style="margin-top:1rem;color:var(--muted);font-size:0.9rem;">¿Tienes problemas? Escribenos al correo: naldana@uca.edu.sv</p>
-    </section>
-  </main>
-  
-  <footer class="site-footer" role="contentinfo">
-    <div class="container footer-inner">
-      <small>© <span id="year"></span> ElektroCodx</small>
-      <nav class="footer-nav" aria-label="Enlaces secundarios">
-        <a href="/privacy">Privacidad</a>
-        <a href="/terms">Términos</a>
-      </nav>
-    </div>
-  </footer>
-  <script src="../assets/js/main.js"></script>
-  <script src="../assets/js/play.js"></script>
+		<section class="contact-info">
+			<hr>
+			<p style="margin-top:1rem;color:var(--muted);font-size:0.9rem;">¿Tienes problemas? Escribenos al correo:
+				naldana@uca.edu.sv</p>
+		</section>
+	</main>
+
+	<footer class="site-footer" role="contentinfo">
+		<div class="container footer-inner">
+			<small>© <span id="year"></span> ElektroCodx</small>
+			<nav class="footer-nav" aria-label="Enlaces secundarios">
+				<a href="/privacy">Privacidad</a>
+				<a href="/terms">Términos</a>
+			</nav>
+		</div>
+	</footer>
+	<script src="../assets/js/main.js"></script>
+	<script src="../assets/js/play.js"></script>
 </body>
+
 </html>

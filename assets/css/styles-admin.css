@@ -1,13 +1,14 @@
 main.admin {
-      width:100%;
-      max-width:var(--container-max);
-      margin:0 auto;
-      padding:1rem;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:1rem;
-    }
-    .admin-hero {
-      text-align:center;
-    }
+	width: 100%;
+	max-width: var(--container-max);
+	margin: 0 auto;
+	padding: 1rem;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1rem;
+}
+
+.admin-hero {
+	text-align: center;
+}

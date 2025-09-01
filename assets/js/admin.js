@@ -36,7 +36,7 @@ function saveStation() {
         return;
     }
     if(editUuid === "") {
-        stations.push({_uuid: uuid, name, status: "Unregistered" });
+        stations.push({_uuid: uuid, name, status: "No visitado" });
     } else {
         const index = stations.findIndex(station => station._uuid === editUuid);
         stations[index].name = name;
