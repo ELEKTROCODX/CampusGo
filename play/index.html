@@ -40,18 +40,9 @@
     <video id="video" autoplay muted playsinline hidden aria-label="Vista previa de cámara para escaneo"></video>
     <canvas id="qr-canvas" hidden></canvas>
 
-    <section aria-labelledby="tasks-title" style="width:100%;">
-      <h3 id="tasks-title" class="section-title">Estaciones</h3>
+    <section aria-labelledby="stations-title" style="width:100%;">
+		<h3 id="stations-title" class="section-title">Estaciones</h3>
       <div class="stations-grid" id="stations-grid">
-        <div class="station-card" id="task1"><strong>Polideportivo</strong><div class="station-state" id="state1">Unregistered</div></div>
-        <div class="station-card" id="task2"><strong>Biblio UCA</strong><div class="station-state" id="state2">Unregistered</div></div>
-        <div class="station-card" id="task3"><strong>Parqueo 3</strong><div class="station-state" id="state3">Unregistered</div></div>
-        <div class="station-card" id="task4"><strong>Terrazas A</strong><div class="station-state" id="state4">Unregistered</div></div>
-        <div class="station-card" id="task5"><strong>CEDITEC</strong><div class="station-state" id="state5">Unregistered</div></div>
-        <div class="station-card" id="task6"><strong>Capilla</strong><div class="station-state" id="state6">Unregistered</div></div>
-        <div class="station-card" id="task7"><strong>Modulo B</strong><div class="station-state" id="state7">Unregistered</div></div>
-        <div class="station-card" id="task8"><strong>DEI</strong><div class="station-state" id="state8">Unregistered</div></div>
-      </div>
     </section>
 
     <section class="contact-info">
@@ -59,7 +50,7 @@
       <p style="margin-top:1rem;color:var(--muted);font-size:0.9rem;">¿Tienes problemas? Escribenos al correo: naldana@uca.edu.sv</p>
     </section>
   </main>
-
+  
   <footer class="site-footer" role="contentinfo">
     <div class="container footer-inner">
       <small>© <span id="year"></span> ElektroCodx</small>
@@ -69,119 +60,7 @@
       </nav>
     </div>
   </footer>
-
-  <script>
-    const btnScan = document.getElementById('btn-scan-qr');
-    const btnStop = document.getElementById('btn-stop-qr');
-    const statusLine = document.getElementById('status-line');
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('qr-canvas');
-    const ctx = canvas.getContext('2d');
-    const audio = new Audio('https://www.soundjay.com/buttons/sounds/button-3.mp3');
-
-    const taskMap = {
-      "Task1": { el: document.getElementById('task1'), state: document.getElementById('state1') },
-      "Task2": { el: document.getElementById('task2'), state: document.getElementById('state2') },
-      "Task3": { el: document.getElementById('task3'), state: document.getElementById('state3') },
-      "Task4": { el: document.getElementById('task4'), state: document.getElementById('state4') },
-      "Task5": { el: document.getElementById('task5'), state: document.getElementById('state5') },
-      "Task6": { el: document.getElementById('task6'), state: document.getElementById('state6') },
-      "Task7": { el: document.getElementById('task7'), state: document.getElementById('state7') },
-      "Task8": { el: document.getElementById('task8'), state: document.getElementById('state8') }
-    };
-
-    let scanning = false;
-    let stream = null;
-
-    async function startCamera() {
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } } });
-        video.srcObject = stream;
-        video.hidden = false;
-        canvas.hidden = true; 
-        video.setAttribute('playsinline', true);
-        await video.play();
-        scanning = true;
-        btnStop.hidden = false;
-        btnStop.removeAttribute('aria-hidden');
-        btnScan.setAttribute('aria-pressed','true');
-        statusLine.textContent = 'Escaneando... apunta al QR';
-        requestAnimationFrame(tick);
-      } catch (err) {
-        console.error(err);
-        statusLine.textContent = 'No se pudo acceder a la cámara. Revisa permisos o intenta otro dispositivo.';
-        btnScan.removeAttribute('aria-pressed');
-        btnScan.hidden = false;
-        btnStop.hidden = true;
-        alertMessageForCameraError(err);
-      }
-    }
-
-    function alertMessageForCameraError(err){
-      if(err.name === 'NotAllowedError') alert('Permiso de cámara denegado. Actívalo en la configuración del navegador.');
-      else if(err.name === 'NotFoundError') alert('No se encontró una cámara en este dispositivo.');
-      else if(err.name === 'OverconstrainedError') alert('No existe la cámara solicitada (trasera). Prueba en otro dispositivo.');
-      else alert('Error accediendo a la cámara: ' + (err.message || err));
-    }
-
-    function stopCamera(){
-      scanning = false;
-      if(stream){
-        stream.getTracks().forEach(t => t.stop());
-        stream = null;
-      }
-      video.pause();
-      video.srcObject = null;
-      video.hidden = true;
-      btnStop.hidden = true;
-      btnStop.setAttribute('aria-hidden','true');
-      btnScan.hidden = false;
-      btnScan.setAttribute('aria-pressed','false');
-      statusLine.textContent = 'Escaneo detenido. Puedes reiniciarlo.';
-    }
-
-    function tick(){
-      if(!scanning) return;
-      if(video.readyState === video.HAVE_ENOUGH_DATA){
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        const imageData = ctx.getImageData(0,0,canvas.width,canvas.height);
-        const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "dontInvert" });
-
-        if(code && code.data){
-          handleScannedCode(code.data.trim());
-          return; 
-        }
-      }
-      requestAnimationFrame(tick);
-    }
-
-    function handleScannedCode(content){
-      scanning = false;
-      audio.play().catch(()=>{}); 
-      stopCamera();
-
-      const key = content; 
-      if(taskMap[key]){
-        taskMap[key].state.textContent = 'Visited';
-        taskMap[key].el.classList.add('done');
-        taskMap[key].state.classList.add('done');
-        statusLine.textContent = `Estación registrada: ${key}`;
-      } else {
-        alert('QR no reconocido: ' + content);
-        statusLine.textContent = 'QR no válido. Intenta de nuevo.';
-      }
-    }
-
-    btnScan.addEventListener('click', () => {
-      btnScan.hidden = true;
-      startCamera();
-    });
-    btnStop.addEventListener('click', stopCamera);
-
-    document.getElementById('year').textContent = new Date().getFullYear();
-  </script>
+  <script src="../assets/js/main.js"></script>
+  <script src="../assets/js/play.js"></script>
 </body>
 </html>

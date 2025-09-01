@@ -1,6 +1,5 @@
 
 let stations = JSON.parse(localStorage.getItem("stations")) || [];
-
 renderStations();
 
 function renderStations() {
@@ -60,7 +59,11 @@ function deleteStation(_uuid) {
         stations = stations.filter(station => station._uuid !== _uuid);
         localStorage.setItem("stations", JSON.stringify(stations));
         renderStations();
-    }
+    }    
+}    
+
+function cancelForm() {
+    document.getElementById("new-station-form").style.display = "none";
 }
 
 function seeStationInfo(_uuid) {
@@ -80,23 +83,35 @@ function seeStationInfo(_uuid) {
             colorDark : "#000000",
             colorLight : "#ffffff",
             correctLevel : QRCode.CorrectLevel.H
-        });
+        });    
     } else {
         document.getElementById("no-station-found-msg").style.display = "block";
-    }
-}
-
-function cancelForm() {
-    document.getElementById("new-station-form").style.display = "none";
-}
+    }    
+}    
 
 
 function downloadQR() {
     const canvas = document.querySelector("#qrcode canvas");
+    if (!canvas) {
+        alert("No se ha generado el QR todavía.");
+        return;
+    }
     const station = document.getElementById("station-name-info").textContent;
+    const margin = 20; // margen en píxeles
+    // Crear un nuevo canvas más grande
+    const newCanvas = document.createElement("canvas");
+    const ctx = newCanvas.getContext("2d");
+    newCanvas.width = canvas.width + margin * 2;
+    newCanvas.height = canvas.height + margin * 2;
+    // Fondo blanco
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, newCanvas.width, newCanvas.height);
+    // Dibujar el QR en el centro con margen
+    ctx.drawImage(canvas, margin, margin);
+    // Descargar
     const link = document.createElement("a");
     link.download = `${station}-QR.png`;
-    link.href = canvas.toDataURL("image/png");
+    link.href = newCanvas.toDataURL("image/png");
     link.click();
 }
 
