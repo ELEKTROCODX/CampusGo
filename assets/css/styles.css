@@ -222,6 +222,7 @@ a{ color:inherit }
 
 .btn { padding: 10px 20px; margin: 5px; border-radius: 8px; cursor: pointer; border: none; }
 .btn-primary { background: #007bff; color: white; }
+.btn-view { background: #17a2b8; color: white; border: none; }
 .btn-secondary { background: #f0f0f0; }
 .btn-edit { background: #ffc107; color: white; border: none; }
 .btn-delete { background: #dc3545; color: white; border: none; }

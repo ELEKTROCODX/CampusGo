@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="/assets/css/styles-admin.css" />
     <link rel="stylesheet" href="/assets/css/styles.css" />
     <link rel="icon" href="/assets/favicon.ico" />
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js" defer></script>
 	<script src="../assets/js/jquery.min.js"></script>
 	<script src="../assets/js/qrcode.js"></script>
 </head>
@@ -42,9 +41,17 @@
 	</section>
   <section id="new-station-form">
     <input type="hidden" id="editIndex">
-    <input type="text" class="inputForm" id="stationName" placeholder="Nombre de la estación" required>
+    <input type="text" class="inputForm" id="station-name-form" placeholder="Nombre de la estación" required>
     <button class="btn btn-primary" onclick="saveStation()">Guardar</button>
     <button class="btn btn-secondary" onclick="cancelForm()">Cancelar</button>
+  </section>
+  <section id="see-station-info">
+    <h2 id="no-station-found-msg">No se encontró la estación proporcionada</h2>
+    <h2 id="station-name-info"></h2>
+    <p id="station-id-info"></p>
+    <div id="qrcode"></div>
+    <button class="btn btn-download" onclick="downloadQR()">Descargar QR</button>
+    <button class="btn btn-back" onclick="hideStationInfo()">Ocultar</button>
   </section>
   <section class="contact-info">
     <hr>
