@@ -40,17 +40,17 @@
 		</div>
 	</section>
   <section id="new-station-form">
-    <input type="hidden" id="editIndex">
+    <input type="hidden" id="edit-uuid">
     <input type="text" class="inputForm" id="station-name-form" placeholder="Nombre de la estación" required>
     <button class="btn btn-primary" onclick="saveStation()">Guardar</button>
     <button class="btn btn-secondary" onclick="cancelForm()">Cancelar</button>
   </section>
-  <section id="see-station-info">
+  <section id="see-station-info" style="display: none;">
     <h2 id="no-station-found-msg">No se encontró la estación proporcionada</h2>
     <h2 id="station-name-info"></h2>
-    <p id="station-id-info"></p>
+    <p id="station-id-info" style="display: none;"></p>
     <div id="qrcode"></div>
-    <button class="btn btn-download" onclick="downloadQR()">Descargar QR</button>
+    <button class="btn btn-download" onclick="downloadQR()" id="download-QR">Descargar QR</button>
     <button class="btn btn-back" onclick="hideStationInfo()">Ocultar</button>
   </section>
   <section class="contact-info">
