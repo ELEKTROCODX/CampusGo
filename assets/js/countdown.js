@@ -1,13 +1,17 @@
 
 // Event starts at Nov 29, 2025
 // Counter ends exactly at 6:00 PM UTC-6
-const eventStartDate = new Date("2025-11-29T00:00:00");
-// Access countdown elements
+const eventStartDate = new Date("2025-09-11T18:00:00");
+// Access countdown element
 let countdownDays = document.getElementById("countdownDays");
 let countdownHours = document.getElementById("countdownHours");
 let countdownMinutes = document.getElementById("countdownMinutes");
 let countdownSeconds = document.getElementById("countdownSeconds");
-
+// Access countdown labels
+let countdownDaysLabel = document.getElementById("countdownDaysLabel");
+let countdownHoursLabel = document.getElementById("countdownHoursLabel");
+let countdownMinutesLabel = document.getElementById("countdownMinutesLabel");
+let countdownSecondsLabel = document.getElementById("countdownSecondsLabel");
 function updateCountdown() {
     let now = new Date();
     let timeDifference = eventStartDate - now;
@@ -16,13 +20,18 @@ function updateCountdown() {
         let days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
         if(days < 1) {
             countdownDays.style.display = "none";
+            countdownDaysLabel.style.display = "none";
             countdownSeconds.style.display = "block";
+            countdownHoursLabel.style.display = "block";
         } else if(days < 10) {
             countdownDays.innerHTML = "0" + days;
-            //countdownSeconds.style.display = "none";
+            countdownSeconds.style.display = "none";
+            countdownSecondsLabel.style.display = "none";
+
         } else {
             countdownDays.innerHTML = days;
-            //countdownSeconds.style.display = "none";
+            countdownSeconds.style.display = "none";
+            countdownSecondsLabel.style.display = "none";
         }
         let hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         if(hours < 10) {
