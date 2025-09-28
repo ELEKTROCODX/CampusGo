@@ -53,10 +53,10 @@ function CountdownPage() {
                 </div>
             </div>
 
-            <button className="countdown-btn" onClick={() => navigate("/landing")}>
+            <button className="countdown-btn" onClick={() => navigate("/welcome")}>
                 ¡Muy pronto!
             </button>
-            <p className="countdown-message">Te invitamos a que descubras la nueva experiencia que hemos diseñando para ti.</p>
+            <p className="countdown-message">Te invitamos a que descubras la nueva experiencia que hemos <b>diseñando</b> para ti.</p>
 
         </div>
     );
