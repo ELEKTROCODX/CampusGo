@@ -120,6 +120,7 @@ function downloadQR() {
         return;
     }
     const station = document.getElementById("station-name-info").textContent;
+    const stationId = document.getElementById("station-id-info").textContent;
     const margin = 20; // margen en píxeles
     // Crear un nuevo canvas más grande
     const newCanvas = document.createElement("canvas");
@@ -133,7 +134,7 @@ function downloadQR() {
     ctx.drawImage(canvas, margin, margin);
     // Descargar
     const link = document.createElement("a");
-    link.download = `${station}-QR.png`;
+    link.download = `${stationId}-QR.png`;
     link.href = newCanvas.toDataURL("image/png");
     link.click();
 }
