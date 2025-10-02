@@ -5,7 +5,7 @@ import jsQR from "jsqr";
 export function useQRScanner(onScan) {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
-  const [stream, setStream] = useState(null);
+  const streamRef = useRef(null);
   const [scanning, setScanning] = useState(false);
 
   useEffect(() => {
@@ -17,7 +17,7 @@ export function useQRScanner(onScan) {
       const newStream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: { ideal: "environment" } },
       });
-      setStream(newStream);
+      streamRef.current = newStream;
       if (videoRef.current) {
         videoRef.current.srcObject = newStream;
         await videoRef.current.play();
@@ -31,9 +31,9 @@ export function useQRScanner(onScan) {
 
   function stopCamera() {
     setScanning(false);
-    if (stream) {
-      stream.getTracks().forEach((t) => t.stop());
-      setStream(null);
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
     }
   }
 
