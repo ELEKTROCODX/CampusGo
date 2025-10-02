@@ -9,6 +9,8 @@ function renderStations() {
         container.innerHTML += `
           <div class="station-card">
           <strong>${obj.name}</strong>
+          <p>ID: ${obj._uuid}</p>
+          <p>${obj.location}</p>
             <div class="station-actions">
                 <button class="btn btn-view" onclick="seeStationInfo('${obj._uuid}')"><i class="fa-solid fa-eye"></i></button>
                 <button class="btn btn-edit" onclick="editStation('${obj._uuid}')"><i class="fa-solid fa-pencil"></i></button>
@@ -22,25 +24,41 @@ function renderStations() {
 
 function showCreateForm() {
     document.getElementById("new-station-form").style.display = "block";
+    document.getElementById("station-id-form").disabled = false;
     document.getElementById("edit-uuid").value = "";
+    document.getElementById("station-id-form").value = "";
     document.getElementById("station-name-form").value = "";
+    document.getElementById("station-location-form").value = "";
 }
 
 function saveStation() {
     // Generate ID
     let uuid = crypto.randomUUID();
+    document.getElementById("station-id-form").disabled = true;
     const name = document.getElementById("station-name-form").value;
-    const editUuid = document.getElementById("edit-uuid").value;
+    const id = document.getElementById("station-id-form").value;
+    const editId = document.getElementById("edit-uuid").value;
+    const location = document.getElementById("station-location-form").value;
     if (name.trim() === "") {
         alert("El nombre de la estación no puede estar vacío.");
         return;
     }
-    if(editUuid === "") {
-        stations.push({_uuid: uuid, name, status: "No visitado" });
-    } else {
-        const index = stations.findIndex(station => station._uuid === editUuid);
+    if (id.trim() === "") {
+        alert("El ID de la estación no puede estar vacío.");
+        return;
+    }
+    if (location.trim() === "") {
+        alert("La ubicación de la estación no puede estar vacía.");
+        return;
+    }
+    if(editId === "" && id === "") {
+        stations.push({_uuid: uuid, name, location, status: "No visitado" });
+    } else if(editId === "" && id !== "") {
+        stations.push({_uuid: id, name, location, status: "No visitado" });
+    }else {
+        const index = stations.findIndex(station => station._uuid === id);
         stations[index].name = name;
-
+        stations[index].location = location;
     }
     localStorage.setItem("stations", JSON.stringify(stations));
     document.getElementById("new-station-form").style.display = "none";
@@ -50,8 +68,11 @@ function saveStation() {
 
 function editStation(_uuid) {
     document.getElementById("new-station-form").style.display = "block";
+    document.getElementById("station-id-form").disabled = true;
     document.getElementById("edit-uuid").value = _uuid;
+    document.getElementById("station-id-form").value = _uuid;
     document.getElementById("station-name-form").value = stations.find(station => station._uuid === _uuid).name;
+    document.getElementById("station-location-form").value = stations.find(station => station._uuid === _uuid).location;
 }
 
 function deleteStation(_uuid) {
@@ -64,6 +85,8 @@ function deleteStation(_uuid) {
 
 function cancelForm() {
     document.getElementById("new-station-form").style.display = "none";
+    document.getElementById("station-id-form").disabled = false;
+
 }
 
 function seeStationInfo(_uuid) {
