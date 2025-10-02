@@ -30,10 +30,10 @@ function LandingPage() {
     const [showScanner, setShowScanner] = useState(false);
     const [stations, setStations] = useState(
       JSON.parse(localStorage.getItem("stations")) || [
-        { _uuid: "ceditec", name: "Microcharlas con expertos", location: "CEDITEC", status: "No visitado" },
-        { _uuid: "nzeb", name: "Experiencia interactiva", location: "NZEB", status: "No visitado" },
-        { _uuid: "icas1", name: "Exhibición de proyectos", location: "Atrio del ICAS", status: "No visitado" },
-        { _uuid: "icas2", name: "Proyección de cortos animados", location: "Atrio del ICAS", status: "No visitado" },
+        { _uuid: "microcharlas-expertos-ceditec", name: "Microcharlas con expertos", location: "CEDITEC", status: "No visitado" },
+        { _uuid: "experiencia-interactiva-nzeb", name: "Experiencia interactiva", location: "NZEB", status: "No visitado" },
+        { _uuid: "exhibicion-proyectos-icas", name: "Exhibición de proyectos", location: "Atrio del ICAS", status: "No visitado" },
+        { _uuid: "proyeccion-cortos-animados-icas", name: "Proyección de cortos animados", location: "Atrio del ICAS", status: "No visitado" },
       ]
   );
   useEffect(() => {
