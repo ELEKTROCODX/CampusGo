@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import QRScanner from "../components/QRScanner";
 import "./LandingPage.css";
 
 import Lema from "../assets/images/lema.png";
@@ -26,6 +27,27 @@ import Speaker4 from "../assets/ponents/persona.png";
 
 function LandingPage() {
     const navigate = useNavigate();
+    const [showScanner, setShowScanner] = useState(false);
+    const [stations, setStations] = useState(
+      JSON.parse(localStorage.getItem("stations")) || [
+        { _uuid: "ceditec", name: "Microcharlas con expertos", location: "CEDITEC", status: "No visitado" },
+        { _uuid: "nzeb", name: "Experiencia interactiva", location: "NZEB", status: "No visitado" },
+        { _uuid: "icas1", name: "Exhibición de proyectos", location: "Atrio del ICAS", status: "No visitado" },
+        { _uuid: "icas2", name: "Proyección de cortos animados", location: "Atrio del ICAS", status: "No visitado" },
+      ]
+  );
+  useEffect(() => {
+    localStorage.setItem("stations", JSON.stringify(stations));
+  }, [stations]);
+
+  function handleDetected(code) {
+    const updated = stations.map((s) =>
+      s._uuid === code ? { ...s, status: "Visitado" } : s
+    );
+    setStations(updated);
+    setShowScanner(false);
+    alert("¡Estación registrada!");
+  }
   return (
     <div className="landing-page-container">
       <img src={Sticker1} alt="Sticker de fondo 1" className="sticker fixed sticker-1" />
@@ -47,51 +69,38 @@ function LandingPage() {
           <div className="user-subtitle">¡Eres parte de nuestro primer evento de diseño!</div>
         </div>
       </section>
+       {showScanner && (
+        <QRScanner
+          onDetected={handleDetected}
+          onClose={() => setShowScanner(false)}
+        />
+      )}
+       <section className="section qr-section">
+        <h3>Escanea tu código QR</h3>
+        <p>para registrar tu asistencia y obtener tu certificado</p>
+        <button className="qr-button" onClick={() => setShowScanner(true)}>
+          Escanear QR
+        </button>
+      </section>
 
       <section className="section activities-section">
-        <div className="activity-card">
-          <div className="card-header">
-            <h3>Microcharlas con expertos</h3>
-            <div className="location-tag location-ceditec">
-              <img src={LocationIcon} alt="Icono de ubicación" className="location-icon" />
-              <span>CEDITEC</span>
+        {stations.map((s, i) => (
+          <div
+            key={s._uuid}
+            className={`activity-card ${s._uuid} ${s.status === "Visitado" ? "done" : ""}`}
+          >
+            <div className="card-header">
+              <h3>{s.name}</h3>
+                <div className={"location-tag location-"+(i+1)}>
+                <img src={LocationIcon} alt="Icono de ubicación" className="location-icon" />
+                <span>{s.location}</span>
+              </div>
+            </div>
+            <div className="card-checkbox">
+              {s.status === "Visitado" ? "✔" : "⏳"}
             </div>
           </div>
-          <div className="card-checkbox">
-          </div>
-        </div>
-
-        <div className="activity-card">
-          <div className="card-header">
-            <h3>Experiencia interactiva</h3>
-            <div className="location-tag location-nzeb">
-              <img src={LocationIcon} alt="Icono de ubicación" className="location-icon" />
-              <span>NZEB</span>
-            </div>
-          </div>
-          <div className="card-checkbox"></div>
-        </div>
-
-        <div className="activity-card">
-          <div className="card-header">
-            <h3>Exhibición de proyectos</h3>
-            <div className="location-tag location-icas">
-              <img src={LocationIcon} alt="Icono de ubicación" className="location-icon" />
-              <span>Atrio del ICAS</span>
-            </div>
-          </div>
-          <div className="card-checkbox"></div>
-        </div>
-        <div className="activity-card activity-card-projection">
-          <div className="card-header">
-            <h3>Proyección de cortos animados</h3>
-            <div className="location-tag location-icas-projection">
-              <img src={LocationIcon} alt="Icono de ubicación" className="location-icon" />
-              <span>Atrio del ICAS</span>
-            </div>
-          </div>
-          <div className="card-checkbox"></div>
-        </div>
+        ))}
       </section>
 
       <section className="section speakers-section">
