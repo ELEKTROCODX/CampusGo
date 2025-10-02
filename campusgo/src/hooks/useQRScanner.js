@@ -6,6 +6,7 @@ export function useQRScanner(onScan) {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
+  const scanningRef = useRef(false);
   const [scanning, setScanning] = useState(false);
 
   useEffect(() => {
@@ -23,6 +24,7 @@ export function useQRScanner(onScan) {
         await videoRef.current.play();
       }
       setScanning(true);
+      scanningRef.current = true;      
       tick();
     } catch (err) {
       alert("Error accediendo a la cámara: " + err.message);
@@ -31,6 +33,7 @@ export function useQRScanner(onScan) {
 
   function stopCamera() {
     setScanning(false);
+    scanningRef.current = false;
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((t) => t.stop());
       streamRef.current = null;
@@ -38,12 +41,12 @@ export function useQRScanner(onScan) {
   }
 
   function tick() {
-    if (!scanning || !videoRef.current || !canvasRef.current) return;
+    if (!scanningRef.current || !videoRef.current || !canvasRef.current) return;
 
     const video = videoRef.current;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-
+    
     if (video.readyState === video.HAVE_ENOUGH_DATA) {
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
@@ -51,8 +54,10 @@ export function useQRScanner(onScan) {
 
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       const code = jsQR(imageData.data, imageData.width, imageData.height);
-
+      
       if (code?.data) {
+        console.log("QR Code detected:", code.data.trim());
+        
         onScan(code.data.trim());
         stopCamera();
         return;
