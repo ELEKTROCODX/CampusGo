@@ -3,14 +3,19 @@ import { useNavigate } from "react-router-dom";
 import "./FormPage.css";
 import Sticker1 from "../assets/stickers/elemento1.png";
 import LogoUCA from "../assets/logo/06logotipo-60-aniversario-horizontalblanco-3762.png";
+import {messaging} from "../firebase/firebase"
+import { getToken } from "firebase/messaging";
+import { generateToken } from "../firebase/firebase";
 
 function FormPage() {
   const [step, setStep] = useState(1);
   const navigate = useNavigate();
-
-  const handlePermission = (allow) => {
-    if (allow) Notification.requestPermission();
-    navigate("/register");
+  const handlePermission = async () => { 
+    const success = await generateToken();
+    console.log("Success: ",success);
+    if(success){
+      navigate("/register");
+    }
   };
 
   const handleSkip = () => {
@@ -29,7 +34,7 @@ function FormPage() {
           Queremos guiarte en cada momento del evento, por lo que necesitamos tu permiso para enviarte notificaciones en tiempo real.
         </p>
       </div>
-      <button className="permission-start-btn" onClick={() => handlePermission(true)}>
+      <button className="permission-start-btn" onClick={handlePermission}>
         Permitir
       </button>
 
@@ -54,7 +59,7 @@ function FormPage() {
             <h3>¿Estás seguro de que quieres saltarte las notificaciones?</h3>
             <p>Si no aceptas, no podrás disfrutar de la experiencia completa.</p>
             <div className="permission-buttons">
-              <button onClick={() => handlePermission(true)}>Aceptar</button>
+              <button onClick={generateToken}>Aceptar</button>
               <button onClick={() => navigate("/register")}>No aceptar</button>
             </div>
           </div>

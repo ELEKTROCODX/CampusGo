@@ -1,0 +1,26 @@
+{
+  "files": {
+    "main.css": "/static/css/main.a29a1ad4.css",
+    "main.js": "/static/js/main.fe3c94d7.js",
+    "static/js/453.bea45603.chunk.js": "/static/js/453.bea45603.chunk.js",
+    "static/media/elemento5.png": "/static/media/elemento5.fdc93f557948eb25760d.png",
+    "static/media/elemento8.png": "/static/media/elemento8.8b6d85662a81c4b21ceb.png",
+    "static/media/elemento2.png": "/static/media/elemento2.4308bcee509ee24c0cfd.png",
+    "static/media/elemento6.png": "/static/media/elemento6.656e1d9d2faa98da9e90.png",
+    "static/media/lema.png": "/static/media/lema.a3116602669befd36260.png",
+    "static/media/elemento7.png": "/static/media/elemento7.0614df90ac537ea619ec.png",
+    "static/media/elemento4.png": "/static/media/elemento4.d8c576ee2b6d6b23602d.png",
+    "static/media/06logotipo-60-aniversario-horizontalblanco-3762.png": "/static/media/06logotipo-60-aniversario-horizontalblanco-3762.93ab319b703ded37ab2d.png",
+    "static/media/elemento1.png": "/static/media/elemento1.0fd37fb1e04ce3140e5b.png",
+    "static/media/elemento9.png": "/static/media/elemento9.b418e0e4bc11697c5266.png",
+    "static/media/persona.png": "/static/media/persona.f8a583966ab8acdae35f.png",
+    "index.html": "/index.html",
+    "main.a29a1ad4.css.map": "/static/css/main.a29a1ad4.css.map",
+    "main.fe3c94d7.js.map": "/static/js/main.fe3c94d7.js.map",
+    "453.bea45603.chunk.js.map": "/static/js/453.bea45603.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.a29a1ad4.css",
+    "static/js/main.fe3c94d7.js"
+  ]
+}

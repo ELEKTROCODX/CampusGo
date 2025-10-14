@@ -1,6 +1,9 @@
-import React, { useState } from "react";
+import React, { use, useState } from "react";
 import "./FormPage.css";
 import { useNavigate } from "react-router-dom";
+import { auth, db } from '../firebase/firebase';
+import { signInAnonymously } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
 import Sticker2 from "../assets/stickers/elemento2.png";
 import Sticker7 from "../assets/stickers/elemento7.png";
 import Sticker9 from "../assets/stickers/elemento9.png";
@@ -15,6 +18,9 @@ function FormPageTwo() {
     company: "",
   });
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
@@ -22,6 +28,45 @@ function FormPageTwo() {
     e.preventDefault();
     setStep(4);
   };
+
+  const handleRegistration = async (e) =>{
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    const{email,name,company} = formData;
+
+    try{
+      const userCredential = await signInAnonymously(auth);
+      const user = userCredential.user;
+
+      const fcmToken = localStorage.getItem('fcmToken');
+
+      const userData = {
+        name: name,
+        email: email,
+        company: company
+      }
+
+      if(fcmToken){
+        userData.fcmTokens = [fcmToken];
+        localStorage.removeItem('fcmToken');
+      }
+
+      await setDoc(doc(db, "Usuarios",user.uid), userData);
+      //Borrar console log luego
+      console.log("Usuario registrado y datos guardados: ", user.uid);
+
+      setLoading(false);
+      navigate('/landing');
+    }catch(error){
+      console.error("Error al registrar:", error.message);
+      setError(error.message);
+      setLoading(false);
+    }
+
+  }
+
 
   return (
     <div className="form-container">
@@ -31,7 +76,7 @@ function FormPageTwo() {
 
       {step === 3 && (
         <div className="login-container">
-          <form className="form-box" onSubmit={handleSubmit}>
+          <form className="form-box" onSubmit={handleRegistration}>
             <h2>Registro</h2>
             <input
               type="text"
