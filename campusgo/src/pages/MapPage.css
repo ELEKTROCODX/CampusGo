@@ -1,67 +1,111 @@
-:root {
-  --color-dark-bg: #091622;
-  --color-light-text: #ffffff;
-  --color-muted-text: rgba(255, 255, 255, 0.7);
-}
+/* ==========================================================================
+   ELIMINADO: El bloque :root fue borrado (ya está en index.css)
+   ========================================================================== */
 
-.map-page-container {
+/* ==========================================================================
+   MOBILE FIRST STYLES (< 768px)
+   ========================================================================== */
+
+.MapPage {
   position: relative;
-  width: 100%;
   min-height: 100vh;
-  padding: 4rem 1rem;
-  background-color: var(--color-dark-bg);
-  background-image: radial-gradient(circle at center, rgba(49, 66, 139, 0.2) 0%, var(--color-dark-bg) 80%);
+  padding: 2em 0rem;
   color: var(--color-light-text);
   text-align: center;
   display: flex;
   justify-content: center;
+  align-items: flex-start;   
+  font-family: 'Montserrat', sans-serif;
+  margin-bottom: 2em;
+  /* ELIMINADO: background-color y background-image (ahora en .page-background--radial-purple) */
 }
 
-.map-content {
-  max-width: 800px; 
-  width: 100%;
+.MapPage__content {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2rem;
+  z-index: 10;
+  width: 100%; /* Asegura que ocupe el ancho */
 }
 
-.map-logo {
-  width: 100px; 
-  margin-bottom: 1rem;
+.MapPage__logo {
+  width: 10em; 
+  margin-bottom: 0.5rem;
 }
 
-.map-title {
-  font-size: 1.8rem;
-  font-weight: 700;
+.MapPage__title {
+  font-size: 1.5rem; 
+  font-weight: 800;
   color: var(--color-light-text);
   margin: 0;
-  padding: 0 1rem;
+  padding: 0 0.5rem; 
+  line-height: 1.2;
 }
 
-.map-window {
-  width: 100%;
-  max-width: 760px;
-  height: 450px;
-  border-radius: 1rem;
-  overflow: hidden; 
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); 
-  border: 2px solid rgba(255, 255, 255, 0.1); 
+.MapPage__map-window {
+  width: 90vw; /* Usar width en lugar de max-width para que sea consistente */
+  height: 450px; 
+  border-radius: 1.5rem; 
+  overflow: hidden;   
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);   
+  border: 4px solid var(--color-primary-purple);
+  position: relative;
 }
 
-.map-window iframe {
-    width: 100%;
+.MapPage__map-window iframe {
     height: 100%;
+    width: 100%; /* Asegurar que el iframe llene el contenedor */
+    border: none;
 }
+
+/* ==========================================================================
+   ELIMINADO: .back-button y .back-button:hover (ahora en index.css)
+   ========================================================================== */
+
+/* ==========================================================================
+   TABLET STYLES (>= 768px)
+   ========================================================================== */
 
 @media (min-width: 768px) {
-  .map-page-container {
-    padding: 6rem 2rem;
+  .MapPage__map-window {
+    min-width: 70vw; /* Ajustado para mejor responsive */
+    min-height: 60vh;
+  }   
+  
+  .MapPage__title {
+    font-size: 2.5rem; 
   }
-  .map-title {
-    font-size: 2.5rem;
+      
+  .MapPage__map-window {
+    height: 600px; 
+    border-radius: 2rem;
   }
-  .map-window {
-    height: 600px;
+  
+  /* Los estilos de botón ya son globales y responsive */
+}
+
+/* ==========================================================================
+   DESKTOP STYLES (>= 1024px)
+   ========================================================================== */
+
+@media (min-width: 1024px) {
+  .MapPage {
+    align-items: center; 
+  }
+    
+  .MapPage__content {
+    gap: 3rem;
+  }
+    
+  .MapPage__title {
+    font-size: 2rem; 
+  }
+
+  .MapPage__map-window {
+    width: 800px; /* Ancho fijo para desktop */
+    max-width: 90vw; /* Pero sin pasarse */
+    height: 450px; 
+    border-width: 5px; 
   }
 }

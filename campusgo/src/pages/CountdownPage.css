@@ -1,5 +1,5 @@
 /* Mobile First */
-.countdown-container {
+.CountdownPage {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -7,95 +7,117 @@
   padding: 20px;
   text-align: center;
   min-height: 100vh;
-  background-color: #091622;
-  background-image: radial-gradient(circle at center, #31428B 0%, #091622 70%);
-  background-repeat: no-repeat;
-  background-size: cover;
 }
 
-
-.countdown-logo {
+.CountdownPage__logo {
   width: 15em;
   height: auto;
   margin-bottom: 20px;
 }
 
-.countdown-title {
+.CountdownPage__title {
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 30px;
   color: #ffffff;
 }
 
-.countdown-timer {
+.CountdownPage__timer {
   display: flex;
-  gap: 15px;
+  gap: 5px;
   margin-bottom: 20px;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
 }
 
-.time-box {
-  background-color: #E0E8FF;
+.CountdownPage__time-box {
+  background-color: #E0E8FF; 
   padding: 15px 20px;
   border-radius: 10px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
   max-width: 60px;
   min-height: 60px;
-  display: flex;           
-  flex-direction: column;  
+  display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
-.time {
+.CountdownPage__time-value {
   font-size: 28px;
   font-weight: bold;
   color: #091622;
 }
 
-.label {
+.CountdownPage__time-label {
   display: block;
   font-size: 12px;
   color: #091622;
   margin-top: 4px;
 }
 
-.countdown-message {
+.CountdownPage__message {
   font-size: 1.5em;
   margin-bottom: 30px;
   color: #ffffff;
 }
 
-.countdown-btn {
-  background-color: #F08A00; 
-  color: white;
-  border: none;
-  border-radius: 20px;       
-  padding: 14px 30px;        
-  font-size: 20px;          
-  font-weight: bold;         
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-
-.countdown-btn:hover {
-  background-color: #d97800; 
-}
-
+/* Tablet Styles */
 @media(min-width: 768px) {
-  .countdown-title {
+  .CountdownPage__logo {
+    width: 18em;
+  }
+  .CountdownPage__title {
     font-size: 32px;
   }
-
-  .time {
+  .CountdownPage__time-value {
     font-size: 36px;
   }
+  .CountdownPage__time-box {
+    max-width: 80px;
+    min-height: 80px;
+    padding: 20px 25px;
+  }
+  .CountdownPage__time-label {
+    font-size: 14px;
+  }
+  .CountdownPage__message {
+    margin-top: 2em;
+    font-size: 1.8em;
+  }
+}
 
-  .countdown-btn {
-    font-size: 18px;
-    padding: 14px 30px;
+/* Desktop Styles */
+@media(min-width: 1024px) {
+  .CountdownPage {
+    padding: 0px;
+  }
+  .CountdownPage__logo {
+    width: 15em;
+    margin-bottom: 30px;
+  }
+  .CountdownPage__title {
+    font-size: 30px;
+    margin-bottom: 40px;
+  }
+  .CountdownPage__timer {
+    gap: 25px;
+    margin-bottom: 30px;
+  }
+  .CountdownPage__time-box {
+    max-width: 100px;
+    min-height: 50px;
+    padding: 25px 30px;
+  }
+  .CountdownPage__time-value {
+    font-size: 42px;
+  }
+  .CountdownPage__time-label {
+    font-size: 16px;
+  }
+  .CountdownPage__message {
+    font-size: 1em;
+    margin-bottom: 40px;
   }
 }

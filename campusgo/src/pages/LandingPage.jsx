@@ -1,23 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import QRScanner from "../components/QRScanner";
-import "./LandingPage.css";
+import "./LandingPage.css"; 
+import './QRScanner.css';
 
+// Importar nuevos componentes
+import ActivityCard from "../components/ActivityCard/ActivityCard";
+import SpeakerCard from "../components/SpeakerCard/SpeakerCard";
+import Footer from "../components/Footer/Footer"; // <-- 1. IMPORTADO
+
+// (El resto de tus importaciones de assets...)
 import Lema from "../assets/images/lema.png";
 import LogoUCA from "../assets/logo/06logotipo-60-aniversario-horizontalblanco-3762.png";
-import Sticker1 from "../assets/stickers/elemento8.png"; 
-import Sticker2 from "../assets/stickers/elemento6.png"; 
-import Sticker3 from "../assets/stickers/elemento7.png"; 
+import Sticker1 from "../assets/stickers/elemento8.png";
+import Sticker2 from "../assets/stickers/elemento6.png";
+import Sticker3 from "../assets/stickers/elemento7.png"; // (Asegúrate de tener todas tus importaciones de stickers)
 import Sticker4 from "../assets/stickers/elemento4.png";
 import Sticker5 from "../assets/stickers/elemento5.png";
 
-import Mapa from "../assets/stickers/elemento2.png"; 
-import LocationIcon from "../assets/icons/location.png"; 
-import FacebookIcon from "../assets/icons/facebook.png";
-import InstagramIcon from "../assets/icons/instagram.png";
-import TikTokIcon from "../assets/icons/tiktok.png";
-import XIcon from "../assets/icons/twitter.png"; 
-import YoutubeIcon from "../assets/icons/youtube.png";
+import Mapa from "../assets/stickers/elemento2.png";
+// 2. ELIMINADAS las importaciones de FacebookIcon, InstagramIcon, etc.
+// El componente Footer ya se encarga de ellas.
 
 import Speaker1 from "../assets/ponents/persona.png";
 import Speaker2 from "../assets/ponents/persona.png";
@@ -50,121 +53,77 @@ function LandingPage() {
   }
   return (
     <div className="landing-page-container">
+      {/* (Stickers) */}
       <img src={Sticker1} alt="Sticker de fondo 1" className="sticker fixed sticker-1" />
       <img src={Sticker2} alt="Sticker de fondo 2" className="sticker fixed sticker-2" />
       <img src={Sticker3} alt="Sticker de fondo 3" className="sticker fixed sticker-3" />
       <img src={Sticker4} alt="Sticker de fondo 4" className="sticker fixed sticker-4" />
       <img src={Sticker5} alt="Sticker de fondo 5" className="sticker fixed sticker-5" />
 
-      <section className="section welcome-section">
-        <img src={LogoUCA} alt="Logo UCA 60 Aniversario" className="welcome-logo" />
-        <img src={Lema} alt="Lema El Diseño se toma la UCA" className="welcome-lema" />
-        <div className="tags-row">
-          <span className="tag tag-arq">ARQ</span>
-          <span className="tag tag-medp">MeDP</span>
-          <span className="tag tag-led">LeD</span>
+      {/* --- SECCIÓN DE BIENVENIDA --- */}
+      <section className="page-section welcome-section">
+        <img src={LogoUCA} alt="Logo UCA 60 Aniversario" className="logo" />
+        <img src={Lema} alt="Lema El Diseño se toma la UCA" className="welcome-section__lema" />
+        <div className="welcome-section__tags">
+          <span className="tag tag--arq">ARQ</span>
+          <span className="tag tag--medp">MeDP</span>
+          <span className="tag tag--led">LeD</span>
         </div>
-        <div className="user-greeting">
-          <div className="user-name">{}</div>
-          <div className="user-subtitle">¡Eres parte de nuestro primer evento de diseño!</div>
+        <div className="welcome-section__greeting">
+          <div className="welcome-section__user-name">{ }</div>
+          <div className="welcome-section__subtitle">¡Eres parte de nuestro primer evento de diseño!</div>
         </div>
       </section>
-       {showScanner && (
+
+      {/* (Scanner) */}
+      {showScanner && (
         <QRScanner
           onDetected={handleDetected}
           onClose={() => setShowScanner(false)}
         />
       )}
-       <section className="section qr-section">
-        <h3>Escanea tu código QR</h3>
-        <p>para registrar tu asistencia y obtener tu certificado</p>
-        <button className="qr-button" onClick={() => setShowScanner(true)}>
+
+      {/* --- SECCIÓN QR --- */}
+      <section className="page-section qr-section">
+        <h3 className="qr-section__title">Escanea tu código QR</h3>
+        <p className="qr-section__subtitle">para registrar tu asistencia y obtener tu certificado</p>
+        <button className="btn btn-acento" onClick={() => setShowScanner(true)}>
           Escanear QR
         </button>
       </section>
 
-      <section className="section activities-section">
+      {/* --- SECCIÓN ACTIVIDADES --- */}
+      <section className="page-section activities-section">
         {stations.map((s, i) => (
-          <div
-            key={s._uuid}
-            className={`activity-card ${s._uuid} ${s.status === "Visitado" ? "done" : ""}`}
-          >
-            <div className="card-header">
-              <h3>{s.name}</h3>
-                <div className={"location-tag location-"+(i+1)}>
-                <img src={LocationIcon} alt="Icono de ubicación" className="location-icon" />
-                <span>{s.location}</span>
-              </div>
-            </div>
-            <div className="card-checkbox">
-              {s.status === "Visitado" ? "✔" : "⏳"}
-            </div>
-          </div>
+          <ActivityCard key={s._uuid} station={s} index={i} />
         ))}
       </section>
 
-      <section className="section speakers-section">
-        
-
-        <h2>Conoce a nuestros ponentes</h2>
-        <div className="speakers-grid">
-          <div className="speaker-card">
-            <img src={Speaker1} alt="Ponente 1" className="speaker-img" />
-            <div className="speaker-info">
-              <span className="speaker-name">Nombre Apellido</span>
-              <span className="speaker-role">Cargo o profesión</span>
-            </div>
-          </div>
-          <div className="speaker-card">
-            <img src={Speaker2} alt="Ponente 2" className="speaker-img" />
-            <div className="speaker-info">
-              <span className="speaker-name">Nombre Apellido</span>
-              <span className="speaker-role">Cargo o profesión</span>
-            </div>
-          </div>
-          <div className="speaker-card">
-            <img src={Speaker3} alt="Ponente 3" className="speaker-img" />
-            <div className="speaker-info">
-              <span className="speaker-name">Nombre Apellido</span>
-              <span className="speaker-role">Cargo o profesión</span>
-            </div>
-          </div>
-          <div className="speaker-card">
-            <img src={Speaker4} alt="Ponente 4" className="speaker-img" />
-            <div className="speaker-info">
-              <span className="speaker-name">Nombre Apellido</span>
-              <span className="speaker-role">Cargo o profesión</span>
-            </div>
-          </div>
+      {/* --- SECCIÓN PONENTES --- */}
+      <section className="page-section speakers-section">
+        <h2 className="speakers-section__title">Conoce a nuestros ponentes</h2>
+        <div className="speakers-section__grid">
+          <SpeakerCard name="Nombre Apellido" role="Cargo o profesión" imgSrc={Speaker1} style={{ gridColumn: '1 / 2' }} />
+          <SpeakerCard name="Nombre Apellido" role="Cargo o profesión" imgSrc={Speaker2} style={{ gridColumn: '2 / 3', marginTop: '130px' }} />
+          <SpeakerCard name="Nombre Apellido" role="Cargo o profesión" imgSrc={Speaker3} style={{ gridColumn: '2 / 3', marginTop: '12px' }} />
+          <SpeakerCard name="Nombre Apellido" role="Cargo o profesión" imgSrc={Speaker4} style={{ gridColumn: '1 / 2', marginTop: '-415px' }} />
         </div>
       </section>
 
-      <section className="section info-section">
-        
+      {/* --- SECCIÓN INFO --- */}
+      <section className="page-section info-section">
         <div className="map-section">
-        <h2 className="text">¿Cómo llegar a las exposiciones?</h2>
-          <img src={Mapa} alt="Mapa del evento" className="map-image" />
-          <button className="map-button" onClick={() => navigate("/map")}>Ver mapa</button>
+          <h2 className="map-section__title">¿Cómo llegar a las exposiciones?</h2>
+          <img src={Mapa} alt="Mapa del evento" className="map-section__image" />
+          <button className="btn btn-secondary" onClick={() => navigate("/map")}>Ver mapa</button>
         </div>
 
-        <div className="social-media-section">
-          <p>Mantente al día de las novedades que vienen en</p>
-          <p className="design-uca-text">Diseño UCA</p>
-          <h3>Síguenos en nuestras redes</h3>
-          <div className="social-icons">
-            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer"><img src={FacebookIcon} alt="Facebook" /></a>
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer"><img src={InstagramIcon} alt="Instagram" /></a>
-            <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer"><img src={TikTokIcon} alt="TikTok" /></a>
-            <a href="https://x.com" target="_blank" rel="noopener noreferrer"><img src={XIcon} alt="X" /></a>
-            <a href="https://youtube.com" target="_blank" rel="noopener noreferrer"><img src={YoutubeIcon} alt="YouTube" /></a>
-          </div>
-        </div>
-
-        <footer className="footer-info">
-          <p>Universidad Centroamericana José Simeón Cañas</p>
-          <p>Todos los derechos reservados</p>
-        </footer>
+        {/* 3. BLOQUES DE SOCIAL MEDIA Y FOOTER ELIMINADOS DE AQUÍ */}
+        
       </section>
+
+      {/* 4. COMPONENTE FOOTER AÑADIDO AL FINAL */}
+      <Footer />
     </div>
   );
 }

@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "./CountdownPage.css";
 import Logo from "../assets/logo/06logotipo-60-aniversario-horizontalblanco-3762.png";
 
 function CountdownPage() {
     const navigate = useNavigate();
-
-    const targetDate = new Date("2025-10-30T10:00:00");
+    const targetDate = new Date("2025-11-21T10:00:00"); // Lógica del contador (sin cambios)
     const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
     useEffect(() => {
@@ -30,33 +29,52 @@ function CountdownPage() {
     }, [targetDate]);
 
     return (
-        <div className="countdown-container">
-            <img src={Logo} alt="Logo" className="countdown-logo" />
-            <h1 className="countdown-title">¡Prepárate para el lanzamiento!</h1>
+        // 2. Aplicar BEM y la nueva clase de fondo
+        <div className="CountdownPage page-background--radial">
+            
+            {/* 3. Usar Link para navegación interna */}
+            <Link to="/">
+                <img src={Logo} alt="Logo" className="logo" />
+            </Link>
+            <h1 className="CountdownPage__title">¡Prepárate para el lanzamiento!</h1>
 
-            <div className="countdown-timer">
-                <div className="time-box">
-                    <span className="time">{timeLeft.days}</span>
-                    <span className="label">Días</span>
+            <div className="CountdownPage__timer">
+                <div className="CountdownPage__time-box">
+                    <span className="CountdownPage__time-value">{timeLeft.days}</span>
+                    <span className="CountdownPage__time-label">Días</span>
                 </div>
-                <div className="time-box">
-                    <span className="time">{timeLeft.hours}</span>
-                    <span className="label">Horas</span>
+                <div className="CountdownPage__time-box">
+                    <span className="CountdownPage__time-value">{timeLeft.hours}</span>
+                    <span className="CountdownPage__time-label">Horas</span>
                 </div>
-                <div className="time-box">
-                    <span className="time">{timeLeft.minutes}</span>
-                    <span className="label">Min</span>
+                <div className="CountdownPage__time-box">
+                    <span className="CountdownPage__time-value">{timeLeft.minutes}</span>
+                    <span className="CountdownPage__time-label">Min</span>
                 </div>
-                <div className="time-box">
-                    <span className="time">{timeLeft.seconds}</span>
-                    <span className="label">Seg</span>
+                <div className="CountdownPage__time-box">
+                    <span className="CountdownPage__time-value">{timeLeft.seconds}</span>
+                    <span className="CountdownPage__time-label">Seg</span>
                 </div>
             </div>
 
-            <button className="countdown-btn" onClick={() => navigate("/welcome")}>
-                ¡Muy pronto!
+            {/* 4. Usar la clase de botón global */}
+            <button
+                className="btn btn-acento"
+                onClick={() => {
+                    const now = new Date();
+                    if (now >= targetDate) {
+                        navigate("/welcome");
+                    } else {
+                        navigate("/subscribe");
+                    }
+                }}
+            >
+                {new Date() >= targetDate ? "Entrar al evento" : "¡Inscríbete Ya!"}
             </button>
-            <p className="countdown-message">Te invitamos a que descubras la nueva experiencia que hemos <b>diseñando</b> para ti.</p>
+
+            <p className="CountdownPage__message">
+                Te invitamos a que descubras la nueva experiencia que hemos <b>diseñando</b> para ti.
+            </p>
 
         </div>
     );

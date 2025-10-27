@@ -1,0 +1,177 @@
+/* ============================================
+   SUBSCRIBE PAGE - DISEÑO UCA 2025
+   ============================================ */
+
+.SubscribePage {
+  min-height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  text-align: center;
+  padding: 1em 1em;
+}
+
+.SubscribePage__content {
+  position: relative;
+  z-index: 2;
+  max-width: 350px;
+  width: 100%;
+}
+
+.SubscribePage__step {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%; /* Asegurar que el step llene el contenido */
+}
+
+.SubscribePage__step h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.4;
+}
+
+.SubscribePage__step p {
+  color: #ccc;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.SubscribePage__event-info {
+  margin: 1rem 0;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+/* ======================================================
+   ELIMINADO: .subscribe-btn, .subscribe-btn:hover,
+   form input, form input::placeholder
+   (Ahora son globales)
+   ====================================================== */
+
+/* Stickers */
+.SubscribePage__sticker {
+  position: absolute;
+  opacity: 0.25;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.SubscribePage__sticker--planet {
+  top: 1%;
+  right: 5%;
+  width: 100px;
+  transform: rotate(15deg);
+}
+
+.SubscribePage__sticker--cat {
+  bottom:-3%;
+  left: 6%;
+  width: 110px;
+  transform: rotate(-15deg);
+}
+
+.SubscribePage__sticker--cassette {
+  top: 45%;
+  right: 5%;
+  width: 100px;
+  transform: rotate(15deg);
+}
+
+.SubscribePage__sticker--wifi {
+  top: 10%;
+  left: 6%;
+  width: 110px;
+  transform: rotate(-15deg);
+}
+
+/* Indicadores */
+.SubscribePage__step-indicator {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 2em;
+  margin-bottom: 1rem;
+}
+
+.SubscribePage__step-dot {
+  width: 18px;
+  height: 4px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.SubscribePage__step-dot--active {
+  background-color: var(--color-orange-button);
+}
+
+/* Animación */
+.SubscribePage__fade-in {
+  animation: SubscribePage__fade-in 0.5s ease forwards;
+}
+
+@keyframes SubscribePage__fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* TABLET */
+@media (min-width: 768px) {
+  .SubscribePage {
+    padding: 1em 1em;
+  }
+  .SubscribePage__logo {
+    width: 180px;
+  }
+  .SubscribePage__step h2 {
+    font-size: 1.6rem;
+  }
+  .SubscribePage__content {
+    max-width: 450px; /* Ajustar el contenedor del formulario */
+  }
+}
+
+/* DESKTOP */
+@media (min-width: 1024px) {
+  .SubscribePage {
+    padding: 1em 1em;
+    /* Sobrescribir el fondo global con la versión de desktop */
+    background-image: radial-gradient(circle at 30% top, #2c3f7c 0%, #091622 85%);
+  }
+  .SubscribePage__logo {
+    width: 220px;
+  }
+  .SubscribePage__step h2 {
+    font-size: 1.8rem;
+  }
+  .SubscribePage__step p {
+    font-size: 1.05rem;
+  }
+  .SubscribePage__sticker--cassette {
+    top: 10%;
+    right: 10%;
+    width: 130px;
+  }
+  .SubscribePage__sticker--cat { /* 'leaf' se llamaba 'cat' en el HTML */
+    bottom: 10%;
+    left: 8%;
+    width: 130px;
+  }
+  .SubscribePage__content {
+    max-width: 520px; /* Ajustar el contenedor del formulario */
+  }
+}

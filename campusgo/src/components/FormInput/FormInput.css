@@ -1,0 +1,32 @@
+.FormInput {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 0.5rem; /* Espacio entre label e input */
+}
+
+.FormInput__label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-light-text);
+  margin-left: 0.5rem;
+}
+
+.FormInput__input {
+  width: 100%;
+  padding: 0.9rem 1rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  outline: none;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-weight: 500;
+  transition: background 0.3s ease, transform 0.2s ease;
+  box-sizing: border-box; /* Asegura que el padding no rompa el layout */
+}
+
+.FormInput__input:focus {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.02);
+}

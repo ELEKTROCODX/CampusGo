@@ -1,0 +1,73 @@
+/* Estilos internos de la tarjeta de actividad */
+.ActivityCard {
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ActivityCard--done {
+  border-color: var(--color-success);
+  box-shadow: 0 0 15px rgba(76, 175, 80, 0.2);
+}
+
+.ActivityCard__header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.ActivityCard__title {
+  margin: 0;
+  font-size: 1.8em; /* Ajustado para mejor legibilidad */
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--color-light-text);
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+/* Checkbox */
+.ActivityCard__checkbox {
+  min-width: 32px;
+  height: 32px;
+  border: none;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  transition: all 0.3s ease;
+  margin-left: 1.5rem;
+}
+
+.ActivityCard--done .ActivityCard__checkbox {
+  background-color: var(--color-light-text);
+  color: var(--color-success);
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+}
+
+/* Tag de Ubicación (Componente anidado) */
+.LocationTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-top: 0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.LocationTag__icon {
+  width: 14px;
+  height: 14px;
+}
+
+.LocationTag--1 { background-color: var(--color-primary-purple); color: var(--color-light-text); }
+.LocationTag--2 { background-color: var(--color-secondary-blue); color: var(--color-light-text); }
+.LocationTag--3, .LocationTag--4 { background-color: var(--color-tertiary-green); color: var(--color-dark-bg); }
