@@ -38,12 +38,21 @@ function LandingPage() {
   }, [stations]);
 
   function handleDetected(code) {
-    const updated = stations.map((s) =>
-      s._uuid === code ? { ...s, status: "Visitado" } : s
-    );
+    let stationFound = false;
+    const updated = stations.map((s) => {      
+      if(s._uuid == code){
+        stationFound = true;
+        alert(`¡Has visitado la estación: ${s.name}!`);
+        return { ...s, status: "Visitado" };
+      } else {
+        return s;
+      }
+    });
+    if(!stationFound){
+      alert("Código QR no reconocido. Por favor, intenta nuevamente.");
+    }
     setStations(updated);
     setShowScanner(false);
-    alert("¡Estación registrada!");
   }
   return (
     <div className="landing-page-container">
