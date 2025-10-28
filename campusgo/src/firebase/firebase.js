@@ -15,6 +15,28 @@ const firebaseConfig = {
     measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
 }
 
+const urlBase64ToUint8Array = (base64String) => {
+    // Reemplaza caracteres URL-safe y rellena
+    const base64 = base64String
+        .replace(/-/g, '+') // Cambia '-' por '+'
+        .replace(/_/g, '/'); // Cambia '_' por '/'
+    
+    // Asegura el relleno Base64 (padding)
+    const base64Padded = base64.length % 4 === 0 
+        ? base64 
+        : base64 + '='.repeat(4 - (base64.length % 4));
+
+    // Decodifica la cadena Base64 estándar
+    const rawData = window.atob(base64Padded);
+    
+    // Crea el Uint8Array
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+};
+
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const messaging = getMessaging(app);
@@ -25,8 +47,10 @@ export const generateToken = async () => {
     console.log(permission);
     
     if(permission === "granted"){
+            const vapidKey = process.env.REACT_APP_VAPID_KEY;
+            console.log("vapid:",vapidKey);
         const token = await getToken(messaging, {
-            vapidKey: process.env.REACT_APP_VAPID_KEY
+            vapidKey: ""
         });
         
         console.log(token);
