@@ -1,29 +1,19 @@
-/* Mobile First */
 
-/* ELIMINADO: .landing-container (ahora en FormLayout) */
-/* ELIMINADO: .landing-header (ahora en FormLayout) */
-/* ELIMINADO: .landing-logo (ahora en FormLayout) */
-/* ELIMINADO: .landing-main (ahora en FormLayout) */
-/* ELIMINADO: .landing-btn (ahora es .btn .btn-acento) */
-
-
-/* Estilos BEM específicos de WelcomePage */
 .WelcomePage__lema {
   width: 18em;
   max-width: 90%;
   margin-bottom: 1rem;
-  z-index: 2; /* Asegurar que esté sobre stickers */
+  z-index: 2;
 }
 
 .WelcomePage__title {
   font-size: 1.5rem;
   margin-bottom: 1rem;
   color: #ffffff;
-  z-index: 2; /* Asegurar que esté sobre stickers */
-  margin-top: 1.5em; /* Espacio que daba el .landing-btn */
+  z-index: 2; 
+  margin-top: 1.5em; 
 }
 
-/* Sticker animation */
 @keyframes WelcomePage-sticker-enter {
   0% {
     transform: translateY(-20px) rotate(0deg);
@@ -35,7 +25,6 @@
   }
 }
 
-/* Stickers - Mobile First */
 .WelcomePage__sticker {
   position: absolute;
   z-index: 1;
@@ -45,7 +34,6 @@
   animation: WelcomePage-sticker-enter 1s ease forwards;
 }
 
-/* Sticker positions - Mobile */
 .WelcomePage__sticker--1 {
   top: 5%;
   right: 5%;
@@ -67,7 +55,6 @@
   --rotate: -20deg;
 }
 
-/* Tablet */
 @media(min-width: 768px) {
   .WelcomePage__lema {
     width: 40em;
@@ -76,7 +63,7 @@
     font-size: 2rem;
   }
   .WelcomePage__sticker {
-    max-width: 12em; /* Corregido de tu CSS original */
+    max-width: 12em;
   }
   .WelcomePage__sticker--1 { top: 10%; right: 1%; }
   .WelcomePage__sticker--2 { top: 15%; left: 2%; }
@@ -84,7 +71,6 @@
   .WelcomePage__sticker--4 { bottom: 3%; left: 3%; }
 }
 
-/* Desktop */
 @media(min-width: 1024px) {
   .WelcomePage__lema {
     width: 30em;

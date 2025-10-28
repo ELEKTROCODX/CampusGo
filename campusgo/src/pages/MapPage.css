@@ -1,11 +1,3 @@
-/* ==========================================================================
-   ELIMINADO: El bloque :root fue borrado (ya está en index.css)
-   ========================================================================== */
-
-/* ==========================================================================
-   MOBILE FIRST STYLES (< 768px)
-   ========================================================================== */
-
 .MapPage {
   position: relative;
   min-height: 100vh;
@@ -17,7 +9,6 @@
   align-items: flex-start;   
   font-family: 'Montserrat', sans-serif;
   margin-bottom: 2em;
-  /* ELIMINADO: background-color y background-image (ahora en .page-background--radial-purple) */
 }
 
 .MapPage__content {
@@ -26,7 +17,7 @@
   align-items: center;
   gap: 2rem;
   z-index: 10;
-  width: 100%; /* Asegura que ocupe el ancho */
+  width: 100%;
 }
 
 .MapPage__logo {
@@ -44,7 +35,7 @@
 }
 
 .MapPage__map-window {
-  width: 90vw; /* Usar width en lugar de max-width para que sea consistente */
+  width: 90vw; 
   height: 450px; 
   border-radius: 1.5rem; 
   overflow: hidden;   
@@ -55,21 +46,13 @@
 
 .MapPage__map-window iframe {
     height: 100%;
-    width: 100%; /* Asegurar que el iframe llene el contenedor */
+    width: 100%; 
     border: none;
 }
 
-/* ==========================================================================
-   ELIMINADO: .back-button y .back-button:hover (ahora en index.css)
-   ========================================================================== */
-
-/* ==========================================================================
-   TABLET STYLES (>= 768px)
-   ========================================================================== */
-
 @media (min-width: 768px) {
   .MapPage__map-window {
-    min-width: 70vw; /* Ajustado para mejor responsive */
+    min-width: 70vw; 
     min-height: 60vh;
   }   
   
@@ -81,13 +64,7 @@
     height: 600px; 
     border-radius: 2rem;
   }
-  
-  /* Los estilos de botón ya son globales y responsive */
 }
-
-/* ==========================================================================
-   DESKTOP STYLES (>= 1024px)
-   ========================================================================== */
 
 @media (min-width: 1024px) {
   .MapPage {
@@ -103,8 +80,8 @@
   }
 
   .MapPage__map-window {
-    width: 800px; /* Ancho fijo para desktop */
-    max-width: 90vw; /* Pero sin pasarse */
+    width: 800px; 
+    max-width: 90vw; 
     height: 450px; 
     border-width: 5px; 
   }

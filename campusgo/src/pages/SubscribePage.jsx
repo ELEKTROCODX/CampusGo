@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom"; // 1. Importar Link
-import "./SubscribePage.css"; // CSS Limpio
+import { useNavigate, Link } from "react-router-dom"; 
+import "./SubscribePage.css"; 
 import Logo from "../assets/logo/06logotipo-60-aniversario-horizontalblanco-3762.png";
 import sticker1 from "../assets/stickers/elemento4.png";
 import sticker2 from "../assets/stickers/elemento6.png";
@@ -60,7 +60,6 @@ function SubscribePage() {
                             <p><strong>Lugar:</strong><br />UCA Edificio CEDITEC</p>
                         </div>
 
-                        {/* 6. Usar botón global */}
                         <button className="btn btn-acento" onClick={handleNext}>
                             Quiero participar
                         </button>
@@ -72,10 +71,7 @@ function SubscribePage() {
                         <h2>Crear perfil</h2>
                         <p>Este perfil nos ayudará a saber el total de participantes y a preparar las sorpresas del evento</p>
 
-                        {/* 7. REFACTORIZACIÓN COMPLETA DEL FORMULARIO */}
                         <form className="card card--form" onSubmit={handleFormSubmit}>
-                            {/* El H2 "Crear perfil" es opcional, card--form ya tiene uno */}
-                            {/* <h2>Crear perfil</h2> */}
                             
                             <FormInput
                                 label="Nombre y apellido*"
@@ -126,7 +122,6 @@ function SubscribePage() {
                 )}
             </div>
 
-            {/* 9. Indicador de paso con BEM */}
             <div className="SubscribePage__step-indicator">
                 <span className={`SubscribePage__step-dot ${currentStep === 1 ? "SubscribePage__step-dot--active" : ""}`}></span>
                 <span className={`SubscribePage__step-dot ${currentStep === 2 ? "SubscribePage__step-dot--active" : ""}`}></span>

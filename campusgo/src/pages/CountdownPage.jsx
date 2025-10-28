@@ -29,10 +29,8 @@ function CountdownPage() {
     }, [targetDate]);
 
     return (
-        // 2. Aplicar BEM y la nueva clase de fondo
         <div className="CountdownPage page-background--radial">
             
-            {/* 3. Usar Link para navegación interna */}
             <Link to="/">
                 <img src={Logo} alt="Logo" className="logo" />
             </Link>
@@ -57,7 +55,6 @@ function CountdownPage() {
                 </div>
             </div>
 
-            {/* 4. Usar la clase de botón global */}
             <button
                 className="btn btn-acento"
                 onClick={() => {

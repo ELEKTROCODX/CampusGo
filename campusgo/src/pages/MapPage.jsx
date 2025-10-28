@@ -1,19 +1,17 @@
 import React from 'react';
-import './MapPage.css'; // CSS Limpio
+import './MapPage.css'; 
 import LogoUCA from '../assets/logo/06logotipo-60-aniversario-horizontalblanco-3762.png';
-import { Link, useNavigate } from 'react-router-dom'; // 1. Importar Link y useNavigate
+import { Link, useNavigate } from 'react-router-dom'; 
 
 function MapPage() {
-    const navigate = useNavigate(); // 2. Hook para el botón "atrás"
+    const navigate = useNavigate(); 
     const ucaMapEmbedUrl =
         "https://www.google.com/maps?q=Universidad+Centroamericana+José+Simeón+Cañas+(UCA),+El+Salvador&output=embed";
 
     return (
-        // 3. Usar BEM y la nueva clase de fondo global
         <div className="MapPage page-background--radial-purple">
             <div className="MapPage__content">
                 
-                {/* 4. Usar Link para navegación interna */}
                 <Link to="/">
                     <img src={LogoUCA} alt="Logo UCA 60 Aniversario" className="logo" />
                 </Link>
@@ -33,11 +31,7 @@ function MapPage() {
                     ></iframe>
                 </div>
 
-                {/* 5. Añadir el botón "atrás" y usar la clase global */}
-                <button 
-                    className="btn btn-outline-primary" 
-                    onClick={() => navigate(-1)} // Vuelve a la página anterior
-                >
+                <button className="btn btn-outline-primary" onClick={() => navigate(-1)}>
                     Regresar
                 </button>
 

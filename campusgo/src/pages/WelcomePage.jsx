@@ -1,13 +1,12 @@
 import React from "react";
-import { useNavigate, Link } from "react-router-dom"; // 1. Usar Link
-import "./WelcomePage.css"; // CSS limpio
+import { useNavigate, Link } from "react-router-dom"; 
+import "./WelcomePage.css"; 
 import Lema from "../assets/images/lema.png";
 import Sticker1 from "../assets/stickers/elemento1.png";
 import Sticker2 from "../assets/stickers/elemento2.png";
 import Sticker7 from "../assets/stickers/elemento7.png";
 import Sticker9 from "../assets/stickers/elemento9.png";
 
-// 2. Importar el Layout que ya tiene el fondo y el logo
 import FormLayout from "../layouts/FormLayout/FormLayout";
 
 function WelcomePage() {

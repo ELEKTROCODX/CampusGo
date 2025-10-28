@@ -1,9 +1,6 @@
-/* src/index.css (ACTUALIZADO) */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap');
 
-/* 2. VARIABLES GLOBALES */
 :root {
-  /* Paleta del Proyecto */
   --color-dark-bg: #091622;
   --color-light-text: #ffffff;
   --color-muted-text: rgba(255, 255, 255, 0.7);
@@ -11,29 +8,22 @@
   --color-secondary-blue: #40B1D8;
   --color-tertiary-green: #96E060;
   --color-orange-button: #F08A00;
-  --card-bg-dark: rgba(255, 255, 255, 0.08); /* <-- Actualizado de tu CSS */
-  --card-border: rgba(255, 255, 255, 0.2); /* <-- Actualizado de tu CSS */
-  --color-success: #4caf50; 
+  --card-bg-dark: rgba(255, 255, 255, 0.08);
+  --card-border: rgba(255, 255, 255, 0.2);
+  --color-success: #4caf50;
   --color-danger: #ff5252;
   --color-transparent-dark: rgba(0, 0, 0, 0.6);
-
-  /* Paleta Institucional */
   --color-uca-azul: #004a99;
   --color-uca-dorado: #fdb913;
-  --color-duca-acento: #e85d04; 
-
-  /* Tipografía */
+  --color-duca-acento: #e85d04;
   --fuente-principal: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
   --fuente-codigo: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
   --tamano-fuente-base: 16px;
-
-  /* Layout y Efectos */
-  --radio-borde: 1.5rem; /* <-- Actualizado de tu CSS (era 8px) */
-  --sombra-caja: 0 8px 20px rgba(0, 0, 0, 0.3); /* <-- Sombra más sutil */
+  --radio-borde: 1.5rem;
+  --sombra-caja: 0 8px 20px rgba(0, 0, 0, 0.3);
   --max-ancho-contenido: 1200px;
 }
 
-/* 3. RESETS GLOBALES Y ESTILOS BASE */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -53,12 +43,9 @@ code {
   font-family: var(--fuente-codigo);
 }
 
-/* 4. CLASES DE UTILIDAD GLOBALES */
-
-/* --- Layout de Sección de Página --- */
 .page-section {
   padding: 4rem 1rem;
-  max-width: 400px; /* Base móvil */
+  max-width: 400px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -68,11 +55,10 @@ code {
   z-index: 10;
 }
 
-/* --- Tarjetas (Estilo base Glassmorphism) --- */
 .card {
   background-color: var(--card-bg-dark);
   backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px); /* Soporte Safari */
+  -webkit-backdrop-filter: blur(10px);
   border-radius: var(--radio-borde);
   border: 1px solid var(--card-border);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -84,79 +70,6 @@ code {
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
 }
 
-/* --- Botones --- */
-.btn {
-  display: inline-block;
-  padding: 0.8rem 2rem; /* <-- Ajustado a tu diseño */
-  font-family: var(--fuente-principal);
-  font-size: 1rem;
-  font-weight: 700;
-  text-decoration: none;
-  text-align: center;
-  border: none;
-  border-radius: 25px; /* <-- Ajustado a tu diseño */
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
-  color: var(--color-light-text);
-  text-transform: uppercase;
-}
-
-.btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-}
-
-/* Variación Primaria (Purple) */
-.btn-primario {
-  background-color: var(--color-primary-purple);
-}
-.btn-primario:hover { background-color: #5a52e0; }
-
-/* Variación de Acento (Orange) */
-.btn-acento {
-  background-color: var(--color-orange-button);
-  color: var(--color-light-text);
-}
-.btn-acento:hover { background-color: #d97800; }
-
-/* --- ¡NUEVO! Variación Secundaria (Blue) --- */
-.btn-secondary {
-  background-color: var(--color-secondary-blue);
-  color: var(--color-dark-bg); /* <-- Texto oscuro para contraste */
-  box-shadow: 0 4px 10px rgba(64,177,216,0.4);
-}
-.btn-secondary:hover { background-color: #3498b9; }
-
-/* Variación Outline (Usa el texto claro) */
-.btn-outline {
-  background-color: transparent;
-  color: var(--color-light-text);
-  border: 2px solid var(--color-light-text);
-}
-.btn-outline:hover {
-  background-color: var(--color-light-text);
-  color: var(--color-dark-bg);
-}
-
-/* Media Queries para layout de sección */
-@media (min-width: 768px) {
-  .page-section {
-    max-width: 650px;
-    padding: 6rem 2rem;
-  }
-}
-@media (min-width: 1024px) {
-  .page-section {
-    max-width: 1000px;
-    padding: 8rem 2rem;
-  }
-}
-
-/* EN: src/index.css (AÑADIR AL FINAL) */
-
-/* ... (Todo tu CSS global y .btn) ... */
-
-/* Modificador de tarjeta para formularios */
 .card--form {
   padding: 2rem 1.5rem;
   max-width: 400px;
@@ -166,7 +79,6 @@ code {
   text-align: left;
   animation: fade-in 0.8s ease forwards;
 }
-
 .card--form h2 {
   font-size: 1.6rem;
   font-weight: 800;
@@ -176,7 +88,6 @@ code {
   letter-spacing: 0.5px;
 }
 
-/* Modificador de tarjeta para bienvenida */
 .card--welcome {
   padding: 2rem;
   max-width: 700px;
@@ -200,8 +111,105 @@ code {
   font-weight: 700;
 }
 
+.btn {
+  display: inline-block;
+  padding: 0.8rem 2rem;
+  font-family: var(--fuente-principal);
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  text-align: center;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  color: var(--color-light-text);
+  text-transform: uppercase;
+}
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
 
-/* Animación genérica de Fade-in */
+.btn-primario {
+  background-color: var(--color-primary-purple);
+}
+.btn-primario:hover { 
+  background-color: #5a52e0; 
+}
+
+.btn-acento {
+  background-color: var(--color-orange-button);
+  color: var(--color-light-text);
+}
+.btn-acento:hover { 
+  background-color: #d97800; 
+}
+
+.btn-secondary {
+  background-color: var(--color-secondary-blue);
+  color: var(--color-dark-bg);
+  box-shadow: 0 4px 10px rgba(64,177,216,0.4);
+}
+.btn-secondary:hover { 
+  background-color: #3498b9; 
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--color-light-text);
+  border: 2px solid var(--color-light-text);
+}
+.btn-outline:hover {
+  background-color: var(--color-light-text);
+  color: var(--color-dark-bg);
+}
+
+.btn-outline-primary {
+  background-color: transparent;
+  color: var(--color-primary-purple);
+  border: 2px solid var(--color-primary-purple);
+}
+.btn-outline-primary:hover {
+  background-color: var(--color-primary-purple);
+  color: var(--color-dark-bg);
+  box-shadow: 0 4px 15px rgba(108, 99, 255, 0.5);
+}
+
+.page-background--radial {
+  background-color: var(--color-dark-bg);
+  background-image: radial-gradient(circle at center, #31428B 0%, #091622 70%);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.page-background--radial-purple {
+  background-color: var(--color-dark-bg);
+  background-image: radial-gradient(circle at center, rgba(108, 99, 255, 0.1) 0%, var(--color-dark-bg) 80%);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.page-background--radial-dark {
+  background-color: var(--color-dark-bg);
+  background-image: radial-gradient(circle at top, #1b2e4a 0%, #091622 80%);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.page-background--radial-blue-top {
+  background-color: var(--color-dark-bg);
+  background-image: radial-gradient(circle at top, #1b2e4a 0%, #091622 85%);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.logo {
+  width: 140px;
+  margin-bottom: 1rem;
+  z-index: 3;
+}
+
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -213,8 +221,11 @@ code {
   }
 }
 
-/* Media Queries para estas tarjetas */
 @media (min-width: 768px) {
+  .page-section {
+    max-width: 650px;
+    padding: 6rem 2rem;
+  }
   .card--form {
     max-width: 450px;
     padding: 3rem 2.5rem;
@@ -226,6 +237,10 @@ code {
 }
 
 @media (min-width: 1024px) {
+  .page-section {
+    max-width: 1000px;
+    padding: 8rem 2rem;
+  }
   .card--form {
     max-width: 520px;
     padding: 3.5rem 3rem;
@@ -233,58 +248,4 @@ code {
   .card--form h2 {
     font-size: 2rem;
   }
-}
-
-/* --- Fondos de Página --- */
-.page-background--radial {
-  background-color: var(--color-dark-bg);
-  background-image: radial-gradient(circle at center, #31428B 0%, #091622 70%);
-  background-repeat: no-repeat;
-  background-size: cover;
-}
-
-/* EN: src/index.css (AÑADIR AL FINAL) */
-
-/* ... (Todo tu CSS global y fondos) ... */
-
-/* Nuevo Fondo de Página (Púrpura) */
-.page-background--radial-purple {
-  background-color: var(--color-dark-bg);
-  background-image: radial-gradient(circle at center, rgba(108, 99, 255, 0.1) 0%, var(--color-dark-bg) 80%);
-  background-repeat: no-repeat;
-  background-size: cover;
-}
-
-/* ¡NUEVA! Variación Outline Primario (Purple) */
-.btn-outline-primary {
-  background-color: transparent;
-  color: var(--color-primary-purple);
-  border: 2px solid var(--color-primary-purple);
-}
-.btn-outline-primary:hover {
-  background-color: var(--color-primary-purple);
-  color: var(--color-dark-bg); /* Texto oscuro para contraste */
-  box-shadow: 0 4px 15px rgba(108, 99, 255, 0.5);
-}
-
-/* Nuevo Fondo de Página (Post Evento) */
-.page-background--radial-dark {
-  background-color: var(--color-dark-bg);
-  background-image: radial-gradient(circle at top, #1b2e4a 0%, #091622 80%);
-  background-repeat: no-repeat;
-  background-size: cover;
-}
-
-/* Nuevo Fondo de Página (SubscribePage) */
-.page-background--radial-blue-top {
-  background-color: var(--color-dark-bg);
-  background-image: radial-gradient(circle at top, #1b2e4a 0%, #091622 85%);
-  background-repeat: no-repeat;
-  background-size: cover;
-}
-
-.logo{
-  width: 140px;
-  margin-bottom: 1rem;
-  z-index: 3;
 }

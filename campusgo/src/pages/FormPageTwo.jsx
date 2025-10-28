@@ -1,15 +1,13 @@
 import React, { useState } from "react";
-import "./FormPage.css"; // CSS limpio
+import "./FormPage.css"; 
 import { useNavigate } from "react-router-dom";
 import { auth, db } from '../firebase/firebase';
 import { signInAnonymously } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 
-// Importar nuevos componentes
 import FormLayout from "../layouts/FormLayout/FormLayout";
 import FormInput from "../components/FormInput/FormInput";
 
-// Importar stickers
 import Sticker2 from "../assets/stickers/elemento2.png";
 import Sticker7 from "../assets/stickers/elemento7.png";
 import Sticker9 from "../assets/stickers/elemento9.png";
@@ -17,8 +15,6 @@ import Sticker9 from "../assets/stickers/elemento9.png";
 function FormPageTwo() {
   const navigate = useNavigate();
   const [step, setStep] = useState(3);
-  // (Toda tu lógica de formData, loading, error, handleChange... está perfecta)
-  // ...
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -49,7 +45,7 @@ function FormPageTwo() {
       await setDoc(doc(db, "Usuarios", user.uid), userData);
       console.log("Usuario registrado y datos guardados: ", user.uid);
       setLoading(false);
-      setStep(4); // Cambiar al step 4 en lugar de navegar
+      setStep(4); 
     } catch (error) {
       console.error("Error al registrar:", error.message);
       setError(error.message);
@@ -65,7 +61,6 @@ function FormPageTwo() {
           <img src={Sticker7} alt="" className="WelcomeScreen__sticker sticker-2" />
           <img src={Sticker9} alt="" className="WelcomeScreen__sticker sticker-3" />
 
-          {/* Usamos la tarjeta global .card con el modificador .card--welcome */}
           <div className="card card--welcome">
             <h2>Bienvenido {formData.name}</h2>
             <p>
@@ -83,7 +78,6 @@ function FormPageTwo() {
               ¡Disfruta del evento y sé parte de la revolución del diseño en la
               UCA!
             </p>
-            {/* Usamos el botón global .btn-acento */}
             <button className="btn btn-acento" onClick={() => navigate("/landing")}>
               Comencemos
             </button>

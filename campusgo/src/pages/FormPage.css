@@ -10,7 +10,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.5rem; /* Aumentado para más espacio */
+  gap: 1.5rem; 
   padding: 1rem;
 }
 
@@ -20,8 +20,6 @@
   margin-bottom: 0.5rem;
   --rotate: 10deg;
   transform: rotate(var(--rotate));
-  /* La animación 'fade-slide-rotate' ahora está en FormLayout.css */
-  /* pero la aplicamos al ícono para el efecto deseado */
   animation: fade-slide-rotate 1s ease forwards;
 }
 
@@ -51,7 +49,6 @@
   text-decoration: underline;
 }
 
-/* Botones dentro del Modal */
 .PermissionScreen__modal-buttons {
   display: flex;
   flex-direction: column;
@@ -66,27 +63,21 @@
   max-width: 240px;
 }
 
-
-/* --- Bloque: RegisterScreen (FormPageTwo.jsx) --- */
-
 .RegisterScreen {
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
   max-width: 95vw;
-  flex-grow: 1; /* Ocupa el espacio disponible */
+  flex-grow: 1; 
 }
 
-/* Estilo para mensaje de error */
 .FormInput__error {
   color: var(--color-danger);
   font-size: 0.9rem;
   text-align: center;
   margin-top: 0.5rem;
 }
-
-/* --- Bloque: WelcomeScreen (FormPageTwo.jsx) --- */
 
 .WelcomeScreen {
   position: relative;
