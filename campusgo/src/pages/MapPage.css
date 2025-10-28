@@ -17,7 +17,7 @@
   align-items: flex-start;   
   font-family: 'Montserrat', sans-serif;
   margin-bottom: 2em;
-  /* ELIMINADO: background-color y background-image (ahora en .page-background--radial-purple) */
+  flex-direction: column;
 }
 
 .MapPage__content {

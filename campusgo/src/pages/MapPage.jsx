@@ -2,6 +2,8 @@ import React from 'react';
 import './MapPage.css'; // CSS Limpio
 import LogoUCA from '../assets/logo/06logotipo-60-aniversario-horizontalblanco-3762.png';
 import { Link, useNavigate } from 'react-router-dom'; // 1. Importar Link y useNavigate
+import Footer from "../components/Footer/Footer"; // <-- 1. IMPORTADO
+
 
 function MapPage() {
     const navigate = useNavigate(); // 2. Hook para el botón "atrás"
@@ -12,7 +14,7 @@ function MapPage() {
         // 3. Usar BEM y la nueva clase de fondo global
         <div className="MapPage page-background--radial-purple">
             <div className="MapPage__content">
-                
+
                 {/* 4. Usar Link para navegación interna */}
                 <Link to="/">
                     <img src={LogoUCA} alt="Logo UCA 60 Aniversario" className="logo" />
@@ -34,14 +36,15 @@ function MapPage() {
                 </div>
 
                 {/* 5. Añadir el botón "atrás" y usar la clase global */}
-                <button 
-                    className="btn btn-outline-primary" 
+                <button
+                    className="btn btn-outline-primary"
                     onClick={() => navigate(-1)} // Vuelve a la página anterior
                 >
                     Regresar
                 </button>
 
             </div>
+            <Footer></Footer>
         </div>
     );
 }

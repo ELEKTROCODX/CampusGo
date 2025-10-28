@@ -1,15 +1,14 @@
 .AppFooter {
-  /* Contenedor principal del footer */
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3rem;
-  padding: 2rem 1rem 4rem;
+  gap: 0.5em;
+  padding: 0.5em;
   max-width: 700px;
-  margin: 0 auto; /* Centrar el componente */
   z-index: 10;
   position: relative;
+  margin-top: 2em;
 }
 
 .SocialMedia { 
@@ -18,7 +17,7 @@
   align-items: center; 
   text-align: center; 
   width: 100%; 
-  gap: 0.75rem; 
+  gap: 0.5em; 
 }
 .SocialMedia p { 
   margin: 0; 
@@ -34,7 +33,6 @@
   font-size: 1rem; 
   font-weight: 400; 
   margin: 0; 
-  margin-bottom: 1rem; 
 }
 .SocialMedia__icons { 
   display: flex; 

@@ -2,16 +2,25 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "./CountdownPage.css";
 import Logo from "../assets/logo/06logotipo-60-aniversario-horizontalblanco-3762.png";
+import Footer from "../components/Footer/Footer"; // <-- 1. IMPORTADO
+
 
 function CountdownPage() {
     const navigate = useNavigate();
-    const targetDate = new Date("2025-11-21T10:00:00"); // Lógica del contador (sin cambios)
+    const targetDate = new Date("2025-11-26T10:00:00"); // Lógica del contador (sin cambios)
     const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+    const [Logged, setLogged] = useState(false);
 
     useEffect(() => {
         const interval = setInterval(() => {
             const now = new Date();
             const difference = targetDate - now;
+            const loggedUser = localStorage.getItem('userLog');
+
+            if(loggedUser){
+                setLogged(true);
+            }
+
 
             if (difference <= 0) {
                 clearInterval(interval);
@@ -31,7 +40,7 @@ function CountdownPage() {
     return (
         // 2. Aplicar BEM y la nueva clase de fondo
         <div className="CountdownPage page-background--radial">
-            
+
             {/* 3. Usar Link para navegación interna */}
             <Link to="/">
                 <img src={Logo} alt="Logo" className="logo" />
@@ -69,14 +78,15 @@ function CountdownPage() {
                     }
                 }}
             >
-                {new Date() >= targetDate ? "Entrar al evento" : "¡Inscríbete Ya!"}
+                {new Date() >= targetDate ? "Entrar al evento" :(Logged ? "Espera" : "¡Inscríbete Ya!") }
             </button>
 
             <p className="CountdownPage__message">
                 Te invitamos a que descubras la nueva experiencia que hemos <b>diseñando</b> para ti.
             </p>
-
+            <Footer />
         </div>
+
     );
 }
 

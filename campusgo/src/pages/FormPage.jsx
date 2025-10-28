@@ -6,6 +6,8 @@ import { generateToken } from "../firebase/firebase";
 
 import FormLayout from "../layouts/FormLayout/FormLayout";
 import Modal from "../components/Modal/Modal";
+import Footer from "../components/Footer/Footer"; // <-- 1. IMPORTADO
+
 
 function FormPage() {
   const [showModal, setShowModal] = useState(false); 
@@ -63,6 +65,7 @@ function FormPage() {
           </div>
         </Modal>
       )}
+    <Footer></Footer>
     </FormLayout>
   );
 }

@@ -9,6 +9,8 @@ import Sticker9 from "../assets/stickers/elemento9.png";
 
 // 2. Importar el Layout que ya tiene el fondo y el logo
 import FormLayout from "../layouts/FormLayout/FormLayout";
+import Footer from "../components/Footer/Footer"; // <-- 1. IMPORTADO
+
 
 function WelcomePage() {
   const navigate = useNavigate();
@@ -36,6 +38,7 @@ function WelcomePage() {
       <button className="btn btn-acento" onClick={() => navigate("/form")}>
         Comencemos
       </button>
+      <Footer></Footer>
     </FormLayout>
   );
 }

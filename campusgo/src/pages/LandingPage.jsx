@@ -118,11 +118,9 @@ function LandingPage() {
           <button className="btn btn-secondary" onClick={() => navigate("/map")}>Ver mapa</button>
         </div>
 
-        {/* 3. BLOQUES DE SOCIAL MEDIA Y FOOTER ELIMINADOS DE AQUÍ */}
         
       </section>
 
-      {/* 4. COMPONENTE FOOTER AÑADIDO AL FINAL */}
       <Footer />
     </div>
   );

@@ -43,7 +43,6 @@ function FormPageTwo() {
 
       if (fcmToken) {
         userData.fcmTokens = [fcmToken];
-        localStorage.removeItem('fcmToken');
       }
 
       await setDoc(doc(db, "Usuarios", user.uid), userData);

@@ -6,11 +6,15 @@ import sticker1 from "../assets/stickers/elemento4.png";
 import sticker2 from "../assets/stickers/elemento6.png";
 import sticker3 from "../assets/stickers/elemento7.png";
 import sticker4 from "../assets/stickers/elemento8.png";
-
+import { auth, db } from '../firebase/firebase';
+import { signInAnonymously } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
 import FormInput from "../components/FormInput/FormInput";
 
 function SubscribePage() {
     const [currentStep, setCurrentStep] = useState(1);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
@@ -29,6 +33,50 @@ function SubscribePage() {
         console.log("Formulario enviado:", formData);
         setCurrentStep(3);
     };
+
+    const handleRegistration = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError(null);
+        const {email, name, company} = formData;
+
+        try{
+            const userCredential = await signInAnonymously(auth);
+            const user = userCredential.user;
+
+            const fcmToken = localStorage.getItem('fcmToken');
+            const registrationDate = new Date().toISOString();
+
+            const userData = {
+                name,
+                email,
+                company: company || "N/A",
+                registeredAt: registrationDate,
+            };
+
+            if(fcmToken){
+                userData.fcmTokens = [fcmToken];
+            }
+
+            await setDoc(doc(db,"Usuarios",user.uid), userData);
+            console.log("Usuario registrado y datos guardados: ", user.uid);
+            localStorage.setItem('userLog',user.uid);
+
+            setCurrentStep(3);
+        }catch (err) {
+            console.error("Error al registrar:", err.message);
+            
+            // Si el error es un problema de permisos de Firestore, mostrar un mensaje amigable
+            if (err.code === 'permission-denied' || err.message.includes('insufficient permissions')) {
+                setError("Hubo un error de permisos. Asegúrate de que las reglas de Firestore están configuradas para 'create' en la colección 'Usuarios'.");
+            } else {
+                setError("Error en el registro: " + err.message);
+            }
+        } finally {
+            setLoading(false);
+        }
+
+    }
 
     const handleNext = () => {
         if (currentStep === 1) {
@@ -73,7 +121,7 @@ function SubscribePage() {
                         <p>Este perfil nos ayudará a saber el total de participantes y a preparar las sorpresas del evento</p>
 
                         {/* 7. REFACTORIZACIÓN COMPLETA DEL FORMULARIO */}
-                        <form className="card card--form" onSubmit={handleFormSubmit}>
+                        <form className="card card--form" onSubmit={handleRegistration}>
                             {/* El H2 "Crear perfil" es opcional, card--form ya tiene uno */}
                             {/* <h2>Crear perfil</h2> */}
                             
