@@ -6,10 +6,12 @@ import sticker1 from "../assets/stickers/elemento4.png";
 import sticker2 from "../assets/stickers/elemento6.png";
 import sticker3 from "../assets/stickers/elemento7.png";
 import sticker4 from "../assets/stickers/elemento8.png";
-import { auth, db } from '../firebase/firebase';
+import { auth, db, functions } from '../firebase/firebase';
 import { signInAnonymously } from 'firebase/auth';
 import { doc, runTransaction, setDoc, Transaction } from 'firebase/firestore';
 import FormInput from "../components/FormInput/FormInput";
+import { generateToken } from "../firebase/firebase";
+import { httpsCallable } from "firebase/functions";
 
 function SubscribePage() {
     const [currentStep, setCurrentStep] = useState(1);
@@ -17,6 +19,7 @@ function SubscribePage() {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
     const topics = ["Grupo_1", "Grupo_2","Grupo_3"];
+    const subscribeToTopicCallable = httpsCallable(functions,'subscribeUserToTopicCallable')
 
     const [formData, setFormData] = useState({
         name: "",
@@ -40,6 +43,7 @@ function SubscribePage() {
         setLoading(true);
         setError(null);
         const {email, name, company} = formData;
+        const success = await generateToken();
 
         try{
             const userCredential = await signInAnonymously(auth);
@@ -83,7 +87,13 @@ function SubscribePage() {
 
 
             if(fcmToken){
-                userData.fcmTokens = [fcmToken];
+                userData.fcmToken = fcmToken;
+                const result = await subscribeToTopicCallable({ 
+                    token: fcmToken, 
+                    topic: assignedTopic,
+                    userId: user.uid 
+                });
+                console.log("Result callable: ",result);
             }
             console.log("User a registrar: ", userData);
             await setDoc(doc(db,"Usuarios",user.uid), userData);

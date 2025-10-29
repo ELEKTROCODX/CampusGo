@@ -1,40 +1,46 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-
-// Inicializa el SDK de Admin. Esto le da acceso a la base de datos y a Messaging.
 admin.initializeApp();
 
-/**
- * Función que se dispara cada vez que se crea un nuevo documento
- * en la colección 'Usuarios'.
- * Lee el token de FCM y el tema asignado y suscribe el token al tema.
- */
-exports.subscribeUserToTopic = functions.firestore
-    .document('Usuarios/{userId}')
-    .onCreate(async (snap, context) => {
-        const userData = snap.data();
-        
-        // Verifica si existe el tema asignado (topic)
-        const topic = userData.topic;
-        
-        // Verifica si existe un token de FCM en el primer elemento del array fcmTokens
-        // Usamos el operador ternario para asegurarnos que userData.fcmTokens no sea nulo antes de acceder a [0]
-        const token = (userData.fcmTokens && userData.fcmTokens.length > 0) 
-            ? userData.fcmTokens[0] 
-            : null;
+// ESTA FUNCIÓN AHORA ES HTTPS CALLABLE
+// Recibe el 'token' y el 'topic' directamente desde la aplicación de React.
+exports.subscribeUserToTopicCallable = functions.https.onCall(async (data, context) => {
+    // 1. Verificar autenticación (práctica recomendada para funciones Callable)
+    if (!context.auth) {
+        throw new functions.https.HttpsError('unauthenticated', 'Solo usuarios autenticados pueden llamar a esta función.');
+    }
 
-        if (topic && token) {
-            try {
-                // LLAMADA SEGURA: Suscribe el token al tema de FCM
-                await admin.messaging().subscribeToTopic(token, topic);
-                console.log(`[EXITO] Token ${token} suscrito a tema: ${topic}`);
-            } catch (error) {
-                console.error(`[ERROR] Falló la suscripción al tema ${topic} para el token ${token}:`, error);
-            }
-        } else {
-            console.log(`Omite suscripción: Token (${!!token}) o Tema (${!!topic}) faltante.`);
-        }
+    // Espera 'token' (singular string) y 'topic' del payload del cliente.
+    const { token, topic, userId } = data; 
+
+    // --- LOG DE DIAGNÓSTICO ---
+    const logUserId = context.auth?.uid || userId || 'Anon'; 
+    console.log(`[START-CALLABLE] Invocación recibida para el usuario: ${logUserId}`);
+    console.log(`Datos recibidos: Token: ${token ? 'Presente' : 'Ausente'}, Tema: ${topic}`);
+    // -------------------------
+
+    // 2. Validación de datos
+    if (!token || typeof token !== 'string' || token.length === 0 || !topic) {
+        console.log("No hay token (o no es string) o tema para suscribir. Terminando Callable.");
+        return { success: true, message: "No se requirió suscripción." };
+    }
+
+    try {
+        // 3. Suscripción al tema
+        // admin.messaging().subscribeToTopic acepta un string (token singular).
+        const response = await admin.messaging().subscribeToTopic(token, topic);
         
-        // Siempre debe retornar un valor nulo o un Promise resuelto
-        return null;
-    });
+        console.log(`[SUCCESS] Éxito al suscribir el token al tema ${topic}.`);
+        
+        if (response.failureCount > 0) {
+            console.error("Fallo al suscribir el token:", response.errors);
+        }
+
+        return { success: true, message: "Suscripción a tema completada.", response: response };
+
+    } catch (error) {
+        console.error("[ERROR] Error general al intentar suscribir:", error);
+        // Lanza un error de HTTPS para que el cliente lo pueda capturar
+        throw new functions.https.HttpsError('internal', 'Fallo al procesar la suscripción.', error.message);
+    }
+});
