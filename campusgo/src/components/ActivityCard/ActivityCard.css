@@ -27,11 +27,13 @@
   text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 }
 
+/* --- Checkbox Actualizado --- */
+/* Estado NO VISITADO (Más sutil) */
 .ActivityCard__checkbox {
   min-width: 32px;
   height: 32px;
-  border: none;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: transparent; /* Fondo transparente */
+  border: 1px solid var(--card-border); /* Borde sutil */
   border-radius: 0.75rem;
   display: flex;
   justify-content: center;
@@ -40,13 +42,17 @@
   font-weight: 700;
   transition: all 0.3s ease;
   margin-left: 1.5rem;
+  color: transparent; /* Oculta el check por defecto */
 }
 
+/* Estado VISITADO (Más integrado) */
 .ActivityCard--done .ActivityCard__checkbox {
-  background-color: var(--color-light-text);
-  color: var(--color-success);
-  box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+  background-color: var(--color-success); /* Fondo verde */
+  color: var(--color-light-text); /* Check blanco */
+  border-color: var(--color-success); /* Borde verde (o border: none;) */
+  box-shadow: none; /* Sin sombra */
 }
+/* --- Fin Checkbox Actualizado --- */
 
 .LocationTag {
   display: inline-flex;

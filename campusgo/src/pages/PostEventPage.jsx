@@ -23,11 +23,11 @@ function PostEventPage() {
         </p>
 
         <h2 className="PostEventPage__quote">
-          Diseño UCA ha venido para quedarse…
+          El Diseño en la UCA ha venido para quedarse…
         </h2>
 
         <a
-          href="https://www.uca.edu.sv"
+          href="https://uca.edu.sv/carrera/licenciatura-en-diseno-semipresencial/"
           className="btn btn-acento" 
           target="_blank"
           rel="noopener noreferrer"

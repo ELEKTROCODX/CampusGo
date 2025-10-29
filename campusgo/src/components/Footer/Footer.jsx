@@ -9,8 +9,8 @@ function Footer() {
   return (
     <section className="AppFooter">
       <div className="SocialMedia">
-        <p>Mantente al día de las novedades</p>
-        <p className="SocialMedia__brand-text">Diseño UCA</p>
+        <p>Mantente al día de las novedades que vienen del</p>
+        <p className="SocialMedia__brand-text">DISEÑO UCA</p>
         <div className="SocialMedia__icons">
           <a href="https://facebook.com/" target="_blank" rel="noopener noreferrer"><img src={FacebookIcon} alt="Facebook" /></a>
           <a href="https://instagram.com/" target="_blank" rel="noopener noreferrer"><img src={InstagramIcon} alt="Instagram" /></a>

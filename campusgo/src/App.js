@@ -1,7 +1,11 @@
 import React, { useEffect } from "react";
 // 1. Importa Navigate para la redirección
-import { Routes, Route, Navigate } from "react-router-dom"; 
-import { postEventDate } from "./config.js"; 
+import { Routes, Route, Navigate } from "react-router-dom";
+import { postEventDate } from "./config.js";
+
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 // ... (Importaciones de tus páginas)
 import CountdownPage from "./pages/CountdownPage.jsx";
@@ -23,29 +27,45 @@ function App() {
     onMessage(messaging, (payload) => {
       console.log(payload);
     });
-  }, []); 
+  }, []);
 
   const now = new Date();
   const isAfterEvent = now >= postEventDate;
 
   return (
-    <Routes>
-      <Route path="/" element={<CountdownPage />} />
-      <Route path="/welcome" element={<WelcomePage />} />
-      <Route path="/form" element={<RegistrationPage />} />
-      <Route path="/register" element={<FormPageTwo />} />
-      <Route path="/landing" element={<LandingPage />} />
-      <Route path="/map" element={<MapPage />} />
-      <Route path="/subscribe" element={<SubscribePage />} />
+    <>
+      <Routes>
+        <Route path="/" element={<CountdownPage />} />
+        <Route path="/welcome" element={<WelcomePage />} />
+        <Route path="/form" element={<RegistrationPage />} />
+        <Route path="/register" element={<FormPageTwo />} />
+        <Route path="/landing" element={<LandingPage />} />
+        <Route path="/map" element={<MapPage />} />
+        <Route path="/subscribe" element={<SubscribePage />} />
 
-      <Route 
-        path="/pevent" 
-        element={ isAfterEvent ? <PostEventPage /> : <Navigate to="/" replace /> }
+        <Route
+          path="/pevent"
+          element={isAfterEvent ? <PostEventPage /> : <Navigate to="/" replace />}
+        />
+
+        {/* 3. Redirige a la raíz ("/") usando Navigate */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+
+
+      <ToastContainer
+        position="bottom-center" 
+        autoClose={3000} 
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark" 
       />
-      
-      {/* 3. Redirige a la raíz ("/") usando Navigate */}
-      <Route path="*" element={<Navigate to="/" replace />} /> 
-    </Routes>
+    </>
   );
 }
 

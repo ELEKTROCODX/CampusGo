@@ -12,7 +12,7 @@ import FormLayout from "../layouts/FormLayout/FormLayout";
 
 function WelcomePage() {
   const navigate = useNavigate();
-  const [pageMode, setPageMode] = useState('before'); 
+  const [pageMode, setPageMode] = useState('before');
 
   useEffect(() => {
     const now = new Date();
@@ -22,7 +22,7 @@ function WelcomePage() {
     } else if (now >= eventStartDate) {
       setPageMode('during');
     }
-  }, []); 
+  }, []);
 
   const stickers = [
     { src: Sticker1, id: 1 },
@@ -62,8 +62,25 @@ function WelcomePage() {
       <img src={Lema} alt="Lema" className="WelcomePage__lema" />
 
       {pageMode === 'before' && (
-        <h1 className="WelcomePage__title">¡Bienvenidos nuestro primer evento de diseño!</h1>
+        <>
+          <h1 className="WelcomePage__title">¡Bienvenidos a nuestro primer evento de diseño!</h1>
+
+          <div className="p-container">
+            <p className="WelcomePage__event-details">
+              Nos alegra que seas parte del primer evento de diseño de la UCA, tenemos preparado dinámicas para que conozcas un poco sobre como el diseño se toma la UCA.
+            </p>
+
+            <p className="WelcomePage__event-details">
+              Dentro de nuestra landing encontrarás toda la información necesaria sobre este evento y mantén tu móvil listo porque en cada dinámica deberas escanear un código QR para marcarla como visitada.
+            </p>
+
+            <p className="WelcomePage__event-details">
+              ¡Disfruta del evento y se parte de la revolución del diseño en la UCA!
+            </p>
+          </div>
+        </>
       )}
+
 
       {pageMode === 'during' && (
         <>
@@ -73,8 +90,8 @@ function WelcomePage() {
           </div>
         </>
       )}
-      
-      
+
+
       <button className="btn btn-acento" onClick={handleNavigate}>
         {getButtonText()}
       </button>

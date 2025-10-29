@@ -7,6 +7,7 @@
 }
 
 .WelcomePage__title {
+  text-align: center;
   font-size: 1.5rem;
   margin-bottom: 1rem;
   color: #ffffff;
@@ -69,6 +70,10 @@
   .WelcomePage__sticker--2 { top: 15%; left: 2%; }
   .WelcomePage__sticker--3 { bottom: 9%; right: 2%; }
   .WelcomePage__sticker--4 { bottom: 3%; left: 3%; }
+
+  .p-container{
+  padding: 1em 16em;
+}
 }
 
 @media(min-width: 1024px) {
@@ -88,12 +93,16 @@
 }
 
 .WelcomePage__event-details {
+  text-align: center;
   color: var(--color-light-text);
   margin-bottom: 1.5rem; 
 }
 
 .WelcomePage__event-details p {
-  margin: 0.5rem 0; 
+  text-align: center;
+  padding: 1em 2em;
+  margin: 1em; 
   font-size: 1.1rem;
   font-weight: 600;
 }
+
