@@ -19,5 +19,9 @@
     "ui": {
       "port": 4000
     }
-  }
+  },
+  "functions": {
+    "source": "functions",
+    "runtime": "nodejs18"
+  } 
 }

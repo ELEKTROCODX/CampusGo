@@ -8,7 +8,7 @@ import sticker3 from "../assets/stickers/elemento7.png";
 import sticker4 from "../assets/stickers/elemento8.png";
 import { auth, db } from '../firebase/firebase';
 import { signInAnonymously } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, runTransaction, setDoc, Transaction } from 'firebase/firestore';
 import FormInput from "../components/FormInput/FormInput";
 
 function SubscribePage() {
@@ -16,6 +16,7 @@ function SubscribePage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
+    const topics = ["Grupo_1", "Grupo_2","Grupo_3"];
 
     const [formData, setFormData] = useState({
         name: "",
@@ -47,21 +48,49 @@ function SubscribePage() {
             const fcmToken = localStorage.getItem('fcmToken');
             const registrationDate = new Date().toISOString();
 
+            let assignedTopic = null;
+
+            await runTransaction(db,async(Transaction) => {
+                const counterRef = doc(db,"Metadatos","asignacionTemas");
+                const counterDoc = await Transaction.get(counterRef);
+
+                let currentIndex = 0;
+                if(counterDoc.exists()){
+                    currentIndex = counterDoc.data().lastAssignedIndex;
+                }
+
+                assignedTopic = topics[currentIndex % topics.length];
+                const nextIndex = (currentIndex + 1) % topics.length;
+
+                if (counterDoc.exists()) {
+                    // Si el documento existe, actualiza el índice para el siguiente usuario
+                    Transaction.update(counterRef, { lastAssignedIndex: nextIndex });
+                } else {
+                    // Si es la primera vez (el documento no existe), crea el documento del contador
+                    Transaction.set(counterRef, { lastAssignedIndex: nextIndex });
+                }
+
+
+            })
+
             const userData = {
                 name,
                 email,
                 company: company || "N/A",
+                topic: assignedTopic,
                 registeredAt: registrationDate,
             };
+
 
             if(fcmToken){
                 userData.fcmTokens = [fcmToken];
             }
-
+            console.log("User a registrar: ", userData);
             await setDoc(doc(db,"Usuarios",user.uid), userData);
             console.log("Usuario registrado y datos guardados: ", user.uid);
             localStorage.setItem('userLog',user.uid);
-
+            console.log("Usuario registrado y asignado al tema:", assignedTopic);
+            
             setCurrentStep(3);
         }catch (err) {
             console.error("Error al registrar:", err.message);
