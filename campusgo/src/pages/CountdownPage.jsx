@@ -2,15 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "./CountdownPage.css";
 import Logo from "../assets/logo/06logotipo-60-aniversario-horizontalblanco-3762.png";
-import Footer from "../components/Footer/Footer"
-
+import Footer from "../components/Footer/Footer";
 import { eventStartDate, postEventDate } from "../config";
 
 
 function CountdownPage() {
     const navigate = useNavigate();
-
     const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+    const [Logged, setLogged] = useState(false);
 
     useEffect(() => {
         const now = new Date();
@@ -27,7 +26,12 @@ function CountdownPage() {
 
         const interval = setInterval(() => {
             const now = new Date();
-            const difference = eventStartDate - now;
+            const difference = targetDate - now;
+            const loggedUser = localStorage.getItem('userLog');
+
+            if(loggedUser){
+                setLogged(true);
+            }
 
             if (difference <= 0) {
                 clearInterval(interval);
@@ -47,7 +51,6 @@ function CountdownPage() {
 
     return (
         <div className="CountdownPage page-background--radial">
-
             <Link to="/">
                 <img src={Logo} alt="Logo" className="logo" />
             </Link>
@@ -76,16 +79,16 @@ function CountdownPage() {
                 className="btn btn-acento"
                 onClick={() => {
                     navigate("/subscribe");
-                }}
-            >
-                ¡Inscríbete Ya!
+                }}>
+                {new Date() >= targetDate ? "Entrar al evento" :(Logged ? "Espera" : "¡Inscríbete Ya!") }
             </button>
 
             <p className="CountdownPage__message">
                 Te invitamos a que descubras la nueva experiencia que hemos <b>diseñando</b> para ti.
             </p>
-            <Footer></Footer>
+            <Footer />
         </div>
+
     );
 }
 

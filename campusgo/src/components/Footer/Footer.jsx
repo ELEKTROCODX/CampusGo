@@ -12,9 +12,9 @@ function Footer() {
         <p>Mantente al día de las novedades que vienen del</p>
         <p className="SocialMedia__brand-text">DISEÑO UCA</p>
         <div className="SocialMedia__icons">
-          <a href="https://facebook.com/" target="_blank" rel="noopener noreferrer"><img src={FacebookIcon} alt="Facebook" /></a>
-          <a href="https://instagram.com/" target="_blank" rel="noopener noreferrer"><img src={InstagramIcon} alt="Instagram" /></a>
-          <a href="https://tiktok.com/" target="_blank" rel="noopener noreferrer"><img src={TikTokIcon} alt="TikTok" /></a>
+          <a href="https://facebook.com/departamentodeorganizacion.delespacio/?locale=es_LA" target="_blank" rel="noopener noreferrer"><img src={FacebookIcon} alt="Facebook" /></a>
+          <a href="https://instagram.com/ucadiseno/" target="_blank" rel="noopener noreferrer"><img src={InstagramIcon} alt="Instagram" /></a>
+          <a href="https://tiktok.com/@disenouca" target="_blank" rel="noopener noreferrer"><img src={TikTokIcon} alt="TikTok" /></a>
         </div>
       </div>
 

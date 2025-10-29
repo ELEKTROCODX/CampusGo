@@ -2,6 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getMessaging, getToken } from "firebase/messaging";
+import { getFunctions, httpsCallable } from 'firebase/functions';
 
 // Accessing environment variables using process.env
 const firebaseConfig = {
@@ -19,6 +20,7 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const messaging = getMessaging(app);
 export const db = getFirestore(app);
+export const functions = getFunctions(app,'us-central1');
 
 export const generateToken = async () => {
     const permission = await Notification.requestPermission();

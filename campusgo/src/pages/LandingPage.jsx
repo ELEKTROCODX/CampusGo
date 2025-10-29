@@ -142,9 +142,8 @@ function LandingPage() {
           <img src={Mapa} alt="Mapa del evento" className="map-section__image" />
           <button className="btn btn-secondary" onClick={() => navigate("/map")}>Ver mapa</button>
         </div>
-      </section>
-      
-      <Footer />
+      </section>      
+      <Footer/>
     </div>
   );
 }

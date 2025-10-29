@@ -7,20 +7,24 @@ import sticker1 from "../assets/stickers/elemento4.png";
 import sticker2 from "../assets/stickers/elemento6.png";
 import sticker3 from "../assets/stickers/elemento7.png";
 import sticker4 from "../assets/stickers/elemento8.png";
-
+import { auth, db, functions } from '../firebase/firebase';
+import { signInAnonymously } from 'firebase/auth';
+import { doc, runTransaction, setDoc, Transaction } from 'firebase/firestore';
 import FormInput from "../components/FormInput/FormInput";
+import { httpsCallable } from "firebase/functions";
 import { eventStartDate, postEventDate } from "../config"; 
-
 const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
 const timeOptions = { hour: 'numeric', minute: 'numeric', hour12: true };
-
 const friendlyDate = eventStartDate.toLocaleDateString("es-SV", dateOptions);
 const friendlyTime = eventStartDate.toLocaleTimeString("es-SV", timeOptions);
 
-
 function SubscribePage() {
     const [currentStep, setCurrentStep] = useState(1);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
     const navigate = useNavigate();
+    const topics = ["Grupo_1", "Grupo_2","Grupo_3"];
+    const subscribeToTopicCallable = httpsCallable(functions,'subscribeUserToTopicCallable')
 
     useEffect(() => {
         const now = new Date();
@@ -50,6 +54,82 @@ function SubscribePage() {
         console.log("Formulario enviado:", formData);
         setCurrentStep(3);
     };
+
+    const handleRegistration = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError(null);
+        const {email, name, company} = formData;
+
+        try{
+            const userCredential = await signInAnonymously(auth);
+            const user = userCredential.user;
+
+            const fcmToken = localStorage.getItem('fcmToken');
+            const registrationDate = new Date().toISOString();
+
+            let assignedTopic = null;
+
+            await runTransaction(db,async(Transaction) => {
+                const counterRef = doc(db,"Metadatos","asignacionTemas");
+                const counterDoc = await Transaction.get(counterRef);
+
+                let currentIndex = 0;
+                if(counterDoc.exists()){
+                    currentIndex = counterDoc.data().lastAssignedIndex;
+                }
+
+                assignedTopic = topics[currentIndex % topics.length];
+                const nextIndex = (currentIndex + 1) % topics.length;
+
+                if (counterDoc.exists()) {
+                    // Si el documento existe, actualiza el índice para el siguiente usuario
+                    Transaction.update(counterRef, { lastAssignedIndex: nextIndex });
+                } else {
+                    // Si es la primera vez (el documento no existe), crea el documento del contador
+                    Transaction.set(counterRef, { lastAssignedIndex: nextIndex });
+                }
+            })
+
+            const userData = {
+                name,
+                email,
+                company: company || "N/A",
+                topic: assignedTopic,
+                registeredAt: registrationDate,
+            };
+
+
+            if(fcmToken){
+                userData.fcmToken = fcmToken;
+                const result = await subscribeToTopicCallable({ 
+                    token: fcmToken, 
+                    topic: assignedTopic,
+                    userId: user.uid 
+                });
+                console.log("Result callable: ",result);
+            }
+            console.log("User a registrar: ", userData);
+            await setDoc(doc(db,"Usuarios",user.uid), userData);
+            console.log("Usuario registrado y datos guardados: ", user.uid);
+            localStorage.setItem('userLog',user.uid);
+            console.log("Usuario registrado y asignado al tema:", assignedTopic);
+            
+            setCurrentStep(3);
+        }catch (err) {
+            console.error("Error al registrar:", err.message);
+            
+            // Si el error es un problema de permisos de Firestore, mostrar un mensaje amigable
+            if (err.code === 'permission-denied' || err.message.includes('insufficient permissions')) {
+                setError("Hubo un error de permisos. Asegúrate de que las reglas de Firestore están configuradas para 'create' en la colección 'Usuarios'.");
+            } else {
+                setError("Error en el registro: " + err.message);
+            }
+        } finally {
+            setLoading(false);
+        }
+
+    }
 
     const handleNext = () => {
         if (currentStep === 1) {
@@ -91,9 +171,7 @@ function SubscribePage() {
                     <div className="SubscribePage__step SubscribePage__fade-in">
                         <h2>Crear perfil</h2>
                         <p>Este perfil nos ayudará a saber el total de participantes y a preparar las sorpresas del evento</p>
-
-                        <form className="card card--form" onSubmit={handleFormSubmit}>
-                            
+                        <form className="card card--form" onSubmit={handleRegistration}>
                             <FormInput
                                 label="Nombre y apellido*"
                                 name="name"
@@ -141,7 +219,6 @@ function SubscribePage() {
                     </div>
                 )}
             </div>
-
             <div className="SubscribePage__step-indicator">
                 <span className={`SubscribePage__step-dot ${currentStep === 1 ? "SubscribePage__step-dot--active" : ""}`}></span>
                 <span className={`SubscribePage__step-dot ${currentStep === 2 ? "SubscribePage__step-dot--active" : ""}`}></span>
