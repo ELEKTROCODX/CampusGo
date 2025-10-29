@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react"; // 1. Importar useEffect
 import { useNavigate, Link } from "react-router-dom"; 
 import "./SubscribePage.css"; 
+import Footer from "../components/Footer/Footer"
 import Logo from "../assets/logo/06logotipo-60-aniversario-horizontalblanco-3762.png";
 import sticker1 from "../assets/stickers/elemento4.png";
 import sticker2 from "../assets/stickers/elemento6.png";
@@ -8,10 +9,30 @@ import sticker3 from "../assets/stickers/elemento7.png";
 import sticker4 from "../assets/stickers/elemento8.png";
 
 import FormInput from "../components/FormInput/FormInput";
+import { eventStartDate, postEventDate } from "../config"; 
+
+const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+const timeOptions = { hour: 'numeric', minute: 'numeric', hour12: true };
+
+const friendlyDate = eventStartDate.toLocaleDateString("es-SV", dateOptions);
+const friendlyTime = eventStartDate.toLocaleTimeString("es-SV", timeOptions);
+
 
 function SubscribePage() {
     const [currentStep, setCurrentStep] = useState(1);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const now = new Date();
+
+        if (now >= postEventDate) {
+            // Si el evento ya terminó, no te puedes inscribir.
+            navigate("/pevent"); 
+        } else if (now >= eventStartDate) {
+            navigate("/welcome"); 
+        }
+        // Si es "antes", el useEffect no hace nada y la página se muestra.
+    }, [navigate]); 
 
     const [formData, setFormData] = useState({
         name: "",
@@ -56,7 +77,7 @@ function SubscribePage() {
                         <p>Te invitamos a que seas parte del primer evento de diseño de la UCA</p>
 
                         <div className="SubscribePage__event-info">
-                            <p><strong>Día y hora del evento:</strong><br />10 / Nov / 2025 – 7:00 AM</p>
+                            <p><strong>Día y hora del evento:</strong><br />{friendlyDate} – {friendlyTime}</p>
                             <p><strong>Lugar:</strong><br />UCA Edificio CEDITEC</p>
                         </div>
 
@@ -110,11 +131,10 @@ function SubscribePage() {
                         </p>
 
                         <div className="SubscribePage__event-info">
-                            <p><strong>Día y hora del evento:</strong><br />10 / Nov / 2025 – 7:00 AM</p>
+                            <p><strong>Día y hora del evento:</strong><br />{friendlyDate} – {friendlyTime}</p>
                             <p><strong>Lugar:</strong><br />UCA Edificio CEDITEC</p>
                         </div>
 
-                        {/* 8. Usar botón global */}
                         <button className="btn btn-acento" onClick={handleNext}>
                             Finalizar
                         </button>
@@ -127,6 +147,7 @@ function SubscribePage() {
                 <span className={`SubscribePage__step-dot ${currentStep === 2 ? "SubscribePage__step-dot--active" : ""}`}></span>
                 <span className={`SubscribePage__step-dot ${currentStep === 3 ? "SubscribePage__step-dot--active" : ""}`}></span>
             </div>
+            <Footer></Footer>
         </div>
     );
 }

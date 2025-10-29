@@ -15,7 +15,7 @@ function PostEventPage() {
       <img src={Sticker3} alt="Sticker 3" className="PostEventPage__sticker PostEventPage__sticker--3" />
 
       <div className="PostEventPage__content">
-        <img src={LogoUCA} alt="Logo UCA" className="logo" />
+        <img src={LogoUCA} alt="Logo UCA" className="PostEventPage__logo" />
 
         <h1 className="PostEventPage__title">Edición 2025</h1>
         <p className="PostEventPage__subtitle">

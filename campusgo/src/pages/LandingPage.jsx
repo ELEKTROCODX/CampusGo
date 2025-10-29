@@ -6,13 +6,13 @@ import './QRScanner.css';
 
 import ActivityCard from "../components/ActivityCard/ActivityCard";
 import SpeakerCard from "../components/SpeakerCard/SpeakerCard";
-import Footer from "../components/Footer/Footer"; // <-- 1. IMPORTADO
+import Footer from "../components/Footer/Footer"; 
 
 import Lema from "../assets/images/lema.png";
 import LogoUCA from "../assets/logo/06logotipo-60-aniversario-horizontalblanco-3762.png";
 import Sticker1 from "../assets/stickers/elemento8.png";
 import Sticker2 from "../assets/stickers/elemento6.png";
-import Sticker3 from "../assets/stickers/elemento7.png"; // (Asegúrate de tener todas tus importaciones de stickers)
+import Sticker3 from "../assets/stickers/elemento7.png"; 
 import Sticker4 from "../assets/stickers/elemento4.png";
 import Sticker5 from "../assets/stickers/elemento5.png";
 import Mapa from "../assets/stickers/elemento2.png";
@@ -40,7 +40,7 @@ function LandingPage() {
   function handleDetected(code) {
     let stationFound = false;
     const updated = stations.map((s) => {      
-      if(s._uuid == code){
+      if(s._uuid === code){
         stationFound = true;
         alert(`¡Has visitado la estación: ${s.name}!`);
         return { ...s, status: "Visitado" };

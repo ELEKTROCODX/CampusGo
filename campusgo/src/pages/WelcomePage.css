@@ -86,3 +86,14 @@
   .WelcomePage__sticker--3 { bottom: 8%; right: 2%; }
   .WelcomePage__sticker--4 { bottom: 4%; left: 2%; }
 }
+
+.WelcomePage__event-details {
+  color: var(--color-light-text);
+  margin-bottom: 1.5rem; 
+}
+
+.WelcomePage__event-details p {
+  margin: 0.5rem 0; 
+  font-size: 1.1rem;
+  font-weight: 600;
+}

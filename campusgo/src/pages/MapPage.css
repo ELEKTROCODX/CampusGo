@@ -5,10 +5,12 @@
   color: var(--color-light-text);
   text-align: center;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: flex-start;   
   font-family: 'Montserrat', sans-serif;
   margin-bottom: 2em;
+  box-shadow: none;
 }
 
 .MapPage__content {
@@ -85,4 +87,23 @@
     height: 450px; 
     border-width: 5px; 
   }
+}
+
+.MapPage__location-buttons {
+  display: flex;
+  gap: 1rem; 
+  margin-bottom: 1rem; 
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.MapPage__location-buttons .btn {
+  padding: 0.6rem 1.2rem; 
+  font-size: 0.9rem;
+}
+
+.MapPage__location-buttons .btn.active {
+  background-color: var(--color-primary-purple); 
+  color: var(--color-light-text);
+  box-shadow: 0 2px 8px rgba(108, 99, 255, 0.6);
 }

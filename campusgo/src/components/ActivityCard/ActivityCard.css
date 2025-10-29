@@ -1,4 +1,3 @@
-/* Estilos internos de la tarjeta de actividad */
 .ActivityCard {
   padding: 1.5rem;
   display: flex;
@@ -21,14 +20,13 @@
 
 .ActivityCard__title {
   margin: 0;
-  font-size: 1.8em; /* Ajustado para mejor legibilidad */
+  font-size: 1.8em; 
   font-weight: 700;
   line-height: 1.2;
   color: var(--color-light-text);
   text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 }
 
-/* Checkbox */
 .ActivityCard__checkbox {
   min-width: 32px;
   height: 32px;
@@ -50,7 +48,6 @@
   box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
 }
 
-/* Tag de Ubicación (Componente anidado) */
 .LocationTag {
   display: inline-flex;
   align-items: center;

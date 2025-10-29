@@ -31,10 +31,10 @@
 }
 
 .CountdownPage__time-box {
-  background-color: #E0E8FF; 
+  background-color: #E0E8FF;
   padding: 15px 20px;
   border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   max-width: 60px;
   min-height: 60px;
   display: flex;
@@ -58,65 +58,215 @@
 
 .CountdownPage__message {
   font-size: 1.5em;
-  margin-bottom: 30px;
+  margin: 30px;
   color: #ffffff;
 }
 
-/* Tablet Styles */
 @media(min-width: 768px) {
   .CountdownPage__logo {
     width: 18em;
   }
+
   .CountdownPage__title {
     font-size: 32px;
   }
+
   .CountdownPage__time-value {
     font-size: 36px;
   }
+
   .CountdownPage__time-box {
     max-width: 80px;
     min-height: 80px;
     padding: 20px 25px;
   }
+
   .CountdownPage__time-label {
     font-size: 14px;
   }
+
   .CountdownPage__message {
     margin-top: 2em;
     font-size: 1.8em;
   }
 }
 
-/* Desktop Styles */
 @media(min-width: 1024px) {
   .CountdownPage {
     padding: 0px;
   }
+
   .CountdownPage__logo {
     width: 15em;
     margin-bottom: 30px;
   }
+
   .CountdownPage__title {
     font-size: 30px;
     margin-bottom: 40px;
   }
+
   .CountdownPage__timer {
     gap: 25px;
     margin-bottom: 30px;
   }
+
   .CountdownPage__time-box {
     max-width: 100px;
     min-height: 50px;
     padding: 25px 30px;
   }
+
   .CountdownPage__time-value {
     font-size: 42px;
   }
+
   .CountdownPage__time-label {
     font-size: 16px;
   }
+
   .CountdownPage__message {
     font-size: 1em;
     margin-bottom: 40px;
+  }
+}
+
+.WelcomePage__lema {
+  width: 18em;
+  max-width: 90%;
+  margin-bottom: 1rem;
+  z-index: 2;
+}
+
+.WelcomePage__title {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #ffffff;
+  z-index: 2;
+  margin-top: 1.5em;
+}
+
+@keyframes WelcomePage-sticker-enter {
+  0% {
+    transform: translateY(-20px) rotate(0deg);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateY(0) rotate(var(--rotate, 0deg));
+    opacity: 0.7;
+  }
+}
+
+.WelcomePage__sticker {
+  position: absolute;
+  z-index: 1;
+  opacity: 0;
+  max-width: 8em;
+  pointer-events: none;
+  animation: WelcomePage-sticker-enter 1s ease forwards;
+}
+
+.WelcomePage__sticker--1 {
+  top: 5%;
+  right: 5%;
+  --rotate: 10deg;
+}
+
+.WelcomePage__sticker--2 {
+  top: 20%;
+  left: 15%;
+  --rotate: -8deg;
+}
+
+.WelcomePage__sticker--3 {
+  bottom: 10%;
+  right: 6%;
+  --rotate: 15deg;
+}
+
+.WelcomePage__sticker--4 {
+  bottom: 5%;
+  left: 6%;
+  --rotate: -20deg;
+}
+
+.WelcomePage__event-details {
+  color: var(--color-light-text);
+  margin-bottom: 1.5rem;
+  z-index: 2;
+  position: relative;
+}
+
+.WelcomePage__event-details p {
+  margin: 0.5rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+@media(min-width: 768px) {
+  .WelcomePage__lema {
+    width: 40em;
+  }
+
+  .WelcomePage__title {
+    font-size: 2rem;
+  }
+
+  .WelcomePage__sticker {
+    max-width: 12em;
+  }
+
+  .WelcomePage__sticker--1 {
+    top: 10%;
+    right: 1%;
+  }
+
+  .WelcomePage__sticker--2 {
+    top: 15%;
+    left: 2%;
+  }
+
+  .WelcomePage__sticker--3 {
+    bottom: 9%;
+    right: 2%;
+  }
+
+  .WelcomePage__sticker--4 {
+    bottom: 3%;
+    left: 3%;
+  }
+}
+
+@media(min-width: 1024px) {
+  .WelcomePage__lema {
+    width: 30em;
+    margin-bottom: 1.5rem;
+  }
+
+  .WelcomePage__title {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    margin-top: 1.2em;
+  }
+
+  .WelcomePage__sticker--1 {
+    top: 8%;
+    right: 2%;
+  }
+
+  .WelcomePage__sticker--2 {
+    top: 10%;
+    left: 2%;
+  }
+
+  .WelcomePage__sticker--3 {
+    bottom: 8%;
+    right: 2%;
+  }
+
+  .WelcomePage__sticker--4 {
+    bottom: 4%;
+    left: 2%;
   }
 }

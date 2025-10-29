@@ -72,7 +72,6 @@
   transform: scale(1.05);
 }
 
-/* Media Queries para la tarjeta */
 @media (min-width: 768px) {
   .SpeakerCard {
     height: 420px;

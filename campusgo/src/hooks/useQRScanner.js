@@ -1,4 +1,3 @@
-// src/hooks/useQRScanner.js
 import { useEffect, useRef, useState } from "react";
 import jsQR from "jsqr";
 

@@ -1,16 +1,28 @@
-import React from "react";
-import { useNavigate, Link } from "react-router-dom"; 
-import "./WelcomePage.css"; 
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import "./WelcomePage.css";
 import Lema from "../assets/images/lema.png";
 import Sticker1 from "../assets/stickers/elemento1.png";
 import Sticker2 from "../assets/stickers/elemento2.png";
 import Sticker7 from "../assets/stickers/elemento7.png";
 import Sticker9 from "../assets/stickers/elemento9.png";
-
+import Footer from "../components/Footer/Footer"
+import { eventStartDate, postEventDate } from "../config";
 import FormLayout from "../layouts/FormLayout/FormLayout";
 
 function WelcomePage() {
   const navigate = useNavigate();
+  const [pageMode, setPageMode] = useState('before'); 
+
+  useEffect(() => {
+    const now = new Date();
+
+    if (now >= postEventDate) {
+      setPageMode('after');
+    } else if (now >= eventStartDate) {
+      setPageMode('during');
+    }
+  }, []); 
 
   const stickers = [
     { src: Sticker1, id: 1 },
@@ -19,9 +31,26 @@ function WelcomePage() {
     { src: Sticker9, id: 4 }
   ];
 
+  const handleNavigate = () => {
+    if (pageMode === 'after') {
+      navigate("/pevent"); // Ir a "Revive el Evento"
+    } else if (pageMode === 'during') {
+      navigate("/form"); // Ir al formulario de registro
+    } else { // 'before'
+      navigate("/"); // Ir al contador (la raíz)
+    }
+  };
+
+  const getButtonText = () => {
+    if (pageMode === 'after') {
+      return "Revive el Evento";
+    }
+    return "Comencemos";
+  };
+
   return (
     <FormLayout>
-      {stickers.map((sticker) => (
+      {pageMode !== 'after' && stickers.map((sticker) => (
         <img
           key={sticker.id}
           src={sticker.src}
@@ -29,12 +58,27 @@ function WelcomePage() {
           className={`WelcomePage__sticker WelcomePage__sticker--${sticker.id}`}
         />
       ))}
-      <img src={Lema} alt="Lema" className="WelcomePage__lema" />
-      <h1 className="WelcomePage__title">¡Bienvenidos nuestro primer evento de diseño!</h1>
 
-      <button className="btn btn-acento" onClick={() => navigate("/form")}>
-        Comencemos
+      <img src={Lema} alt="Lema" className="WelcomePage__lema" />
+
+      {pageMode === 'before' && (
+        <h1 className="WelcomePage__title">¡Bienvenidos nuestro primer evento de diseño!</h1>
+      )}
+
+      {pageMode === 'during' && (
+        <>
+          <h1 className="WelcomePage__title">¡ES HOY!</h1>
+          <div className="WelcomePage__event-details">
+            <p>Universidad Centroamericana José Simeón Cañas</p>
+          </div>
+        </>
+      )}
+      
+      
+      <button className="btn btn-acento" onClick={handleNavigate}>
+        {getButtonText()}
       </button>
+      <Footer></Footer>
     </FormLayout>
   );
 }

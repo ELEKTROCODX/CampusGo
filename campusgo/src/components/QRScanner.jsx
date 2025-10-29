@@ -6,7 +6,7 @@ export default function QRScanner({ onDetected, onClose }) {
     useQRScanner(handleScan);
 
   function handleScan(content) {
-    onDetected(content); // Pasamos el QR leído al padre
+    onDetected(content);
   }
 
   return (

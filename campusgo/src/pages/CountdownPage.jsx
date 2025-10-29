@@ -2,20 +2,36 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "./CountdownPage.css";
 import Logo from "../assets/logo/06logotipo-60-aniversario-horizontalblanco-3762.png";
+import Footer from "../components/Footer/Footer"
+
+import { eventStartDate, postEventDate } from "../config";
+
 
 function CountdownPage() {
     const navigate = useNavigate();
-    const targetDate = new Date("2025-11-21T10:00:00"); // Lógica del contador (sin cambios)
+
     const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
     useEffect(() => {
+        const now = new Date();
+
+        if (now >= postEventDate) {
+            navigate("/pevent");
+            return;
+        }
+
+        if (now >= eventStartDate) {
+            navigate("/welcome");
+            return;
+        }
+
         const interval = setInterval(() => {
             const now = new Date();
-            const difference = targetDate - now;
+            const difference = eventStartDate - now;
 
             if (difference <= 0) {
                 clearInterval(interval);
-                setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+                navigate("/welcome");
             } else {
                 const days = Math.floor(difference / (1000 * 60 * 60 * 24));
                 const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
@@ -26,11 +42,12 @@ function CountdownPage() {
         }, 1000);
 
         return () => clearInterval(interval);
-    }, [targetDate]);
+
+    }, [navigate]);
 
     return (
         <div className="CountdownPage page-background--radial">
-            
+
             <Link to="/">
                 <img src={Logo} alt="Logo" className="logo" />
             </Link>
@@ -58,21 +75,16 @@ function CountdownPage() {
             <button
                 className="btn btn-acento"
                 onClick={() => {
-                    const now = new Date();
-                    if (now >= targetDate) {
-                        navigate("/welcome");
-                    } else {
-                        navigate("/subscribe");
-                    }
+                    navigate("/subscribe");
                 }}
             >
-                {new Date() >= targetDate ? "Entrar al evento" : "¡Inscríbete Ya!"}
+                ¡Inscríbete Ya!
             </button>
 
             <p className="CountdownPage__message">
                 Te invitamos a que descubras la nueva experiencia que hemos <b>diseñando</b> para ti.
             </p>
-
+            <Footer></Footer>
         </div>
     );
 }

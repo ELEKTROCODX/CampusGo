@@ -2,7 +2,6 @@ import React from 'react';
 import './ActivityCard.css';
 import LocationIcon from '../../assets/icons/location.png';
 
-// El 'index' (1, 2, 3, 4) se usa para el color del tag
 function ActivityCard({ station, index }) {
   const isDone = station.status === 'Visitado';
   return (
