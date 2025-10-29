@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/duca/static/css/main.5ce4a3ba.css",
-    "main.js": "/duca/static/js/main.884b72b6.js",
+    "main.css": "/duca/static/css/main.a4c4a95f.css",
+    "main.js": "/duca/static/js/main.b8621078.js",
     "static/js/453.bea45603.chunk.js": "/duca/static/js/453.bea45603.chunk.js",
     "static/media/elemento5.png": "/duca/static/media/elemento5.fdc93f557948eb25760d.png",
     "static/media/elemento8.png": "/duca/static/media/elemento8.8b6d85662a81c4b21ceb.png",
@@ -16,12 +16,12 @@
     "static/media/elemento9.png": "/duca/static/media/elemento9.b418e0e4bc11697c5266.png",
     "static/media/persona.png": "/duca/static/media/persona.f8a583966ab8acdae35f.png",
     "index.html": "/duca/index.html",
-    "main.5ce4a3ba.css.map": "/duca/static/css/main.5ce4a3ba.css.map",
-    "main.884b72b6.js.map": "/duca/static/js/main.884b72b6.js.map",
+    "main.a4c4a95f.css.map": "/duca/static/css/main.a4c4a95f.css.map",
+    "main.b8621078.js.map": "/duca/static/js/main.b8621078.js.map",
     "453.bea45603.chunk.js.map": "/duca/static/js/453.bea45603.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.5ce4a3ba.css",
-    "static/js/main.884b72b6.js"
+    "static/css/main.a4c4a95f.css",
+    "static/js/main.b8621078.js"
   ]
 }

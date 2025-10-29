@@ -1,6 +1,7 @@
-import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom"; // 1. Importar Link
-import "./SubscribePage.css"; // CSS Limpio
+import React, { useState, useEffect } from "react"; // 1. Importar useEffect
+import { useNavigate, Link } from "react-router-dom"; 
+import "./SubscribePage.css"; 
+import Footer from "../components/Footer/Footer"
 import Logo from "../assets/logo/06logotipo-60-aniversario-horizontalblanco-3762.png";
 import sticker1 from "../assets/stickers/elemento4.png";
 import sticker2 from "../assets/stickers/elemento6.png";
@@ -10,8 +11,12 @@ import { auth, db, functions } from '../firebase/firebase';
 import { signInAnonymously } from 'firebase/auth';
 import { doc, runTransaction, setDoc, Transaction } from 'firebase/firestore';
 import FormInput from "../components/FormInput/FormInput";
-import { generateToken } from "../firebase/firebase";
 import { httpsCallable } from "firebase/functions";
+import { eventStartDate, postEventDate } from "../config"; 
+const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+const timeOptions = { hour: 'numeric', minute: 'numeric', hour12: true };
+const friendlyDate = eventStartDate.toLocaleDateString("es-SV", dateOptions);
+const friendlyTime = eventStartDate.toLocaleTimeString("es-SV", timeOptions);
 
 function SubscribePage() {
     const [currentStep, setCurrentStep] = useState(1);
@@ -20,6 +25,18 @@ function SubscribePage() {
     const navigate = useNavigate();
     const topics = ["Grupo_1", "Grupo_2","Grupo_3"];
     const subscribeToTopicCallable = httpsCallable(functions,'subscribeUserToTopicCallable')
+
+    useEffect(() => {
+        const now = new Date();
+
+        if (now >= postEventDate) {
+            // Si el evento ya terminó, no te puedes inscribir.
+            navigate("/pevent"); 
+        } else if (now >= eventStartDate) {
+            navigate("/welcome"); 
+        }
+        // Si es "antes", el useEffect no hace nada y la página se muestra.
+    }, [navigate]); 
 
     const [formData, setFormData] = useState({
         name: "",
@@ -43,7 +60,6 @@ function SubscribePage() {
         setLoading(true);
         setError(null);
         const {email, name, company} = formData;
-        const success = await generateToken();
 
         try{
             const userCredential = await signInAnonymously(auth);
@@ -73,8 +89,6 @@ function SubscribePage() {
                     // Si es la primera vez (el documento no existe), crea el documento del contador
                     Transaction.set(counterRef, { lastAssignedIndex: nextIndex });
                 }
-
-
             })
 
             const userData = {
@@ -143,11 +157,10 @@ function SubscribePage() {
                         <p>Te invitamos a que seas parte del primer evento de diseño de la UCA</p>
 
                         <div className="SubscribePage__event-info">
-                            <p><strong>Día y hora del evento:</strong><br />10 / Nov / 2025 – 7:00 AM</p>
+                            <p><strong>Día y hora del evento:</strong><br />{friendlyDate} – {friendlyTime}</p>
                             <p><strong>Lugar:</strong><br />UCA Edificio CEDITEC</p>
                         </div>
 
-                        {/* 6. Usar botón global */}
                         <button className="btn btn-acento" onClick={handleNext}>
                             Quiero participar
                         </button>
@@ -158,12 +171,7 @@ function SubscribePage() {
                     <div className="SubscribePage__step SubscribePage__fade-in">
                         <h2>Crear perfil</h2>
                         <p>Este perfil nos ayudará a saber el total de participantes y a preparar las sorpresas del evento</p>
-
-                        {/* 7. REFACTORIZACIÓN COMPLETA DEL FORMULARIO */}
                         <form className="card card--form" onSubmit={handleRegistration}>
-                            {/* El H2 "Crear perfil" es opcional, card--form ya tiene uno */}
-                            {/* <h2>Crear perfil</h2> */}
-                            
                             <FormInput
                                 label="Nombre y apellido*"
                                 name="name"
@@ -201,24 +209,22 @@ function SubscribePage() {
                         </p>
 
                         <div className="SubscribePage__event-info">
-                            <p><strong>Día y hora del evento:</strong><br />10 / Nov / 2025 – 7:00 AM</p>
+                            <p><strong>Día y hora del evento:</strong><br />{friendlyDate} – {friendlyTime}</p>
                             <p><strong>Lugar:</strong><br />UCA Edificio CEDITEC</p>
                         </div>
 
-                        {/* 8. Usar botón global */}
                         <button className="btn btn-acento" onClick={handleNext}>
                             Finalizar
                         </button>
                     </div>
                 )}
             </div>
-
-            {/* 9. Indicador de paso con BEM */}
             <div className="SubscribePage__step-indicator">
                 <span className={`SubscribePage__step-dot ${currentStep === 1 ? "SubscribePage__step-dot--active" : ""}`}></span>
                 <span className={`SubscribePage__step-dot ${currentStep === 2 ? "SubscribePage__step-dot--active" : ""}`}></span>
                 <span className={`SubscribePage__step-dot ${currentStep === 3 ? "SubscribePage__step-dot--active" : ""}`}></span>
             </div>
+            <Footer></Footer>
         </div>
     );
 }

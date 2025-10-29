@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  gap: 0.5rem; /* Espacio entre label e input */
+  gap: 0.5rem; 
 }
 
 .FormInput__label {
@@ -23,7 +23,7 @@
   color: #fff;
   font-weight: 500;
   transition: background 0.3s ease, transform 0.2s ease;
-  box-sizing: border-box; /* Asegura que el padding no rompa el layout */
+  box-sizing: border-box;
 }
 
 .FormInput__input:focus {

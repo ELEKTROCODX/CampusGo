@@ -15,7 +15,6 @@
   justify-content: center;
   margin-bottom: 1.5rem;
   z-index: 2;
-  /* Animación del logo */
   animation: fade-slide-rotate 1s ease forwards;
 }
 
@@ -35,7 +34,6 @@
   z-index: 2;
 }
 
-/* Animación (movida de FormPage.css) */
 @keyframes fade-slide-rotate {
   0% {
     transform: translateY(-20px);

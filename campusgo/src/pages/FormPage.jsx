@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./FormPage.css"; // CSS limpio
+import "./FormPage.css"; 
 import Sticker1 from "../assets/stickers/elemento1.png";
 import { generateToken } from "../firebase/firebase";
 
@@ -59,7 +59,6 @@ function FormPage() {
           <h3>¿Estás seguro de que quieres saltarte las notificaciones?</h3>
           <p>Si no aceptas, no podrás disfrutar de la experiencia completa.</p>
           <div className="PermissionScreen__modal-buttons">
-            {/* Usamos botones globales */}
             <button className="btn btn-acento" onClick={handlePermission}>Aceptar</button>
             <button className="btn btn-outline" onClick={handleConfirmSkip}>No aceptar</button>
           </div>
