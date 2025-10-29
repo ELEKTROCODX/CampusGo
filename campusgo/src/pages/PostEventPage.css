@@ -20,22 +20,22 @@
 }
 
 .PostEventPage__sticker--1 {
-  top: 15%;
-  left: 3%;
-  width: 100px;
+  top: 17%;
+  left: -5%;
+  width: 125px;
   --r: -15deg;
 }
 
 .PostEventPage__sticker--2 {
-  bottom: 10%;
-  right: 12%;
+  bottom: 15%;
+  right: -12%;
   width: 120px;
   --r: 20deg;
 }
 
 .PostEventPage__sticker--3 {
-  top: 75%;
-  right: 80%;
+  top: 78%;
+  right: 82%;
   width: 90px;
   --r: -10deg;
 }
@@ -77,8 +77,6 @@
   font-size: 1.3rem;
   font-weight: 600;
   color: #ffffff;
-  margin-top: 1.5rem;
-  font-style: italic;
 }
 
 @keyframes fade-in {
@@ -109,15 +107,18 @@
     font-size: 1.6rem;
   }
   .PostEventPage__sticker--1 {
+    opacity: 0.2;
     width: 140px;
     top: 10%;
   }
   .PostEventPage__sticker--2 {
+    opacity: 0.2;
     width: 160px;
     right: 38%;
     bottom: 8%;
   }
   .PostEventPage__sticker--3 {
+    opacity: 0.2;
     width: 120px;
     top: 70%;
     }

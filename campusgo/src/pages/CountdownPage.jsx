@@ -26,7 +26,7 @@ function CountdownPage() {
 
         const interval = setInterval(() => {
             const now = new Date();
-            const difference = targetDate - now;
+            const difference = eventStartDate - now;
             const loggedUser = localStorage.getItem('userLog');
 
             if(loggedUser){
@@ -80,11 +80,11 @@ function CountdownPage() {
                 onClick={() => {
                     navigate("/subscribe");
                 }}>
-                {new Date() >= targetDate ? "Entrar al evento" :(Logged ? "Espera" : "¡Inscríbete Ya!") }
+                {new Date() >= eventStartDate ? "Entrar al evento" :(Logged ? "¡Inscríbete Ya" : "¡Inscríbete Ya!") }
             </button>
 
             <p className="CountdownPage__message">
-                Te invitamos a que descubras la nueva experiencia que hemos <b>diseñando</b> para ti.
+                Te invitamos a que descubras la nueva experiencia que hemos <br /> <b>diseñado</b> para ti.
             </p>
             <Footer />
         </div>

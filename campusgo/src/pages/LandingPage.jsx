@@ -21,7 +21,7 @@ import Sticker4 from "../assets/stickers/elemento4.png";
 import Sticker5 from "../assets/stickers/elemento5.png";
 import Mapa from "../assets/stickers/elemento2.png";
 
-import SpeakerImg1 from "../assets/ponents/ponente1.jpeg"; 
+import SpeakerImg1 from "../assets/ponents/ponente1.jpeg";
 import SpeakerImg2 from "../assets/ponents/ponente2.jpeg";
 import SpeakerImg3 from "../assets/ponents/ponente3.jpeg";
 
@@ -33,7 +33,7 @@ function LandingPage() {
       { _uuid: "microcharlas-expertos-ceditec", name: "Microcharlas con expertos", location: "CEDITEC", status: "No visitado" },
       { _uuid: "experiencia-interactiva-nzeb", name: "Experiencia interactiva", location: "NZEB", status: "No visitado" },
       { _uuid: "exhibicion-proyectos-icas", name: "Exhibición de proyectos", location: "Atrio del ICAS", status: "No visitado" },
-      { _uuid: "proyeccion-cortos-animados-icas", name: "Proyección de cortos animados", location: "Atrio del ICAS", status: "No visitado" },
+      { _uuid: "proyeccion-cortos-animados-icas", name: "Proyección de cortos animados", location: "Auditorio del ICAS", status: "No visitado" },
     ]
   );
   useEffect(() => {
@@ -45,11 +45,11 @@ function LandingPage() {
 
     const updated = stations.map((s) => {
       if (s._uuid === code) {
-        stationFound = true; 
-        toast.success(`¡Estación visitada: ${s.name}!`); 
-        return { ...s, status: "Visitado" }; 
+        stationFound = true;
+        toast.success(`¡Estación visitada: ${s.name}!`);
+        return { ...s, status: "Visitado" };
       } else {
-        return s; 
+        return s;
       }
     });
 
@@ -57,8 +57,8 @@ function LandingPage() {
       toast.error("Código QR no reconocido.");
     }
 
-    setStations(updated); 
-    setShowScanner(false); 
+    setStations(updated);
+    setShowScanner(false);
   }
 
   return (
@@ -68,26 +68,27 @@ function LandingPage() {
       <img src={Sticker3} alt="Sticker de fondo 3" className="sticker fixed sticker-3" />
       <img src={Sticker4} alt="Sticker de fondo 4" className="sticker fixed sticker-4" />
       <img src={Sticker5} alt="Sticker de fondo 5" className="sticker fixed sticker-5" />
-
       <section className="page-section welcome-section">
         <Link to="/">
           <img src={Logo} alt="UCA Logo" className="logo" />
         </Link>
         <img src={Lema} alt="Lema El Diseño se toma la UCA" className="welcome-section__lema" />
         <div className="welcome-section__tags">
-          <a href="https://uca.edu.sv/carrera/arquitectura-presencial/" target="_blank" rel="noopener noreferrer">
-             <span className="tag tag--arq">ARQ</span>
+          <a href="https://uca.edu.sv/carrera/licenciatura-en-diseno-semipresencial/" target="_blank" rel="noopener noreferrer">
+            <span className="tag tag--led">LeD</span>
           </a>
           <a href="https://uca.edu.sv/postgrados/ingenieria-y-diseno/diseno-de-productos-y-servicios/" target="_blank" rel="noopener noreferrer">
-             <span className="tag tag--medp">MDPS</span>
+            <span className="tag tag--medp">MDPS</span>
           </a>
-          <a href="https://uca.edu.sv/carrera/licenciatura-en-diseno-semipresencial/" target="_blank" rel="noopener noreferrer">
-             <span className="tag tag--led">LeD</span>
+          <a href="https://uca.edu.sv/carrera/arquitectura-presencial/" target="_blank" rel="noopener noreferrer">
+            <span className="tag tag--arq">ARQ</span>
           </a>
+
         </div>
         <div className="welcome-section__greeting">
           <div className="welcome-section__user-name"></div> {/*Nombre del usuario */}
-          <div className="welcome-section__subtitle">¡Eres parte de nuestro primer evento de diseño!</div>
+          <div className="welcome-section__subtitle">¡Eres parte de nuestro primer</div>
+          <div className="welcome-section__subtitle">networking de Diseño!</div>
         </div>
       </section>
 
@@ -119,19 +120,19 @@ function LandingPage() {
             name={<>José<br />Moz</>} // Permite salto de línea
             role="Gerente de Diseño de Experiencias"
             imgSrc={SpeakerImg1} // Usa la variable renombrada
-            style={{ gridColumn: '1 / 2' }} 
+            style={{ gridColumn: '1 / 2' }}
           />
-          <SpeakerCard 
-            name="Rossemberg Rivas" 
-            role="Artista, Diseñador, Premio Cultura" 
+          <SpeakerCard
+            name="Rossemberg Rivas"
+            role="Artista, Diseñador, Premio Cultura"
             imgSrc={SpeakerImg2}
             style={{ gridColumn: '2 / 3', marginTop: '150px' }}
           />
-          <SpeakerCard 
-            name="Carmen Valenzuela" 
+          <SpeakerCard
+            name="Carmen Valenzuela"
             role="Directora LeD"
             imgSrc={SpeakerImg3}
-            style={{ gridColumn: '1 / 2', marginTop: '-150px' }} 
+            style={{ gridColumn: '1 / 2', marginTop: '-150px' }}
           />
         </div>
       </section>
@@ -142,8 +143,8 @@ function LandingPage() {
           <img src={Mapa} alt="Mapa del evento" className="map-section__image" />
           <button className="btn btn-secondary" onClick={() => navigate("/map")}>Ver mapa</button>
         </div>
-      </section>      
-      <Footer/>
+      </section>
+      <Footer />
     </div>
   );
 }

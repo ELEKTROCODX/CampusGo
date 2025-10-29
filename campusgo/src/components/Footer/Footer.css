@@ -20,13 +20,13 @@
   width: 100%; 
   gap: 0.5em; 
 }
-.SocialMedia p { 
+.SocialMedia { 
   margin: 0; 
   margin-bottom: 0.4em;
   color: var(--color-light-text);
 }
 .SocialMedia__brand-text { 
-  font-size: 2em; 
+  font-size: 1.4em; 
   font-weight: 800; 
   color: var(--color-light-text) !important; 
 }

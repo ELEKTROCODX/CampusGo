@@ -51,7 +51,7 @@ code {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
+  gap: 0rem;
   position: relative;
   z-index: 10;
 }
@@ -92,7 +92,7 @@ code {
 }
 
 .card--welcome {
-  padding: 2rem;
+  padding: 1rem;
   max-width: 700px;
   text-align: center;
   position: relative;

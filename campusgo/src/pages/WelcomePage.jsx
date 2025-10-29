@@ -9,7 +9,6 @@ import Sticker9 from "../assets/stickers/elemento9.png";
 import Footer from "../components/Footer/Footer"
 import { eventStartDate, postEventDate } from "../config";
 import FormLayout from "../layouts/FormLayout/FormLayout";
-import Footer from "../components/Footer/Footer"; // <-- 1. IMPORTADO
 
 
 function WelcomePage() {
@@ -36,10 +35,8 @@ function WelcomePage() {
   const handleNavigate = () => {
     if (pageMode === 'after') {
       navigate("/pevent"); // Ir a "Revive el Evento"
-    } else if (pageMode === 'during') {
+    } else {
       navigate("/form"); // Ir al formulario de registro
-    } else { // 'before'
-      navigate("/"); // Ir al contador (la raíz)
     }
   };
 
@@ -65,11 +62,12 @@ function WelcomePage() {
 
       {pageMode === 'before' && (
         <>
-          <h1 className="WelcomePage__title">¡Bienvenidos a nuestro primer evento de diseño!</h1>
+          <h1 className="WelcomePage__title">¡Bienvenidos!</h1>
+          <p></p>
 
           <div className="p-container">
             <p className="WelcomePage__event-details">
-              Nos alegra que seas parte del primer evento de diseño de la UCA, tenemos preparado dinámicas para que conozcas un poco sobre como el diseño se toma la UCA.
+              Nos alegra que seas parte del primer networking de diseño de la UCA.
             </p>
 
             <p className="WelcomePage__event-details">
@@ -88,7 +86,7 @@ function WelcomePage() {
         <>
           <h1 className="WelcomePage__title">¡ES HOY!</h1>
           <div className="WelcomePage__event-details">
-            <p>Universidad Centroamericana José Simeón Cañas</p>
+            <p>UCA Edificio ICAS<br />5:30 PM</p>
           </div>
         </>
       )}

@@ -77,7 +77,7 @@
   position: relative;
   width: 100%;
   flex-grow: 1;
-  padding: 2rem;
+  padding: 1.5rem;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -88,14 +88,14 @@
 
 .WelcomeScreen__sticker {
   position: absolute;
-  opacity: 0.25;
-  width: 220px;
+  opacity: 0.2;
+  width: 170px;
   animation: float 8s ease-in-out infinite alternate;
 }
 
 .WelcomeScreen__sticker.sticker-1 {
-  top: 5%;
-  left: 8%;
+  top: 0%;
+  left: -18%;
   transform: rotate(15deg);
 }
 .WelcomeScreen__sticker.sticker-2 {
@@ -104,16 +104,7 @@
   transform: rotate(-10deg);
 }
 .WelcomeScreen__sticker.sticker-3 {
-  top: 30%;
-  right: 5%;
+  top: 70%;
+  right: -5%;
   transform: rotate(25deg);
-}
-
-@keyframes float {
-  from {
-    transform: translateY(0) rotate(var(--rotate-start, 0deg));
-  }
-  to {
-    transform: translateY(-20px) rotate(var(--rotate-end, 10deg));
-  }
 }

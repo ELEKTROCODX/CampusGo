@@ -42,13 +42,10 @@ function App() {
         <Route path="/landing" element={<LandingPage />} />
         <Route path="/map" element={<MapPage />} />
         <Route path="/subscribe" element={<SubscribePage />} />
+        <Route path="/pevent" element={<PostEventPage />} />
 
-        <Route
-          path="/pevent"
-          element={isAfterEvent ? <PostEventPage /> : <Navigate to="/" replace />}
-        />
+        
 
-        {/* 3. Redirige a la raíz ("/") usando Navigate */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 

@@ -41,7 +41,7 @@ function MapPage() {
                         className={`btn btn-secondary ${currentMapUrl === mapUrls.nzeb ? 'active' : ''}`} 
                         onClick={() => setCurrentMapUrl(mapUrls.nzeb)}
                     >
-                        N - ZEB
+                        NZEB
                     </button>
                 </div>
 

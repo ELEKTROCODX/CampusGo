@@ -1,5 +1,5 @@
 import React from 'react';
-import './PostEventPage.css'; 
+import './PostEventPage.css';
 import LogoUCA from '../assets/logo/06logotipo-60-aniversario-horizontalblanco-3762.png';
 import Sticker1 from '../assets/stickers/elemento1.png';
 import Sticker2 from '../assets/stickers/elemento2.png';
@@ -23,17 +23,25 @@ function PostEventPage() {
         </p>
 
         <h2 className="PostEventPage__quote">
-          El Diseño en la UCA ha venido para quedarse…
+          ¡El Diseño en la UCA ha venido para quedarse!
         </h2>
+        <br />
+        <p className="PostEventPage__subtitle">
+          Explora nuestras carreras
+        </p>
+        <div className="welcome-section__tags">
+          <a href="https://uca.edu.sv/carrera/licenciatura-en-diseno-semipresencial/" target="_blank" rel="noopener noreferrer">
+            <span className="tag tag--led">LeD</span>
+          </a>
+          <a href="https://uca.edu.sv/postgrados/ingenieria-y-diseno/diseno-de-productos-y-servicios/" target="_blank" rel="noopener noreferrer">
+            <span className="tag tag--medp">MDPS</span>
+          </a>
+          <a href="https://uca.edu.sv/carrera/arquitectura-presencial/" target="_blank" rel="noopener noreferrer">
+            <span className="tag tag--arq">ARQ</span>
+          </a>
 
-        <a
-          href="https://uca.edu.sv/carrera/licenciatura-en-diseno-semipresencial/"
-          className="btn btn-acento" 
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Nuestra Web
-        </a>
+        </div>
+
       </div>
       <Footer />
     </div>

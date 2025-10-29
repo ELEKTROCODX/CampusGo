@@ -1,0 +1,29 @@
+{
+  "files": {
+    "main.css": "/duca/static/css/main.d6d93fb9.css",
+    "main.js": "/duca/static/js/main.139a99b2.js",
+    "static/js/453.bea45603.chunk.js": "/duca/static/js/453.bea45603.chunk.js",
+    "static/media/elemento5.png": "/duca/static/media/elemento5.fdc93f557948eb25760d.png",
+    "static/media/elemento8.png": "/duca/static/media/elemento8.8b6d85662a81c4b21ceb.png",
+    "static/media/elemento2.png": "/duca/static/media/elemento2.4308bcee509ee24c0cfd.png",
+    "static/media/elemento6.png": "/duca/static/media/elemento6.656e1d9d2faa98da9e90.png",
+    "static/media/lema.png": "/duca/static/media/lema.a3116602669befd36260.png",
+    "static/media/elemento7.png": "/duca/static/media/elemento7.0614df90ac537ea619ec.png",
+    "static/media/elemento4.png": "/duca/static/media/elemento4.d8c576ee2b6d6b23602d.png",
+    "static/media/06logotipo-60-aniversario-horizontalblanco-3762.png": "/duca/static/media/06logotipo-60-aniversario-horizontalblanco-3762.93ab319b703ded37ab2d.png",
+    "static/media/elemento3.png": "/duca/static/media/elemento3.6fecc8634159452e88d0.png",
+    "static/media/elemento1.png": "/duca/static/media/elemento1.0fd37fb1e04ce3140e5b.png",
+    "static/media/ponente2.jpeg": "/duca/static/media/ponente2.f6e7e8fea89a38fda50c.jpeg",
+    "static/media/elemento9.png": "/duca/static/media/elemento9.b418e0e4bc11697c5266.png",
+    "static/media/ponente1.jpeg": "/duca/static/media/ponente1.72c7a5bbfcaa3d413244.jpeg",
+    "static/media/ponente3.jpeg": "/duca/static/media/ponente3.fb7e9abaf690caca7613.jpeg",
+    "index.html": "/duca/index.html",
+    "main.d6d93fb9.css.map": "/duca/static/css/main.d6d93fb9.css.map",
+    "main.139a99b2.js.map": "/duca/static/js/main.139a99b2.js.map",
+    "453.bea45603.chunk.js.map": "/duca/static/js/453.bea45603.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.d6d93fb9.css",
+    "static/js/main.139a99b2.js"
+  ]
+}

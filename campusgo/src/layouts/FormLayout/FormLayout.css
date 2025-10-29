@@ -4,9 +4,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1rem;
   color: var(--color-light-text);
   overflow: hidden;
+  padding: 0em 2em;
 }
 
 .FormLayout__header {

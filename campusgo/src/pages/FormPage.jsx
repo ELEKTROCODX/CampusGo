@@ -2,22 +2,38 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./FormPage.css"; 
 import Sticker1 from "../assets/stickers/elemento1.png";
-import { generateToken } from "../firebase/firebase";
+import { db, generateToken } from "../firebase/firebase";
 
 import FormLayout from "../layouts/FormLayout/FormLayout";
 import Modal from "../components/Modal/Modal";
-import Footer from "../components/Footer/Footer"; // <-- 1. IMPORTADO
+import Footer from "../components/Footer/Footer";
+import { doc, updateDoc } from "firebase/firestore";
 
 
 function FormPage() {
   const [showModal, setShowModal] = useState(false); 
+  const userLog = localStorage.getItem('userLog');
+  const fcmToken = localStorage.getItem('fcmToken');
   const navigate = useNavigate();
+   
 
   const handlePermission = async () => {
     const success = await generateToken();
     console.log("Success: ", success);
     if (success) {
-      navigate("/register");
+      if(userLog){
+        try{
+          const userRef = doc(db,"Usuarios",userLog);
+          await updateDoc(userRef, {
+            fcmToken: fcmToken
+          });
+        }catch(err){
+          console.warn("Error (no crítico) al actualizar el token");
+        }
+        navigate("/landing");
+      }else{
+          console.log("Permiso no otorgado a usuario")
+      }
     }
   };
 
@@ -64,7 +80,7 @@ function FormPage() {
           </div>
         </Modal>
       )}
-    <Footer></Footer>
+    <Footer/>
     </FormLayout>
   );
 }
