@@ -1,5 +1,5 @@
-import React from "react";
-import { useNavigate } from "react-router-dom"; // Se eliminó useState y useEffect
+import React, { useState, useEffect } from "react"; // 1. Re-introducimos useState y useEffect
+import { useNavigate } from "react-router-dom";
 import "./WelcomePage.css";
 import Lema from "../assets/images/lema.png";
 import Sticker1 from "../assets/stickers/elemento1.png";
@@ -7,14 +7,24 @@ import Sticker2 from "../assets/stickers/elemento2.png";
 import Sticker7 from "../assets/stickers/elemento7.png";
 import Sticker9 from "../assets/stickers/elemento9.png";
 import Footer from "../components/Footer/Footer";
-// Se eliminaron las importaciones de 'config'
+import { eventStartDate, postEventDate } from "../config"; // 2. Re-introducimos las fechas
 import FormLayout from "../layouts/FormLayout/FormLayout";
 
-function WelcomePage() { // Asegúrate que el nombre sea 'WelcomePage'
+function WelcomePage() {
   const navigate = useNavigate();
+  // 3. Re-introducimos el estado del modo de página
+  const [pageMode, setPageMode] = useState('before'); 
 
-  // Se eliminó el estado 'pageMode'
-  // Se eliminó el 'useEffect'
+  // 4. Re-introducimos el useEffect para comprobar la fecha
+  useEffect(() => {
+    const now = new Date();
+    if (now >= postEventDate) {
+      setPageMode('after');
+    } else if (now >= eventStartDate) {
+      setPageMode('during');
+    }
+    // Si no, se queda en 'before' (por defecto)
+  }, []);
 
   const stickers = [
     { src: Sticker1, id: 1 },
@@ -23,12 +33,31 @@ function WelcomePage() { // Asegúrate que el nombre sea 'WelcomePage'
     { src: Sticker9, id: 4 }
   ];
 
-  // Se eliminaron 'handleNavigate' y 'getButtonText'
+  // 5. Lógica del botón basada en la fecha
+  const handleNavigate = () => {
+    if (pageMode === 'after') {
+      navigate("/pevent"); // Ir a "Revive el Evento"
+      
+    } else if (pageMode === 'during') {
+      navigate("/landing"); // ¡TU CAMBIO! Ir al Landing durante el evento
+      
+    } else { // 'before'
+      navigate("/form"); // Ir al formulario de permisos antes del evento
+    }
+  };
+
+  // 6. Lógica para el texto del botón
+  const getButtonText = () => {
+    if (pageMode === 'after') {
+      return "Revive el Evento";
+    }
+    return "Comencemos"; // El texto es el mismo para 'before' y 'during'
+  };
 
   return (
     <FormLayout>
-      {/* Los stickers ahora son siempre visibles */}
-      {stickers.map((sticker) => (
+      {/* Oculta stickers si el evento ya pasó */}
+      {pageMode !== 'after' && stickers.map((sticker) => (
         <img
           key={sticker.id}
           src={sticker.src}
@@ -39,18 +68,28 @@ function WelcomePage() { // Asegúrate que el nombre sea 'WelcomePage'
 
       <img src={Lema} alt="Lema" className="WelcomePage__lema" />
 
-      {/* Contenido estático (tomado de tu ejemplo) */}
-      <div className="p-container">
-        <p className="WelcomePage__event-details">
-          Bienvenido a nuestro primer networking de diseño
-        </p>
-      </div>
-      
-      {/* Se eliminó el bloque 'during' */}
+      {/* --- MODO "ANTES" (Muestra bienvenida) --- */}
+      {pageMode === 'before' && (
+        <div className="p-container">
+          <p className="WelcomePage__event-details">
+            Bienvenido a nuestro primer networking de diseño
+          </p>
+        </div>
+      )}
 
-      {/* El botón ahora siempre hace lo mismo */}
-      <button className="btn btn-acento" onClick={() => navigate("/form")}>
-        Comencemos
+      {/* --- MODO "DURANTE" (Muestra "¡ES HOY!") --- */}
+      {pageMode === 'during' && (
+        <>
+          <h1 className="WelcomePage__title">¡ES HOY!</h1>
+          <div className="WelcomePage__event-details">
+            {/* Asegúrate que la hora sea la correcta aquí */}
+            <p>UCA Edificio ICAS<br />5:30 PM</p> 
+          </div>
+        </>
+      )}
+
+      <button className="btn btn-acento" onClick={handleNavigate}>
+        {getButtonText()}
       </button>
       
       <Footer />
@@ -58,4 +97,4 @@ function WelcomePage() { // Asegúrate que el nombre sea 'WelcomePage'
   );
 }
 
-export default WelcomePage; 
+export default WelcomePage;

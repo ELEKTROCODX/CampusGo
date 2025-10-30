@@ -8,42 +8,39 @@ import sticker2 from "../assets/stickers/elemento6.png";
 import sticker3 from "../assets/stickers/elemento7.png";
 import sticker4 from "../assets/stickers/elemento8.png";
 
-// Importa TODO lo de firebase
-import { auth, db, functions, generateToken } from '../firebase/firebase'; 
+// Importa TODO lo de firebase, incluyendo getDoc
+import { auth, db, functions, generateToken } from '../firebase/firebase';
 import { signInAnonymously } from 'firebase/auth';
-import { doc, runTransaction, setDoc } from 'firebase/firestore';
+import { doc, runTransaction, setDoc, getDoc } from 'firebase/firestore';
 import { httpsCallable } from "firebase/functions";
 
 import FormInput from "../components/FormInput/FormInput";
 import { eventStartDate, postEventDate } from "../config";
-import { toast } from "react-toastify"; 
+import { toast } from "react-toastify";
 
-// Formato de fechas
+// ... (Formato de fechas, lógica de Tópicos, y assignTopic() - sin cambios) ...
 const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
 const timeOptions = { hour: 'numeric', minute: 'numeric', hour12: true };
 const friendlyDate = eventStartDate.toLocaleDateString("es-SV", dateOptions);
 const friendlyTime = eventStartDate.toLocaleTimeString("es-SV", timeOptions);
-
-// Lógica de Tópicos
-const topics = ["Grupo_1", "Grupo_2", "Grupo_3", "Grupo_4"]; 
-const subscribeToTopicCallable = httpsCallable(functions, 'subscribeUserToTopicCallable'); // <-- Nombre corregido
-
+const topics = ["Grupo_1", "Grupo_2", "Grupo_3", "Grupo_4"];
+const subscribeToTopicCallable = httpsCallable(functions, 'subscribeUserToTopicCallable');
 async function assignTopic() {
     let assignedTopic = null;
     await runTransaction(db, async (transaction) => {
-      const counterRef = doc(db, "Metadatos", "asignacionTemas");
-      const counterDoc = await transaction.get(counterRef);
-      let currentIndex = 0;
-      if (counterDoc.exists()) {
-        currentIndex = counterDoc.data().lastAssignedIndex;
-      }
-      assignedTopic = topics[currentIndex % topics.length];
-      const nextIndex = (currentIndex + 1) % topics.length;
-      if (counterDoc.exists()) {
-        transaction.update(counterRef, { lastAssignedIndex: nextIndex });
-      } else {
-        transaction.set(counterRef, { lastAssignedIndex: nextIndex, topics: topics });
-      }
+        const counterRef = doc(db, "Metadatos", "asignacionTemas");
+        const counterDoc = await transaction.get(counterRef);
+        let currentIndex = 0;
+        if (counterDoc.exists()) {
+            currentIndex = counterDoc.data().lastAssignedIndex;
+        }
+        assignedTopic = topics[currentIndex % topics.length];
+        const nextIndex = (currentIndex + 1) % topics.length;
+        if (counterDoc.exists()) {
+            transaction.update(counterRef, { lastAssignedIndex: nextIndex });
+        } else {
+            transaction.set(counterRef, { lastAssignedIndex: nextIndex, topics: topics });
+        }
     });
     console.log("Tópico asignado:", assignedTopic);
     return assignedTopic;
@@ -51,18 +48,59 @@ async function assignTopic() {
 
 
 function SubscribePage() {
-    const [currentStep, setCurrentStep] = useState(2); 
+    const [currentStep, setCurrentStep] = useState(2);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
+    // 1. AÑADIMOS ESTADO DE VALIDACIÓN
+    // La página no mostrará nada hasta que la validación termine.
+    const [isValidating, setIsValidating] = useState(true);
+
     useEffect(() => {
+        const userLog = localStorage.getItem('userLog');
         const now = new Date();
-        if (now >= postEventDate) {
-            navigate("/pevent");
-        } else if (now >= eventStartDate) {
-            navigate("/landing");
-        }
+
+        const checkUserAndDate = async () => {
+            try {
+                // --- 1. VALIDACIÓN DE USUARIO (Tu nueva lógica) ---
+                if (userLog) {
+                    const userRef = doc(db, "Usuarios", userLog);
+                    const userDoc = await getDoc(userRef);
+
+                    if (userDoc.exists()) {
+                        // ¡USUARIO YA REGISTRADO!
+                        // Redirigir siempre a la raíz (/) como pediste.
+                        console.log("Usuario ya registrado. Redirigiendo a /");
+                        navigate("/");
+                        return; // Detiene la ejecución
+                    } else {
+                        // userLog existe pero no es válido (ej. BD borrada)
+                        localStorage.removeItem('userLog');
+                    }
+                }
+
+                // --- 2. USUARIO NUEVO ---
+                // Si llegamos aquí, no hay un userLog válido.
+                // Aplicamos la lógica de fechas para un usuario nuevo.
+                if (now >= postEventDate) {
+                    navigate("/pevent"); // Evento terminó
+                } else if (now >= eventStartDate) {
+                    navigate("/landing"); // Evento en curso (se salta el registro)
+                } else {
+                    // Es un usuario nuevo Y el evento no ha comenzado.
+                    // ¡Mostramos el formulario de registro!
+                    setIsValidating(false);
+                }
+            } catch (err) {
+                console.error("Error durante la validación:", err);
+                // Si hay un error, por si acaso, muestra el formulario.
+                setIsValidating(false);
+            }
+        };
+
+        checkUserAndDate();
+
     }, [navigate]);
 
     const [formData, setFormData] = useState({
@@ -76,7 +114,7 @@ function SubscribePage() {
         setFormData({ ...formData, [name]: value });
     };
 
-    // --- FUNCIÓN DE REGISTRO CON ORDEN CORREGIDO ---
+    // --- handleRegistration (Sin cambios) ---
     const handleRegistration = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -84,13 +122,10 @@ function SubscribePage() {
         const { email, name, company } = formData;
 
         try {
-            // 1. Inicia sesión anónimamente PRIMERO
-            // (Esto asegura que 'request.auth' no sea null)
             const userCredential = await signInAnonymously(auth);
             const user = userCredential.user;
             console.log("Usuario anónimo creado:", user.uid);
 
-            // 2. Pide permiso de notificación
             toast.info("Por favor, acepta los permisos de notificación.");
             const tokenResult = await generateToken();
             const fcmToken = tokenResult.success ? tokenResult.token : null;
@@ -101,10 +136,7 @@ function SubscribePage() {
                 toast.warn("No se aceptaron las notificaciones. Puedes activarlas luego.");
             }
 
-            // 3. Asigna un tópico (Ahora 'request.auth' SÍ existe)
-            const assignedTopic = await assignTopic(); 
-
-            // 4. Prepara TODOS los datos del usuario
+            const assignedTopic = await assignTopic();
             const registrationDate = new Date().toISOString();
             const userData = {
                 name,
@@ -115,30 +147,26 @@ function SubscribePage() {
                 fcmToken: fcmToken,
             };
 
-            // 5. Suscribe a la Cloud Function (si tenemos token y tópico)
             if (fcmToken && assignedTopic) {
-                // (Esta es la línea 114)
-                await subscribeToTopicCallable({ 
-                    token: fcmToken, 
+                await subscribeToTopicCallable({
+                    token: fcmToken,
                     topic: assignedTopic,
-                    userId: user.uid 
+                    userId: user.uid
                 });
                 console.log("Usuario suscrito al tópico:", assignedTopic);
             }
 
-            // 6. Guarda el usuario en Firestore
             await setDoc(doc(db, "Usuarios", user.uid), userData);
             console.log("Usuario registrado y datos guardados: ", user.uid);
             localStorage.setItem('userLog', user.uid);
-            
-            // 7. Ve al paso final
+
             setCurrentStep(3);
         } catch (err) {
-            console.error("Error al registrar:", err.message); // (Esta es la línea 129)
-            if (err.code === 'permission-denied' || err.message.includes('insufficient permissions')) {
-                setError("Hubo un error de permisos. Asegúrate de que las reglas de Firestore están configuradas para 'create' en la colección 'Usuarios'.");
+            console.error("Error al registrar:", err.message);
+            if (err.code === 'permission-denied') {
+                setError("Hubo un error de permisos.");
             } else if (err.code === 'internal' || err.code === 'unavailable') {
-                setError("Error de conexión con el servidor. Verifica tu conexión o inténtalo más tarde.");
+                setError("Error de conexión con el servidor.");
             } else {
                 setError("Error en el registro: " + err.message);
             }
@@ -149,10 +177,21 @@ function SubscribePage() {
 
     const handleNext = () => {
         if (currentStep === 3) {
-            navigate("/"); 
+            navigate("/");
         }
     };
 
+    // 3. MUESTRA UNA PANTALLA DE CARGA MIENTRAS SE VALIDA
+    if (isValidating) {
+        return (
+            <div className="SubscribePage page-background--radial-blue-top" style={{ justifyContent: 'center' }}>
+                {/* Puedes poner un spinner o logo aquí */}
+                <h2 style={{ color: 'white' }}>Validando...</h2>
+            </div>
+        );
+    }
+
+    // 4. Si no está validando (y no ha redirigido), muestra el formulario
     return (
         <div className="SubscribePage page-background--radial-blue-top">
             <Link to="/">
@@ -171,7 +210,7 @@ function SubscribePage() {
                 {currentStep === 2 && (
                     <div className="SubscribePage__step SubscribePage__fade-in">
                         <h2>Crear perfil</h2>
-                        <form className="card card--form" onSubmit={handleRegistration}> 
+                        <form className="card card--form" onSubmit={handleRegistration}>
                             <FormInput
                                 label="Nombre y apellido*"
                                 name="name"
