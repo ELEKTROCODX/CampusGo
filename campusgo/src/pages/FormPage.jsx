@@ -13,50 +13,52 @@ function FormPage() {
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const userLog = localStorage.getItem('userLog');
-  const [status,setStatus] = useState("Esperando permiso...");
 
-  // 1. ESTE ESTADO ES LA CLAVE
+  // 1. Estado para manejar la carga/espera
   const [loading, setLoading] = useState(false);
+  // Estado para saber si la carga ya superó el tiempo mínimo
+  const [showReloadOption, setShowReloadOption] = useState(false);
+
+  // Función para forzar la recarga de la página
+  const handleManualReload = () => {
+    toast.info("Reiniciando la página para completar la activación...");
+    window.location.reload();
+  };
 
   const handlePermission = async () => {
-    // 2. PONER EL ESTADO DE CARGA AL INICIO
-    setLoading(true);
+    if (loading) return;
+
+    setShowModal(false);
+    setLoading(true); // Iniciar estado de carga
 
     try {
       const result = await generateToken();
-
-      if (result.reload) {
-        toast.info("Activando servicio de notificaciones... recargando.");
-        setTimeout(() => window.location.reload(), 2000);
-        return;
-      }
+      setShowReloadOption(false); // Ocultar opción de reinicio
 
       if (result.success) {
-        toast.success("¡Permiso aceptado! Token guardado."); // Toast de éxito
-        if (userLog) {
+        toast.success("¡Permiso aceptado! Token guardado.");
+
+        if (userLog && result.token) {
           try {
             const userRef = doc(db, "Usuarios", userLog);
             await updateDoc(userRef, { fcmToken: result.token });
-            console.log("Token actualizado en Firestore para usuario existente.");
+            console.log("Token actualizado en Firestore.");
           } catch (error) {
             console.warn("Error (no crítico) al actualizar el token en Firestore:", error);
           }
-        } else {
-          setStatus("Permiso otorgado. Continuar a registro.");
-          console.log("Permiso otorgado. El token está en localStorage.");
         }
-        // 3. ELIMINAMOS LA LÓGICA DE NAVEGACIÓN (como pediste antes)
+
         navigate("/subscribe");
       } else {
-        // El toast de error ya se maneja en firebase.js (si usas el Plan B)
-        console.error("No se pudo generar el token de notificación.");
-        navigate("/form");
+        toast.info("Notificaciones no permitidas. Puedes activarlas más tarde.");
+        navigate("/subscribe");
       }
     } catch (error) {
+      setShowReloadOption(false);
       console.error("Error en handlePermission:", error);
-      toast.error("Ocurrió un error inesperado.");
+      toast.error("Ocurrió un error inesperado al solicitar permisos.");
+      navigate("/subscribe");
     } finally {
-      // 4. QUITAR EL ESTADO DE CARGA AL FINAL (INCLUSO SI HAY ERROR)
       setLoading(false);
     }
   };
@@ -72,25 +74,39 @@ function FormPage() {
   const handleConfirmSkip = () => {
     localStorage.removeItem('fcmToken');
     toast.info("Permiso omitido.");
-    setShowModal(false); // Cierra el modal
-    // navigate("/landing"); // Eliminado
+    setShowModal(false);
+    navigate("/subscribe");
   };
 
-  // 5. ¡AQUÍ ESTÁ TU PANTALLA DE CARGA!
-  // Se renderiza ANTES que el return normal si 'loading' es true.
+  // 4. Pantalla de carga (si 'loading' es true)
   if (loading) {
     return (
       <FormLayout>
-        {/* Usamos FormLayout para mantener el fondo y el logo */}
-        <div className="PermissionScreen" style={{ justifyContent: 'center', height: '60vh', alignItems: 'center' }}>
-          <h2 style={{ color: 'white', fontSize: '1.5rem', textAlign: 'center' }}>Validando permisos...</h2>
-          {/* Aquí puedes agregar un spinner CSS si quieres */}
+        <div className="PermissionScreen" style={{ justifyContent: 'center', height: '60vh', alignItems: 'center', display: 'flex', flexDirection: 'column' }}>
+          {/* Eliminamos la imagen rotando y ponemos un mensaje */}
+          <h2 style={{ color: 'white', fontSize: '1.5rem', textAlign: 'center', marginTop: '1rem' }}>
+            Activando servicio de notificaciones...
+            Estableciendo conexion con Google
+          </h2>
+          <button className="btn btn-outline" onClick={handleManualReload}>
+              Reiniciar la Página
+            </button>
+          <p style={{ color: 'white', opacity: 0.8, textAlign: 'center', margin: '0.5rem 0 2rem' }}>
+            (Esto puede tardar unos segundos)
+          </p>
+
+          {/* BOTÓN DE REINICIO MANUAL (Solo visible después del timeout) */}
+          {showReloadOption && (
+            <button className="btn btn-outline" onClick={handleManualReload}>
+              Reiniciar la Página
+            </button>
+          )}
         </div>
       </FormLayout>
     );
   }
 
-  // 6. Si loading es false, se muestra la página normal
+  // 5. Página de formulario normal
   return (
     <FormLayout>
       <div className="PermissionScreen">
@@ -101,9 +117,8 @@ function FormPage() {
             Queremos guiarte en cada momento del evento, por lo que necesitamos tu permiso para enviarte notificaciones en tiempo real.
           </p>
         </div>
-        {/* 7. El botón ahora usa el estado 'loading' (como en tu JSX) */}
         <button className="btn btn-acento" onClick={handlePermission} disabled={loading}>
-          {loading ? "Comprobando..." : "Permitir"}
+          {"Permitir"}
         </button>
         <div className="PermissionScreen__progress-bottom">
           <span className="PermissionScreen__skip-text" onClick={handleSkip}>
@@ -117,8 +132,8 @@ function FormPage() {
           <h3>¿Estás seguro de que quieres saltarte las notificaciones?</h3>
           <p>Si no aceptas, no podrás disfrutar de la experiencia completa.</p>
           <div className="PermissionScreen__modal-buttons">
-            <button className="btn btn-acento" onClick={handlePermission} disabled={loading}>Aceptar</button>
-            <button className="btn btn-outline" onClick={handleConfirmSkip}>No aceptar</button>
+            <button className="btn btn-acento" onClick={handlePermission} disabled={loading}>Sí, Aceptar</button>
+            <button className="btn btn-outline" onClick={handleConfirmSkip}>No, Omitir</button>
           </div>
         </Modal>
       )}

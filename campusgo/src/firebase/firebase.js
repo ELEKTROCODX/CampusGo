@@ -3,10 +3,11 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getMessaging, getToken } from "firebase/messaging";
 import { getFunctions } from 'firebase/functions';
-import { toast } from 'react-toastify'; // 1. Importa toast
+import { toast } from 'react-toastify';
 
-// Configuración de Firebase (leyendo de .env)
+// La configuración de Firebase DEBE estar disponible
 const firebaseConfig = {
+    // ... Tu configuración actual
     apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
     authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
     databaseURL: process.env.REACT_APP_FIREBASE_DATABASE_URL,
@@ -22,79 +23,91 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const messaging = getMessaging(app);
 export const db = getFirestore(app);
-export const functions = getFunctions(app,'us-central1');
+export const functions = getFunctions(app, 'us-central1');
 
-// --- INICIO DE LÓGICA DE TIMEOUT (PLAN B) ---
-
-// 2. Función de ayuda que crea una promesa de "timeout"
-const createTimeout = (ms, message) => {
-  return new Promise((_, reject) => {
-    setTimeout(() => {
-      reject(new Error(message));
-    }, ms);
-  });
-};
-
-// 3. Función real de registro (la que se trababa)
-async function registerAndGetToken() {
-  const permission = await Notification.requestPermission();
-  if (permission !== "granted") {
-    console.log("Permiso de notificación denegado.");
-    return { success: false, token: null };
-  }
-
-  const swPath = "/duca/firebase-messaging-sw.js";
-  const scope = "/duca/";
-  
-  await navigator.serviceWorker.register(swPath, { scope: scope });
-  
-  console.log("Esperando a que el Service Worker esté 'listo'...");
-  // Esta es la línea que se traba:
-  const registration = await navigator.serviceWorker.ready; 
-  
-  console.log("Service Worker está 'listo':", registration);
-  const vapidKey = process.env.REACT_APP_VAPID_KEY;
-  if (!vapidKey) {
-      console.error("Error: REACT_APP_VAPID_KEY no definida en .env");
-      return { success: false, token: null };
-  }
-
-  console.log("Intentando obtener token...");
-  const fcmToken = await getToken(messaging, {
-    serviceWorkerRegistration: registration,
-    vapidKey: vapidKey, 
-  });
-
-  if (fcmToken) {
-    localStorage.setItem("fcmToken", fcmToken);
-    return { success: true, token: fcmToken };
-  } else {
-    console.log("No se pudo generar el token.");
-    return { success: false, token: null };
-  }
-}
-
-// 4. Función exportada que USA la carrera (Promise.race)
+/**
+ * Registra el Service Worker, espera a que esté activo y obtiene el token de FCM.
+ * @returns {object} { success: boolean, token: string | null }
+ */
 export const generateToken = async () => {
-  try {
-    // Ejecuta la función real y el temporizador al mismo tiempo
-    const result = await Promise.race([
-      registerAndGetToken(),
-      createTimeout(10000, 'El registro del Service Worker tardó demasiado (10s).') // Temporizador de 5 segundos
-    ]);
+    // 1. OPTIMIZACIÓN CLAVE: Verificar si el token ya existe
+    const cachedToken = localStorage.getItem("fcmToken");
+    if (cachedToken) {
+        console.log("FCM: ✅ Token encontrado en localStorage. Devolución instantánea.");
+        return { success: true, token: cachedToken };
+    }
     
-    return result; // Devuelve el resultado si 'registerAndGetToken' gana
+    // Si no está en caché, procedemos con la solicitud costosa
+    const startTime = performance.now();
+    console.log("FCM: ⏱️ INICIO de la solicitud de token (Token no encontrado en caché).");
 
-  } catch (error) {
-    // Esto se ejecuta si el TEMPORIZADOR de 5 segundos gana
-    console.error("Error detallado al generar el token (Timeout):", error.message);
-    
-    // 5. ¡TU LÓGICA!
-    toast.error("Error al activar notificaciones. Inténtalo de nuevo."); 
-    
-    // Espera 2 segundos para que se vea el toast y recarga
-    setTimeout(() => window.location.reload(), 6000); 
+    const permission = await Notification.requestPermission();
+    if (permission !== "granted") {
+        console.log("FCM: Permiso de notificación denegado.");
+        toast.info("Permiso denegado para notificaciones.");
+        return { success: false, token: null };
+    }
 
-    return { success: false, token: null };
-  }
+    try {
+        const swPath = "/duca/firebase-messaging-sw.js";
+        const scope = "/duca/";
+        let registration;
+
+        // 2. INICIO: Registro y espera de Service Worker (rápido)
+        const swRegStart = performance.now();
+        console.log(`FCM: Intentando registrar Service Worker en ${swPath} con scope ${scope}`);
+        
+        registration = await navigator.serviceWorker.register(swPath, { scope: scope });
+        
+        if (registration.installing) {
+            console.log("FCM: ⏳ Esperando a que el Service Worker pase a activo...");
+            await new Promise((resolve) => {
+                const newWorker = registration.installing;
+                newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'activated') {
+                        resolve();
+                    }
+                });
+            });
+        }
+
+        const swRegEnd = performance.now();
+        console.log(`FCM: Service Worker activo. Duración de activación: ${(swRegEnd - swRegStart).toFixed(2)} ms.`);
+
+        const vapidKey = process.env.REACT_APP_VAPID_KEY;
+        if (!vapidKey) {
+            console.error("FCM: Error: REACT_APP_VAPID_KEY no definida en .env");
+            toast.error("Error de configuración (VAPID Key).");
+            return { success: false, token: null };
+        }
+
+        // 3. INICIO: Solicitud de Token a Google/FCM (lento, 4.5s)
+        const tokenReqStart = performance.now();
+        console.log("FCM: 🚨 INICIO de la solicitud de token a los servidores de Google...");
+
+        const fcmToken = await getToken(messaging, {
+            serviceWorkerRegistration: registration,
+            vapidKey: vapidKey,
+        });
+        
+        const tokenReqEnd = performance.now();
+        console.log(`FCM: ✅ FIN de la solicitud de token. Duración: ${(tokenReqEnd - tokenReqStart).toFixed(2)} ms.`);
+
+
+        if (fcmToken) {
+            localStorage.setItem("fcmToken", fcmToken);
+            const totalTime = (performance.now() - startTime).toFixed(2);
+            console.log(`FCM: 🟢 Proceso COMPLETO exitoso. Tiempo total: ${totalTime} ms.`);
+            return { success: true, token: fcmToken };
+        } else {
+            console.log("FCM: No se pudo generar el token.");
+            toast.error("No se pudo obtener el token de FCM.");
+            return { success: false, token: null };
+        }
+    } catch (error) {
+        // Manejo de errores generales (red, seguridad, etc.)
+        console.error("FCM: 🔴 Error grave durante la generación de token:", error);
+        toast.error("Error de red o seguridad. Consulte la consola.");
+        return { success: false, token: null };
+    }
 };

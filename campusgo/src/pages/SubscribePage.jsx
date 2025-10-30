@@ -18,13 +18,20 @@ import FormInput from "../components/FormInput/FormInput";
 import { eventStartDate, postEventDate } from "../config";
 import { toast } from "react-toastify";
 
-// ... (Formato de fechas, lógica de Tópicos, y assignTopic() - sin cambios) ...
+// --- Variables de configuración de Fechas (DEBEN ESTAR DEFINIDAS FUERA DEL COMPONENTE) ---
+// Usaremos fechas de ejemplo aquí, asumiendo que vienen de una fuente externa real.
+
 const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
 const timeOptions = { hour: 'numeric', minute: 'numeric', hour12: true };
 const friendlyDate = eventStartDate.toLocaleDateString("es-SV", dateOptions);
 const friendlyTime = eventStartDate.toLocaleTimeString("es-SV", timeOptions);
 const topics = ["Grupo_1", "Grupo_2", "Grupo_3", "Grupo_4"];
 const subscribeToTopicCallable = httpsCallable(functions, 'subscribeUserToTopicCallable');
+
+/**
+ * Asigna un topic de forma rotativa utilizando una transacción de Firestore.
+ * @returns {Promise<string>} El topic asignado.
+ */
 async function assignTopic() {
     let assignedTopic = null;
     await runTransaction(db, async (transaction) => {
@@ -52,24 +59,23 @@ function SubscribePage() {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-    // 1. AÑADIMOS ESTADO DE VALIDACIÓN
-    // La página no mostrará nada hasta que la validación termine.
+    // Estado de validación (muestra una pantalla de carga inicial)
     const [isValidating, setIsValidating] = useState(true);
 
+    // --- LÓGICA DE NAVEGACIÓN Y REDIRECCIÓN ---
     useEffect(() => {
         const userLog = localStorage.getItem('userLog');
         const now = new Date();
 
         const checkUserAndDate = async () => {
             try {
-                // --- 1. VALIDACIÓN DE USUARIO (Tu nueva lógica) ---
+                // 1. USUARIO YA REGISTRADO: Si hay userLog, vamos a la landing
                 if (userLog) {
-                    navigate('/')
+                    navigate('/');
+                    return;
                 }
 
-                // --- 2. USUARIO NUEVO ---
-                // Si llegamos aquí, no hay un userLog válido.
-                // Aplicamos la lógica de fechas para un usuario nuevo.
+                // 2. USUARIO NUEVO: Validar fechas
                 if (now >= postEventDate) {
                     navigate("/pevent"); // Evento terminó
                 } else if (now >= eventStartDate) {
@@ -81,7 +87,6 @@ function SubscribePage() {
                 }
             } catch (err) {
                 console.error("Error durante la validación:", err);
-                // Si hay un error, por si acaso, muestra el formulario.
                 setIsValidating(false);
             }
         };
@@ -89,8 +94,6 @@ function SubscribePage() {
         checkUserAndDate();
 
     }, [navigate]);
-
-    //USEEFECT END HERE
 
     const [formData, setFormData] = useState({
         name: "",
@@ -103,7 +106,7 @@ function SubscribePage() {
         setFormData({ ...formData, [name]: value });
     };
 
-    // --- handleRegistration (Sin cambios) ---
+    // --- FUNCIÓN DE REGISTRO OPTIMIZADA POR PARALELIZACIÓN ---
     const handleRegistration = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -111,20 +114,27 @@ function SubscribePage() {
         const { email, name, company } = formData;
 
         try {
+            // Paso 1: Autenticación Anónima (Debe ir primero para obtener el UID)
             const userCredential = await signInAnonymously(auth);
             const user = userCredential.user;
 
-            toast.info("Por favor, acepta los permisos de notificación.");
-            const tokenResult = await generateToken();
+            toast.info("Por favor, acepta los permisos de notificación (solicitud externa).");
+
+            // Paso 2: PARALELIZACIÓN DEL CUELLO DE BOTELLA
+            // Ejecutamos generateToken (lento) y assignTopic (transacción) al mismo tiempo
+            const [tokenResult, assignedTopic] = await Promise.all([
+                generateToken(), // Lento (~4.5s)
+                assignTopic()    // Medio (Transacción Firestore)
+            ]);
+
             const fcmToken = tokenResult.success ? tokenResult.token : null;
 
             if (fcmToken) {
-                toast.success("¡Permiso aceptado!");
+                toast.success("¡Permiso aceptado y token obtenido!");
             } else {
                 toast.warn("No se aceptaron las notificaciones. Puedes activarlas luego.");
             }
 
-            const assignedTopic = await assignTopic();
             const registrationDate = new Date().toISOString();
             const userData = {
                 name,
@@ -135,27 +145,40 @@ function SubscribePage() {
                 fcmToken: fcmToken,
             };
 
+            const promises = [
+                // 3a. Guardar datos del usuario en Firestore
+                setDoc(doc(db, "Usuarios", user.uid), userData),
+            ];
+
             if (fcmToken && assignedTopic) {
-                await subscribeToTopicCallable({
-                    token: fcmToken,
-                    topic: assignedTopic,
-                    userId: user.uid
-                });
+                // 3b. Suscripción al topic de FCM (si hay token)
+                promises.push(
+                    subscribeToTopicCallable({
+                        token: fcmToken,
+                        topic: assignedTopic,
+                        userId: user.uid
+                    })
+                );
             }
+            
+            // Esperar a que el guardado y la suscripción terminen
+            await Promise.all(promises);
 
-            await setDoc(doc(db, "Usuarios", user.uid), userData);
             localStorage.setItem('userLog', user.uid);
-
+            toast.success("¡Registro completado!");
             setCurrentStep(3);
         } catch (err) {
-            console.error("Error al registrar:", err.message);
-            if (err.code === 'permission-denied') {
-                setError("Hubo un error de permisos.");
-            } else if (err.code === 'internal' || err.code === 'unavailable') {
-                setError("Error de conexión con el servidor.");
-            } else {
-                setError("Error en el registro: " + err.message);
+            console.error("Error al registrar:", err);
+            let errorMessage = "Error desconocido. Inténtalo de nuevo.";
+
+            if (err.code) {
+                errorMessage = `Error: ${err.code}. Revisa la consola.`;
+            } else if (err.message) {
+                 errorMessage = `Error: ${err.message}.`;
             }
+            
+            setError(errorMessage);
+            toast.error(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -170,9 +193,11 @@ function SubscribePage() {
     // 3. MUESTRA UNA PANTALLA DE CARGA MIENTRAS SE VALIDA
     if (isValidating) {
         return (
-            <div className="SubscribePage page-background--radial-blue-top" style={{ justifyContent: 'center' }}>
-                {/* Puedes poner un spinner o logo aquí */}
-                <h2 style={{ color: 'white' }}>Validando...</h2>
+            <div className="SubscribePage page-background--radial-blue-top flex items-center justify-center min-h-screen">
+                <div className="text-center text-white">
+                    <h2 className="text-3xl font-bold mb-4">Validando acceso...</h2>
+                    <p>Por favor, espera un momento.</p>
+                </div>
             </div>
         );
     }
@@ -226,7 +251,7 @@ function SubscribePage() {
                                 className="btn btn-acento"
                                 disabled={loading}
                             >
-                                {loading ? 'Registrando...' : 'Confirmar'}
+                                {loading ? 'Registrando y activando notificaciones...' : 'Confirmar'}
                             </button>
                             {error && <p className="FormInput__error">{error}</p>}
                         </form>
