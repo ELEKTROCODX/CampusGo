@@ -113,8 +113,6 @@ function SubscribePage() {
         try {
             const userCredential = await signInAnonymously(auth);
             const user = userCredential.user;
-
-            toast.info("Por favor, acepta los permisos de notificación.");
             const tokenResult = await generateToken();
             const fcmToken = tokenResult.success ? tokenResult.token : null;
 
