@@ -1,0 +1,125 @@
+.landing-page-container {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background-image: radial-gradient(circle at center, rgba(108, 99, 255, 0.1) 0%, var(--color-dark-bg) 80%);
+  background-repeat: no-repeat;
+  background-size: cover;
+  overflow: hidden;
+}
+
+.sticker.fixed { position: absolute; opacity: 0.2; pointer-events: none; z-index: 1; max-width: 200px; }
+.sticker-1 { top: 17.3%; left: 1%; transform: rotate(-10deg); }
+.sticker-2 { top: 0%; left: 68%; transform: rotate(5deg); opacity: 0.5; }
+.sticker-3 { bottom: 6%; left: 5%; transform: rotate(18deg); opacity: 0.4; }
+.sticker-4 { bottom:25%; right: 10%; transform: rotate(-155deg); }
+.sticker-5 { top: 40%; left: -5%; transform: rotate(25deg); }
+
+.welcome-section { 
+  padding-top: 8vh; 
+  gap: 1rem; 
+}
+.welcome-section__logo { width: 15em; margin-bottom: 0.5rem; }
+.welcome-section__lema { width: 100%; max-width: 350px; height: auto; margin-bottom: 1rem; }
+.welcome-section__tags { display: flex; gap: 0.8rem; margin-bottom: 0.5rem; }
+
+.tag { padding: 0.5rem 1.2rem; border-radius: 20px; color: var(--color-light-text); font-weight: bold; font-size: 1.2em; text-transform: uppercase; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); }
+.tag--arq { background-color: var(--color-primary-purple); }
+.tag--medp { background-color: var(--color-secondary-blue); }
+.tag--led { background-color: var(--color-tertiary-green); }
+
+.welcome-section__greeting { text-align: center; margin-top: 1rem; }
+.welcome-section__user-name { font-size: 1.3rem; font-weight: 700; }
+.welcome-section__subtitle { font-size: 0.9rem; color: var(--color-muted-text); }
+
+.qr-section {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6); 
+  border-radius: 1em;
+}
+.qr-section__title { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem; text-align: center; }
+.qr-section__subtitle { font-size: 1rem; color: var(--color-muted-text); margin-bottom: 0.5rem; text-align: center; }
+
+.activities-section { 
+  gap: 1rem; 
+  padding: 2rem 1rem; 
+  max-width: 450px; 
+}
+
+.speakers-section {
+  gap: 1.5rem;
+  text-align: center;
+}
+.speakers-section__title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+.speakers-section__grid {
+  padding: 0em 0.6em 0em 0em;
+  display: grid;
+  grid-template-columns: 50% 50%;
+  gap: 0.5em;
+  justify-items: center;
+  width: 95%;
+  max-width: 420px;
+  margin: 0 auto;
+}
+.speakers-section__grid > .SpeakerCard:nth-child(1) { grid-column: 1 / 2; }
+.speakers-section__grid > .SpeakerCard:nth-child(2) { grid-column: 2 / 3; margin-top: 190px; }
+.speakers-section__grid > .SpeakerCard:nth-child(3) { grid-column: 2 / 3; margin-top: 12px; }
+.speakers-section__grid > .SpeakerCard:nth-child(n+5) { margin-top: 0 !important; grid-column: 1 / 2; }
+
+
+.info-section { 
+  padding: 2rem 1rem 4rem; 
+  gap: 3rem; 
+  max-width: 700px; 
+}
+
+.map-section { 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  gap: 1rem; 
+  width: 100%; 
+  text-align: center; 
+}
+.map-section__title { font-size: 1.4rem; font-weight: 700; margin: 0; }
+.map-section__image { width: 50%; max-width: 350px; height: auto; border-radius: 0.75rem; }
+
+@media (min-width: 768px) {
+  .welcome-section__lema { max-width: 500px; }
+  .welcome-section__subtitle { font-size: 2rem; }
+  .tag { font-size: 2em; }
+
+  .speakers-section__grid {
+    grid-template-columns: 1fr 1fr;
+    max-width: 700px;
+    gap: 3rem;
+  }
+  .speakers-section__grid > .SpeakerCard:nth-child(2) { margin-top: 140px; }
+  .speakers-section__grid > .SpeakerCard:nth-child(3) { margin-top: -280px; }
+  .speakers-section__grid > .SpeakerCard:nth-Mchild(4) { margin-top: -280px; }
+}
+
+@media (min-width: 1024px) {
+  .welcome-section { padding: 1em; }
+  .welcome-section__logo { width: 18em; }
+  .welcome-section__lema { max-width: 600px; }
+
+  .qr-section, .activities-section { max-width: 1100px; padding: 1em 0em 1em 0em;}
+  .info-section { max-width: 1200px; padding:1em;}
+  .map-section { padding: 2em 1em;}
+
+  .speakers-section__grid {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    gap: 2rem;
+    max-width: 1200px;
+  }
+  .speakers-section__grid > .SpeakerCard {
+    margin-top: 0 !important;
+    grid-column: unset !important;
+  }
+}

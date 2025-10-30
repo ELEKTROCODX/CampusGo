@@ -1,0 +1,162 @@
+.PostEventPage {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; 
+  align-items: center;
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.PostEventPage__sticker {
+  position: absolute;
+  opacity: 0.2;
+  z-index: 1;
+  transform: rotate(var(--r, 0deg));
+  transition: all 0.3s ease;
+}
+
+.PostEventPage__sticker--1 {
+  top: 15%;
+  left: 3%;
+  width: 100px;
+  --r: -15deg;
+}
+
+.PostEventPage__sticker--2 {
+  bottom: 10%;
+  right: 12%;
+  width: 120px;
+  --r: 20deg;
+}
+
+.PostEventPage__sticker--3 {
+  top: 75%;
+  right: 80%;
+  width: 90px;
+  --r: -10deg;
+}
+
+.PostEventPage__content {
+  position: relative;
+  z-index: 2;
+  max-width: 600px;
+  margin-top: auto; 
+  margin-bottom: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.3rem;
+  padding: 2rem 0; 
+}
+
+.PostEventPage__logo {
+  width: 170px;
+  margin-bottom: 1rem;
+  animation: fade-in 1s ease forwards;
+}
+
+.PostEventPage__title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--color-orange-button);
+  margin: 0;
+}
+
+.PostEventPage__subtitle {
+  font-size: 1.1rem;
+  color: #e0e0e0;
+  margin-top: 0;
+  line-height: 1.5;
+}
+
+.PostEventPage__quote {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-top: 1.5rem;
+  font-style: italic;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (min-width: 768px) {
+  .PostEventPage {
+    padding: 3rem 2rem;
+  }
+  .PostEventPage__logo {
+    width: 230px;
+  }
+  .PostEventPage__title {
+    font-size: 1.8rem;
+  }
+  .PostEventPage__subtitle {
+    font-size: 1.25rem;
+  }
+  .PostEventPage__quote {
+    font-size: 1.6rem;
+  }
+  .PostEventPage__sticker--1 {
+    width: 140px;
+    top: 10%;
+  }
+  .PostEventPage__sticker--2 {
+    width: 160px;
+    right: 38%;
+    bottom: 8%;
+  }
+  .PostEventPage__sticker--3 {
+    width: 120px;
+    top: 70%;
+    }
+}
+
+@media (min-width: 1024px) {
+  .PostEventPage {
+    padding: 4rem 3rem;
+    background-image: radial-gradient(circle at 1% center, #2c3f7c 0%, #091622 85%);
+  }
+  .PostEventPage__content {
+    max-width: 750px;
+    gap: 1.8rem;
+  }
+  .PostEventPage__logo {
+    width: 280px;
+    margin-bottom: 1.5rem;
+  }
+  .PostEventPage__title {
+    font-size: 2.2rem;
+  }
+  .PostEventPage__subtitle {
+    font-size: 1.4rem;
+  }
+  .PostEventPage__quote {
+    font-size: 1.8rem;
+  }
+  .PostEventPage__sticker--1 {
+    top: 12%;
+    left: 6%;
+    width: 260px;
+  }
+  .PostEventPage__sticker--2 {
+    bottom: 12%;
+    right: 10%;
+    width: 290px;
+  }
+  .PostEventPage__sticker--3 {
+    top: 65%;
+    width: 230px;
+  }
+}
