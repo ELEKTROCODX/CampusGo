@@ -13,7 +13,8 @@ import FormLayout from "../layouts/FormLayout/FormLayout";
 function WelcomePage() {
   const navigate = useNavigate();
   // 3. Re-introducimos el estado del modo de página
-  const [pageMode, setPageMode] = useState('before'); 
+  const [pageMode, setPageMode] = useState('before');
+  const userLog = localStorage.getItem('userLog'); 
 
   // 4. Re-introducimos el useEffect para comprobar la fecha
   useEffect(() => {
@@ -37,11 +38,11 @@ function WelcomePage() {
   const handleNavigate = () => {
     if (pageMode === 'after') {
       navigate("/pevent"); // Ir a "Revive el Evento"
-      
-    } else if (pageMode === 'during') {
+    }else if(pageMode === 'before' && userLog){
+      navigate("/")
+    } else if (pageMode === 'during' && userLog) {
       navigate("/landing"); // ¡TU CAMBIO! Ir al Landing durante el evento
-      
-    } else { // 'before'
+    }else { // 'before'
       navigate("/form"); // Ir al formulario de permisos antes del evento
     }
   };

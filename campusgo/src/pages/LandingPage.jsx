@@ -24,6 +24,7 @@ import Mapa from "../assets/stickers/elemento2.png";
 import SpeakerImg1 from "../assets/ponents/ponente1.jpeg";
 import SpeakerImg2 from "../assets/ponents/ponente2.jpeg";
 import SpeakerImg3 from "../assets/ponents/ponente3.jpeg";
+import SpeakerImg4 from "../assets/ponents/ponente4.jpeg";
 
 function LandingPage() {
   const navigate = useNavigate();
@@ -129,12 +130,17 @@ function LandingPage() {
             style={{ gridColumn: '2 / 3', marginTop: '150px' }}
           />
           <SpeakerCard
-            name="Carmen Valenzuela"
-            role="Directora LeD"
+            name={<>Roberto<br />Gil</>}
+            role="CEO y Cofundador New Eyes Media"
             imgSrc={SpeakerImg3}
             style={{ gridColumn: '1 / 2', marginTop: '-150px' }}
           />
-        </div>
+          <SpeakerCard
+            name="Carmen Valenzuela"
+            role="Fundadora y Presidenta Susana Díaz  "
+            imgSrc={SpeakerImg4}
+            style={{ gridColumn: '2 / 3', marginTop: '0px' }}
+          />        </div>
       </section>
 
       <section className="page-section info-section">

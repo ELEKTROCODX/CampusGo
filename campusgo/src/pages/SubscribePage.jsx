@@ -11,7 +11,7 @@ import sticker4 from "../assets/stickers/elemento8.png";
 // Importa TODO lo de firebase, incluyendo getDoc
 import { auth, db, functions, generateToken } from '../firebase/firebase';
 import { signInAnonymously } from 'firebase/auth';
-import { doc, runTransaction, setDoc, getDoc } from 'firebase/firestore';
+import { doc, runTransaction, setDoc} from 'firebase/firestore';
 import { httpsCallable } from "firebase/functions";
 
 import FormInput from "../components/FormInput/FormInput";
@@ -42,7 +42,6 @@ async function assignTopic() {
             transaction.set(counterRef, { lastAssignedIndex: nextIndex, topics: topics });
         }
     });
-    console.log("Tópico asignado:", assignedTopic);
     return assignedTopic;
 }
 
@@ -65,19 +64,7 @@ function SubscribePage() {
             try {
                 // --- 1. VALIDACIÓN DE USUARIO (Tu nueva lógica) ---
                 if (userLog) {
-                    const userRef = doc(db, "Usuarios", userLog);
-                    const userDoc = await getDoc(userRef);
-
-                    if (userDoc.exists()) {
-                        // ¡USUARIO YA REGISTRADO!
-                        // Redirigir siempre a la raíz (/) como pediste.
-                        console.log("Usuario ya registrado. Redirigiendo a /");
-                        navigate("/");
-                        return; // Detiene la ejecución
-                    } else {
-                        // userLog existe pero no es válido (ej. BD borrada)
-                        localStorage.removeItem('userLog');
-                    }
+                    navigate('/')
                 }
 
                 // --- 2. USUARIO NUEVO ---
@@ -103,6 +90,8 @@ function SubscribePage() {
 
     }, [navigate]);
 
+    //USEEFECT END HERE
+
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -124,7 +113,6 @@ function SubscribePage() {
         try {
             const userCredential = await signInAnonymously(auth);
             const user = userCredential.user;
-            console.log("Usuario anónimo creado:", user.uid);
 
             toast.info("Por favor, acepta los permisos de notificación.");
             const tokenResult = await generateToken();
@@ -153,11 +141,9 @@ function SubscribePage() {
                     topic: assignedTopic,
                     userId: user.uid
                 });
-                console.log("Usuario suscrito al tópico:", assignedTopic);
             }
 
             await setDoc(doc(db, "Usuarios", user.uid), userData);
-            console.log("Usuario registrado y datos guardados: ", user.uid);
             localStorage.setItem('userLog', user.uid);
 
             setCurrentStep(3);

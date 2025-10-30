@@ -80,7 +80,7 @@ function CountdownPage() {
                 onClick={() => {
                     navigate("/welcome");
                 }}>
-                {new Date() >= eventStartDate ? "Entrar al evento" :(Logged ? "¡Inscríbete Ya" : "¡Inscríbete Ya!") }
+                {new Date() >= eventStartDate ? "Entrar al evento" :(Logged ? "Muy pronto" : "¡Inscríbete Ya!") }
             </button>
 
             <p className="CountdownPage__message">

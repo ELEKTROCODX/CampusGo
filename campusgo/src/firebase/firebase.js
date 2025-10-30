@@ -46,14 +46,13 @@ async function registerAndGetToken() {
   const swPath = "/duca/firebase-messaging-sw.js";
   const scope = "/duca/";
   
-  console.log("Registrando SW en:", swPath, "con scope:", scope);
   await navigator.serviceWorker.register(swPath, { scope: scope });
   
-  console.log("Esperando a que el Service Worker esté 'ready'...");
+  console.log("Esperando a que el Service Worker esté 'listo'...");
   // Esta es la línea que se traba:
   const registration = await navigator.serviceWorker.ready; 
   
-  console.log("Service Worker está 'ready':", registration);
+  console.log("Service Worker está 'listo':", registration);
   const vapidKey = process.env.REACT_APP_VAPID_KEY;
   if (!vapidKey) {
       console.error("Error: REACT_APP_VAPID_KEY no definida en .env");
@@ -67,7 +66,6 @@ async function registerAndGetToken() {
   });
 
   if (fcmToken) {
-    console.log("Token generado con éxito:", fcmToken);
     localStorage.setItem("fcmToken", fcmToken);
     return { success: true, token: fcmToken };
   } else {
