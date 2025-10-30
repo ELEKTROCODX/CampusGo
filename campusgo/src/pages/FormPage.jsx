@@ -47,7 +47,7 @@ function FormPage() {
       navigate("/subscribe"); // Navega
     } else {
       console.error("No se pudo generar el token de notificación.");
-      navigate("/subscribe"); // Navega de todos modos
+      navigate("/form"); // Navega de todos modos
     }
   };
 

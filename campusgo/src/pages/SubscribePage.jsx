@@ -8,42 +8,42 @@ import sticker2 from "../assets/stickers/elemento6.png";
 import sticker3 from "../assets/stickers/elemento7.png";
 import sticker4 from "../assets/stickers/elemento8.png";
 
-// Importa TODO lo de firebase (tu código)
-import { auth, db, functions, generateToken } from '../firebase/firebase';
+// Importa TODO lo de firebase
+import { auth, db, functions, generateToken } from '../firebase/firebase'; 
 import { signInAnonymously } from 'firebase/auth';
 import { doc, runTransaction, setDoc } from 'firebase/firestore';
 import { httpsCallable } from "firebase/functions";
 
 import FormInput from "../components/FormInput/FormInput";
 import { eventStartDate, postEventDate } from "../config";
-import { toast } from "react-toastify";
+import { toast } from "react-toastify"; 
 
-// Formato de fechas (tu código)
+// Formato de fechas
 const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
 const timeOptions = { hour: 'numeric', minute: 'numeric', hour12: true };
 const friendlyDate = eventStartDate.toLocaleDateString("es-SV", dateOptions);
 const friendlyTime = eventStartDate.toLocaleTimeString("es-SV", timeOptions);
 
-// Lógica de Tópicos (tu código)
-const topics = ["Grupo_1", "Grupo_2", "Grupo_3", "Grupo_4"];
-const subscribeToTopicCallable = httpsCallable(functions, 'subscribeUserToTopicCallable');
+// Lógica de Tópicos
+const topics = ["Grupo_1", "Grupo_2", "Grupo_3", "Grupo_4"]; 
+const subscribeToTopicCallable = httpsCallable(functions, 'subscribeUserToTopicCallable'); // <-- Nombre corregido
 
 async function assignTopic() {
     let assignedTopic = null;
     await runTransaction(db, async (transaction) => {
-        const counterRef = doc(db, "Metadatos", "asignacionTemas");
-        const counterDoc = await transaction.get(counterRef);
-        let currentIndex = 0;
-        if (counterDoc.exists()) {
-            currentIndex = counterDoc.data().lastAssignedIndex;
-        }
-        assignedTopic = topics[currentIndex % topics.length];
-        const nextIndex = (currentIndex + 1) % topics.length;
-        if (counterDoc.exists()) {
-            transaction.update(counterRef, { lastAssignedIndex: nextIndex });
-        } else {
-            transaction.set(counterRef, { lastAssignedIndex: nextIndex, topics: topics });
-        }
+      const counterRef = doc(db, "Metadatos", "asignacionTemas");
+      const counterDoc = await transaction.get(counterRef);
+      let currentIndex = 0;
+      if (counterDoc.exists()) {
+        currentIndex = counterDoc.data().lastAssignedIndex;
+      }
+      assignedTopic = topics[currentIndex % topics.length];
+      const nextIndex = (currentIndex + 1) % topics.length;
+      if (counterDoc.exists()) {
+        transaction.update(counterRef, { lastAssignedIndex: nextIndex });
+      } else {
+        transaction.set(counterRef, { lastAssignedIndex: nextIndex, topics: topics });
+      }
     });
     console.log("Tópico asignado:", assignedTopic);
     return assignedTopic;
@@ -51,19 +51,17 @@ async function assignTopic() {
 
 
 function SubscribePage() {
-    // 1. CORRECCIÓN: Inicia en el paso 1 (info), no en el formulario
-    const [currentStep, setCurrentStep] = useState(1);
+    const [currentStep, setCurrentStep] = useState(2); 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
-    const now = new Date();
 
-    // Lógica de redirección por fecha (tu código)
     useEffect(() => {
+        const now = new Date();
         if (now >= postEventDate) {
             navigate("/pevent");
         } else if (now >= eventStartDate) {
-            navigate("/subscribe");
+            navigate("/landing");
         }
     }, [navigate]);
 
@@ -78,7 +76,7 @@ function SubscribePage() {
         setFormData({ ...formData, [name]: value });
     };
 
-    // Función de registro (tu código - está perfecto)
+    // --- FUNCIÓN DE REGISTRO CON ORDEN CORREGIDO ---
     const handleRegistration = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -86,6 +84,13 @@ function SubscribePage() {
         const { email, name, company } = formData;
 
         try {
+            // 1. Inicia sesión anónimamente PRIMERO
+            // (Esto asegura que 'request.auth' no sea null)
+            const userCredential = await signInAnonymously(auth);
+            const user = userCredential.user;
+            console.log("Usuario anónimo creado:", user.uid);
+
+            // 2. Pide permiso de notificación
             toast.info("Por favor, acepta los permisos de notificación.");
             const tokenResult = await generateToken();
             const fcmToken = tokenResult.success ? tokenResult.token : null;
@@ -96,11 +101,11 @@ function SubscribePage() {
                 toast.warn("No se aceptaron las notificaciones. Puedes activarlas luego.");
             }
 
-            const assignedTopic = await assignTopic();
-            const userCredential = await signInAnonymously(auth);
-            const user = userCredential.user;
-            const registrationDate = new Date().toISOString();
+            // 3. Asigna un tópico (Ahora 'request.auth' SÍ existe)
+            const assignedTopic = await assignTopic(); 
 
+            // 4. Prepara TODOS los datos del usuario
+            const registrationDate = new Date().toISOString();
             const userData = {
                 name,
                 email,
@@ -110,25 +115,30 @@ function SubscribePage() {
                 fcmToken: fcmToken,
             };
 
+            // 5. Suscribe a la Cloud Function (si tenemos token y tópico)
             if (fcmToken && assignedTopic) {
-                await subscribeToTopicCallable({
-                    token: fcmToken,
+                // (Esta es la línea 114)
+                await subscribeToTopicCallable({ 
+                    token: fcmToken, 
                     topic: assignedTopic,
-                    userId: user.uid
+                    userId: user.uid 
                 });
                 console.log("Usuario suscrito al tópico:", assignedTopic);
             }
 
+            // 6. Guarda el usuario en Firestore
             await setDoc(doc(db, "Usuarios", user.uid), userData);
             console.log("Usuario registrado y datos guardados: ", user.uid);
             localStorage.setItem('userLog', user.uid);
-
-            // 2. CORRECCIÓN: Tu código original avanzaba al 3, lo cual es correcto
+            
+            // 7. Ve al paso final
             setCurrentStep(3);
         } catch (err) {
-            console.error("Error al registrar:", err.message);
+            console.error("Error al registrar:", err.message); // (Esta es la línea 129)
             if (err.code === 'permission-denied' || err.message.includes('insufficient permissions')) {
                 setError("Hubo un error de permisos. Asegúrate de que las reglas de Firestore están configuradas para 'create' en la colección 'Usuarios'.");
+            } else if (err.code === 'internal' || err.code === 'unavailable') {
+                setError("Error de conexión con el servidor. Verifica tu conexión o inténtalo más tarde.");
             } else {
                 setError("Error en el registro: " + err.message);
             }
@@ -137,14 +147,9 @@ function SubscribePage() {
         }
     }
 
-    // 3. handleNext (tu código - está perfecto)
     const handleNext = () => {
-        if (currentStep === 1) {
-            setCurrentStep(2); // Va al formulario
-        } else if (currentStep === 3 && now >= eventStartDate) {
-            navigate("/landing"); // Va a la landing
-        } else {
-            navigate("/")
+        if (currentStep === 3) {
+            navigate("/"); 
         }
     };
 
@@ -162,26 +167,11 @@ function SubscribePage() {
 
             <div className="SubscribePage__content">
 
-                {/* --- PASO 1: INFO --- */}
-                {currentStep === 1 && (
-                    <div className="SubscribePage__step SubscribePage__fade-in">
-                        <h2>Se parte del <br /><b>Networking de diseño</b> más disruptivo de El Salvador</h2>
-                        <p>Te invitamos a que seas parte del primer evento de diseño de la UCA</p>
-                        <div className="SubscribePage__event-info">
-                            <p><strong>Día y hora del evento:</strong><br />{friendlyDate} – {friendlyTime}</p>
-                            <p><strong>Lugar:</strong><br />UCA Edificio ICAS</p>
-                        </div>
-                        <button className="btn btn-acento" onClick={handleNext}>
-                            Quiero participar
-                        </button>
-                    </div>
-                )}
-
-                {/* --- PASO 2: FORMULARIO --- */}
+                {/* PASO 2 (Formulario) */}
                 {currentStep === 2 && (
                     <div className="SubscribePage__step SubscribePage__fade-in">
                         <h2>Crear perfil</h2>
-                        <form className="card card--form" onSubmit={handleRegistration}>
+                        <form className="card card--form" onSubmit={handleRegistration}> 
                             <FormInput
                                 label="Nombre y apellido*"
                                 name="name"
@@ -218,7 +208,7 @@ function SubscribePage() {
                     </div>
                 )}
 
-                {/* --- PASO 3: GRACIAS --- */}
+                {/* PASO 3 (Gracias) */}
                 {currentStep === 3 && (
                     <div className="SubscribePage__step SubscribePage__fade-in">
                         <h2>Gracias por compartir tus datos</h2>
@@ -236,7 +226,6 @@ function SubscribePage() {
 
             {/* Indicador de pasos */}
             <div className="SubscribePage__step-indicator">
-                <span className={`SubscribePage__step-dot ${currentStep === 1 ? "SubscribePage__step-dot--active" : ""}`}></span>
                 <span className={`SubscribePage__step-dot ${currentStep === 2 ? "SubscribePage__step-dot--active" : ""}`}></span>
                 <span className={`SubscribePage__step-dot ${currentStep === 3 ? "SubscribePage__step-dot--active" : ""}`}></span>
             </div>
