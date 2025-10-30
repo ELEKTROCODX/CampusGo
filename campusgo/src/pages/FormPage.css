@@ -79,6 +79,7 @@
   flex-grow: 1;
   padding: 1.5rem;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
@@ -107,4 +108,8 @@
   top: 70%;
   right: -5%;
   transform: rotate(25deg);
+}
+
+.p-container{
+  padding: 0em 2em;
 }

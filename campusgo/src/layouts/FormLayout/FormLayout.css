@@ -6,7 +6,6 @@
   align-items: center;
   color: var(--color-light-text);
   overflow: hidden;
-  padding: 0em 2em;
 }
 
 .FormLayout__header {

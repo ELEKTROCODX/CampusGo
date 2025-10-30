@@ -78,7 +78,7 @@ function CountdownPage() {
             <button
                 className="btn btn-acento"
                 onClick={() => {
-                    navigate("/subscribe");
+                    navigate("/welcome");
                 }}>
                 {new Date() >= eventStartDate ? "Entrar al evento" :(Logged ? "¡Inscríbete Ya" : "¡Inscríbete Ya!") }
             </button>
