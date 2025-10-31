@@ -33,13 +33,13 @@ export const generateToken = async () => {
     // 1. OPTIMIZACIÓN CLAVE: Verificar si el token ya existe
     const cachedToken = localStorage.getItem("fcmToken");
     if (cachedToken) {
-        console.log("FCM: ✅ Token encontrado en localStorage. Devolución instantánea.");
+        console.log("FCM: Token encontrado en localStorage. Devolución instantánea.");
         return { success: true, token: cachedToken };
     }
     
     // Si no está en caché, procedemos con la solicitud costosa
     const startTime = performance.now();
-    console.log("FCM: ⏱️ INICIO de la solicitud de token (Token no encontrado en caché).");
+    console.log("FCM: INICIO de la solicitud de token (Token no encontrado en caché).");
 
     const permission = await Notification.requestPermission();
     if (permission !== "granted") {
@@ -60,7 +60,7 @@ export const generateToken = async () => {
         registration = await navigator.serviceWorker.register(swPath, { scope: scope });
         
         if (registration.installing) {
-            console.log("FCM: ⏳ Esperando a que el Service Worker pase a activo...");
+            console.log("FCM: Esperando a que el Service Worker pase a activo...");
             await new Promise((resolve) => {
                 const newWorker = registration.installing;
                 newWorker.addEventListener('statechange', () => {
@@ -83,7 +83,7 @@ export const generateToken = async () => {
 
         // 3. INICIO: Solicitud de Token a Google/FCM (lento, 4.5s)
         const tokenReqStart = performance.now();
-        console.log("FCM: 🚨 INICIO de la solicitud de token a los servidores de Google...");
+        console.log("FCM: INICIO de la solicitud de token a los servidores de Google...");
 
         const fcmToken = await getToken(messaging, {
             serviceWorkerRegistration: registration,
@@ -91,13 +91,13 @@ export const generateToken = async () => {
         });
         
         const tokenReqEnd = performance.now();
-        console.log(`FCM: ✅ FIN de la solicitud de token. Duración: ${(tokenReqEnd - tokenReqStart).toFixed(2)} ms.`);
+        console.log(`FCM: FIN de la solicitud de token. Duración: ${(tokenReqEnd - tokenReqStart).toFixed(2)} ms.`);
 
 
         if (fcmToken) {
             localStorage.setItem("fcmToken", fcmToken);
             const totalTime = (performance.now() - startTime).toFixed(2);
-            console.log(`FCM: 🟢 Proceso COMPLETO exitoso. Tiempo total: ${totalTime} ms.`);
+            console.log(`FCM: Proceso COMPLETO exitoso. Tiempo total: ${totalTime} ms.`);
             return { success: true, token: fcmToken };
         } else {
             console.log("FCM: No se pudo generar el token.");
@@ -106,7 +106,7 @@ export const generateToken = async () => {
         }
     } catch (error) {
         // Manejo de errores generales (red, seguridad, etc.)
-        console.error("FCM: 🔴 Error grave durante la generación de token:", error);
+        console.error("FCM: Error grave durante la generación de token:", error);
         toast.error("Error de red o seguridad. Consulte la consola.");
         return { success: false, token: null };
     }

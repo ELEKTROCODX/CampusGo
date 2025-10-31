@@ -17,12 +17,16 @@ import { onMessage } from "firebase/messaging";
 function App() {
 
   useEffect(() => {
-    const notificationSound = "/duca/sounds/notifi.mp3"; 
-    const audio = new Audio(notificationSound);
+    const soundPath = "/duca/sounds/noti.mp3";
 
-    onMessage(messaging, (payload) => {
+    // 1. onMessage devuelve una función 'unsubscribe' para limpiar
+    const unsubscribe = onMessage(messaging, (payload) => {
       console.log("Mensaje recibido en primer plano: ", payload);
 
+      // 2. Crea la instancia de Audio AQUÍ, dentro del evento
+      const audio = new Audio(soundPath);
+      
+      // 3. Intenta reproducir el sonido
       audio.play().catch(e => console.warn("El audio no se pudo reproducir automáticamente:", e));
 
       toast.info(
@@ -32,14 +36,19 @@ function App() {
         </div>
       ); 
     });
-  }, []); 
+    
+    // 4. Limpia el 'listener' cuando el componente se desmonte
+    return () => unsubscribe();
+
+  }, []);
 
   const now = new Date();
-  const isAfterEvent = now >= postEventDate;
+  const isAfterEvent = now >= postEventDate; 
 
   return (
     <>
       <Routes>
+        {/* ... (Tus rutas están perfectas) ... */}
         <Route path="/" element={<CountdownPage />} />
         <Route path="/welcome" element={<WelcomePage />} />
         <Route path="/form" element={<RegistrationPage />} />
@@ -55,8 +64,8 @@ function App() {
       </Routes>
 
       <ToastContainer
-        position="bottom-center"
-        autoClose={10000}
+        position="bottom-center" 
+        autoClose={10000} 
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick
@@ -64,7 +73,7 @@ function App() {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme="dark"
+        theme="dark" 
       />
     </>
   );

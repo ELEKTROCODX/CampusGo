@@ -7,14 +7,31 @@ import sticker1 from "../assets/stickers/elemento4.png";
 import sticker2 from "../assets/stickers/elemento6.png";
 import sticker3 from "../assets/stickers/elemento7.png";
 import sticker4 from "../assets/stickers/elemento8.png";
-import { auth, db, functions, generateToken } from '../firebase/firebase';
+import { auth, db, functions, generateToken } from '../firebase/firebase'; 
 import { signInAnonymously } from 'firebase/auth';
-import { doc, runTransaction, setDoc} from 'firebase/firestore';
+import { doc, runTransaction, setDoc } from 'firebase/firestore';
 import { httpsCallable } from "firebase/functions";
 
 import FormInput from "../components/FormInput/FormInput";
 import { eventStartDate, postEventDate } from "../config";
-import { toast } from "react-toastify";
+import { toast } from "react-toastify"; 
+
+// --- INICIO DE CAMBIOS PARA SONIDO ---
+
+// 1. Define la ruta de tu sonido (debe estar en public/sounds/noti.mp3)
+const soundPath = "/duca/sounds/noti.mp3";
+
+// 2. Crea una función de ayuda para reproducir el sonido
+const playSound = () => {
+  try {
+    // Crea una nueva instancia cada vez para evitar errores de interrupción
+    const audio = new Audio(soundPath); 
+    audio.play().catch(e => console.warn("No se pudo reproducir el sonido:", e));
+  } catch (e) {
+    console.error("Error al crear el objeto Audio:", e);
+  }
+};
+// --- FIN DE CAMBIOS PARA SONIDO ---
 
 
 const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
@@ -24,29 +41,26 @@ const friendlyTime = eventStartDate.toLocaleTimeString("es-SV", timeOptions);
 const topics = ["Grupo_1", "Grupo_2", "Grupo_3", "Grupo_4"];
 const subscribeToTopicCallable = httpsCallable(functions, 'subscribeUserToTopicCallable');
 
-/**
- * Asigna un topic de forma rotativa utilizando una transacción de Firestore.
- * @returns {Promise<string>} El topic asignado.
- */
 async function assignTopic() {
     let assignedTopic = null;
     await runTransaction(db, async (transaction) => {
-        const counterRef = doc(db, "Metadatos", "asignacionTemas");
-        const counterDoc = await transaction.get(counterRef);
-        let currentIndex = 0;
-        if (counterDoc.exists()) {
-            currentIndex = counterDoc.data().lastAssignedIndex;
-        }
-        assignedTopic = topics[currentIndex % topics.length];
-        const nextIndex = (currentIndex + 1) % topics.length;
-        if (counterDoc.exists()) {
-            transaction.update(counterRef, { lastAssignedIndex: nextIndex });
-        } else {
-            transaction.set(counterRef, { lastAssignedIndex: nextIndex, topics: topics });
-        }
+      const counterRef = doc(db, "Metadatos", "asignacionTemas");
+      const counterDoc = await transaction.get(counterRef);
+      let currentIndex = 0;
+      if (counterDoc.exists()) {
+          currentIndex = counterDoc.data().lastAssignedIndex;
+      }
+      assignedTopic = topics[currentIndex % topics.length];
+      const nextIndex = (currentIndex + 1) % topics.length;
+      if (counterDoc.exists()) {
+          transaction.update(counterRef, { lastAssignedIndex: nextIndex });
+      } else {
+          transaction.set(counterRef, { lastAssignedIndex: nextIndex, topics: topics });
+      }
     });
     return assignedTopic;
 }
+
 
 function SubscribePage() {
     const [currentStep, setCurrentStep] = useState(2);
@@ -68,9 +82,9 @@ function SubscribePage() {
                     return;
                 }
                 if (now >= postEventDate) {
-                    navigate("/pevent"); // Evento terminó
+                    navigate("/pevent");
                 } else if (now >= eventStartDate) {
-                    navigate("/landing"); // Evento en curso (se salta el registro)
+                    navigate("/landing");
                 } else {
                     setIsValidating(false);
                 }
@@ -103,27 +117,25 @@ function SubscribePage() {
         const { email, name, company } = formData;
 
         try {
-            // Paso 1: Autenticación Anónima (Debe ir primero para obtener el UID)
             const userCredential = await signInAnonymously(auth);
             const user = userCredential.user;
 
-
+            // 3. Reproduce sonido ANTES del toast
+            playSound(); 
             toast.info("Por favor, acepta los permisos de notificación (solicitud externa).");
 
-            // Paso 2: PARALELIZACIÓN DEL CUELLO DE BOTELLA
-            // Ejecutamos generateToken (lento) y assignTopic (transacción) al mismo tiempo
             const [tokenResult, assignedTopic] = await Promise.all([
-                generateToken(), // Lento (~4.5s)
-                assignTopic()    // Medio (Transacción Firestore)
+                generateToken(), 
+                assignTopic()
             ]);
 
-
-            const tokenResult = await generateToken();
             const fcmToken = tokenResult.success ? tokenResult.token : null;
 
             if (fcmToken) {
+                playSound(); // 3. Reproduce sonido
                 toast.success("¡Permiso aceptado y token obtenido!");
             } else {
+                playSound(); // 3. Reproduce sonido
                 toast.warn("No se aceptaron las notificaciones. Puedes activarlas luego.");
             }
 
@@ -138,12 +150,10 @@ function SubscribePage() {
             };
 
             const promises = [
-                // 3a. Guardar datos del usuario en Firestore
                 setDoc(doc(db, "Usuarios", user.uid), userData),
             ];
 
             if (fcmToken && assignedTopic) {
-                // 3b. Suscripción al topic de FCM (si hay token)
                 promises.push(
                     subscribeToTopicCallable({
                         token: fcmToken,
@@ -153,10 +163,10 @@ function SubscribePage() {
                 );
             }
             
-            // Esperar a que el guardado y la suscripción terminen
             await Promise.all(promises);
 
             localStorage.setItem('userLog', user.uid);
+            playSound(); // 3. Reproduce sonido
             toast.success("¡Registro completado!");
             setCurrentStep(3);
         } catch (err) {
@@ -170,6 +180,7 @@ function SubscribePage() {
             }
             
             setError(errorMessage);
+            playSound(); // 3. Reproduce sonido
             toast.error(errorMessage);
         } finally {
             setLoading(false);
@@ -182,7 +193,6 @@ function SubscribePage() {
         }
     };
 
-    // 3. MUESTRA UNA PANTALLA DE CARGA MIENTRAS SE VALIDA
     if (isValidating) {
         return (
             <div className="SubscribePage page-background--radial-blue-top flex items-center justify-center min-h-screen">
@@ -194,7 +204,6 @@ function SubscribePage() {
         );
     }
 
-    // 4. Si no está validando (y no ha redirigido), muestra el formulario
     return (
         <div className="SubscribePage page-background--radial-blue-top">
             <Link to="/">

@@ -16,11 +16,11 @@ export default function QRScanner({ onDetected, onClose }) {
       <canvas ref={canvasRef} hidden />
       <div className="qr-controls">
         {!scanning ? (
-          <button onClick={startCamera}>Iniciar escaneo</button>
+          <button onClick={startCamera}>Escanear</button>
         ) : (
           <button onClick={stopCamera}>Detener</button>
         )}
-        <button onClick={onClose}>Cerrar</button>
+        <button onClick={onClose}>Cancelar</button>
       </div>
     </div>
   );

@@ -4,7 +4,6 @@ import QRScanner from "../components/QRScanner";
 import "./LandingPage.css";
 import '../components/QRScanner.css';
 
-// 1. Importa 'toast'
 import { toast } from 'react-toastify';
 
 import ActivityCard from "../components/ActivityCard/ActivityCard";
@@ -24,7 +23,24 @@ import Mapa from "../assets/stickers/elemento2.png";
 import SpeakerImg1 from "../assets/ponents/ponente1.jpeg";
 import SpeakerImg2 from "../assets/ponents/ponente2.jpeg";
 import SpeakerImg3 from "../assets/ponents/ponente3.jpeg";
-import SpeakerImg4 from "../assets/ponents/ponente4.jpeg";
+import SpeakerImg4 from "../assets/ponents/ponente4.jpeg"; // Asegúrate que este import esté
+
+// --- INICIO DE CAMBIOS PARA SONIDO ---
+
+// 1. Define la ruta de tu sonido (debe estar en public/sounds/noti.mp3)
+const soundPath = "/duca/sounds/noti.mp3"; 
+
+// 2. Crea una función de ayuda para reproducir el sonido
+const playSound = () => {
+  try {
+    const audio = new Audio(soundPath); 
+    audio.play().catch(e => console.warn("No se pudo reproducir el sonido:", e));
+  } catch (e) {
+    console.error("Error al crear el objeto Audio:", e);
+  }
+};
+// --- FIN DE CAMBIOS PARA SONIDO ---
+
 
 function LandingPage() {
   const navigate = useNavigate();
@@ -47,6 +63,7 @@ function LandingPage() {
     const updated = stations.map((s) => {
       if (s._uuid === code) {
         stationFound = true;
+        playSound(); // <-- 3. Sonido añadido
         toast.success(`¡Estación visitada: ${s.name}!`);
         return { ...s, status: "Visitado" };
       } else {
@@ -55,6 +72,7 @@ function LandingPage() {
     });
 
     if (!stationFound) {
+      playSound(); // <-- 3. Sonido añadido
       toast.error("Código QR no reconocido.");
     }
 
@@ -118,9 +136,9 @@ function LandingPage() {
         <h2 className="speakers-section__title">Conoce a nuestros ponentes</h2>
         <div className="speakers-section__grid">
           <SpeakerCard
-            name={<>José<br />Moz</>} // Permite salto de línea
+            name={<>José<br />Moz</>} 
             role="Gerente de Diseño de Experiencias"
-            imgSrc={SpeakerImg1} // Usa la variable renombrada
+            imgSrc={SpeakerImg1} 
             style={{ gridColumn: '1 / 2' }}
           />
           <SpeakerCard
@@ -137,10 +155,10 @@ function LandingPage() {
           />
           <SpeakerCard
             name="Carmen Valenzuela"
-            role="Fundadora y Presidenta Susana Díaz  "
+            role="Fundadora y Presidenta Susana Díaz"
             imgSrc={SpeakerImg4}
             style={{ gridColumn: '2 / 3', marginTop: '0px' }}
-          />        </div>
+          />       </div>
       </section>
 
       <section className="page-section info-section">
