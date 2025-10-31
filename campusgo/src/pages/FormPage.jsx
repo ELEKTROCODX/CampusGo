@@ -123,14 +123,15 @@ function FormPage() {
         <div className="PermissionScreen" style={{ justifyContent: 'center', height: '60vh', alignItems: 'center', display: 'flex', flexDirection: 'column' }}>
           {/* Eliminamos la imagen rotando y ponemos un mensaje */}
           <h2 style={{ color: 'white', fontSize: '1.5rem', textAlign: 'center', marginTop: '1rem' }}>
-            Activando servicio de notificaciones...
+            Activando servicio de notificaciones... <br />
             Estableciendo conexion con Google
           </h2>
           <button className="btn btn-outline" onClick={handleManualReload}>
             Reiniciar la Página
           </button>
           <p style={{ color: 'white', opacity: 0.8, textAlign: 'center', margin: '0.5rem 0 2rem' }}>
-            (Esto puede tardar unos segundos)
+            (Esto puede tardar unos segundos <br />
+            de tardarse demasiado recargar la página)
           </p>
 
           {showReloadOption && (
