@@ -1,0 +1,27 @@
+{
+  "hosting": {
+    "public": "build",
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
+  "emulators": {
+    "hosting": {
+      "port": 5000,
+      "target": "prueba-noti-2db31"
+    },
+    "firestore": {
+      "port": 8080
+    },
+    "ui": {
+      "port": 4000
+    }
+  },
+  "functions": {
+    "source": "functions",
+    "runtime": "nodejs18"
+  } 
+}

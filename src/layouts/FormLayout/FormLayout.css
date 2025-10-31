@@ -1,0 +1,45 @@
+.FormLayout {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--color-light-text);
+  overflow: hidden;
+}
+
+.FormLayout__header {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  z-index: 2;
+  animation: fade-slide-rotate 1s ease forwards;
+}
+
+.FormLayout__logo {
+  width: 12em;
+  max-width: 80%;
+  display: block;
+}
+
+.FormLayout__content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  flex-grow: 1;
+  z-index: 2;
+}
+
+@keyframes fade-slide-rotate {
+  0% {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
