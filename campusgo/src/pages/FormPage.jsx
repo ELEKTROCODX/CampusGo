@@ -25,12 +25,31 @@ function FormPage() {
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const userLog = localStorage.getItem('userLog');
-  const [status, setStatus] = useState("Esperando permiso...");
+  
   const [loading, setLoading] = useState(false);
+  // Estado para saber si la carga ya superó el tiempo mínimo
+  const [showReloadOption, setShowReloadOption] = useState(false);
+
+  // Función para forzar la recarga de la página
+  const handleManualReload = () => {
+    toast.info("Reiniciando la página para completar la activación...");
+    window.location.reload();
+  };
 
   const handlePermission = async () => {
-    setLoading(true);
+    if (loading) return;
 
+    setShowModal(false);
+    setLoading(true); // Iniciar estado de carga
+
+    try {
+      const result = await generateToken();
+      setShowReloadOption(false); // Ocultar opción de reinicio
+
+      if (result.success) {
+        toast.success("¡Permiso aceptado! Token guardado.");
+
+        if (userLog && result.token) {
     try {
       const result = await generateToken();
 
@@ -48,14 +67,18 @@ function FormPage() {
           try {
             const userRef = doc(db, "Usuarios", userLog);
             await updateDoc(userRef, { fcmToken: result.token });
-            console.log("Token actualizado en Firestore para usuario existente.");
+            console.log("Token actualizado en Firestore.");
           } catch (error) {
             console.warn("Error (no crítico) al actualizar el token en Firestore:", error);
           }
-        } else {
-          setStatus("Permiso otorgado. Continuar a registro.");
-          console.log("Permiso otorgado. El token está en localStorage.");
         }
+        navigate("/subscribe");
+      } else {
+        toast.info("Notificaciones no permitidas. Puedes activarlas más tarde.");
+        navigate("/subscribe");
+      }
+    } catch (error) {
+      setShowReloadOption(false);
         navigate("/subscribe");
       } else {
         playSound(infoSound);
@@ -66,7 +89,8 @@ function FormPage() {
     } catch (error) {
       playSound(infoSound);
       console.error("Error en handlePermission:", error);
-      toast.error("Ocurrió un error inesperado.");
+      toast.error("Ocurrió un error inesperado al solicitar permisos.");
+      navigate("/subscribe");
     } finally {
       setLoading(false);
     }
@@ -85,10 +109,40 @@ function FormPage() {
     playSound(infoSound);
     toast.info("Permiso omitido.");
     setShowModal(false);
+    navigate("/subscribe");
+  };
+
+  // 4. Pantalla de carga (si 'loading' es true)
+  if (loading) {
+    return (
+      <FormLayout>
+        <div className="PermissionScreen" style={{ justifyContent: 'center', height: '60vh', alignItems: 'center', display: 'flex', flexDirection: 'column' }}>
+          {/* Eliminamos la imagen rotando y ponemos un mensaje */}
+          <h2 style={{ color: 'white', fontSize: '1.5rem', textAlign: 'center', marginTop: '1rem' }}>
+            Activando servicio de notificaciones...
+            Estableciendo conexion con Google
+          </h2>
+          <button className="btn btn-outline" onClick={handleManualReload}>
+              Reiniciar la Página
+            </button>
+          <p style={{ color: 'white', opacity: 0.8, textAlign: 'center', margin: '0.5rem 0 2rem' }}>
+            (Esto puede tardar unos segundos)
+          </p>
+
+          {/* BOTÓN DE REINICIO MANUAL (Solo visible después del timeout) */}
+          {showReloadOption && (
+            <button className="btn btn-outline" onClick={handleManualReload}>
+              Reiniciar la Página
+            </button>
+          )}
+        </div>
+      </FormLayout>
+    );
+  }
+
     navigate("/landing");
   };
 
-  // ... (El resto de tu JSX de return no cambia) ...
   return (
     <FormLayout>
       <div className="PermissionScreen">
@@ -100,7 +154,7 @@ function FormPage() {
           </p>
         </div>
         <button className="btn btn-acento" onClick={handlePermission} disabled={loading}>
-          {loading ? "Comprobando..." : "Permitir"}
+          {"Permitir"}
         </button>
         <div className="PermissionScreen__progress-bottom">
           <span className="PermissionScreen__skip-text" onClick={handleSkip}>
@@ -114,8 +168,8 @@ function FormPage() {
           <h3>¿Estás seguro de que deseas no recibir notificaciones?</h3>
           <p>No podrás disfrutar de la experiencia completa.</p>
           <div className="PermissionScreen__modal-buttons">
-            <button className="btn btn-acento" onClick={handlePermission} disabled={loading}>Aceptar</button>
-            <button className="btn btn-outline" onClick={handleConfirmSkip}>No aceptar</button>
+            <button className="btn btn-acento" onClick={handlePermission} disabled={loading}>Sí, Aceptar</button>
+            <button className="btn btn-outline" onClick={handleConfirmSkip}>No, Omitir</button>
           </div>
         </Modal>
       )}
