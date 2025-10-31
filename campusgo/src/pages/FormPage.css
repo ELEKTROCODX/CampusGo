@@ -4,13 +4,14 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.5rem; 
+  justify-content: center;
+  gap: 1em; 
   padding: 1rem;
 }
 
 .PermissionScreen__icon {
   width: 10em;
-  max-width: 50%;
+  max-width: 35%;
   margin-bottom: 0.5rem;
   --rotate: 10deg;
   transform: rotate(var(--rotate));
@@ -18,15 +19,19 @@
 }
 
 .PermissionScreen__title {
-  font-size: 1.6rem;
+  font-size: 1.2em;
   font-weight: 700;
   color: #fff;
+}
+
+.permissionScreen__text{
+  font-size: 0.8em;
 }
 
 .PermissionScreen__text-container {
   max-width: 400px;
   color: var(--color-muted-text);
-  line-height: 1.6;
+  line-height: 1.6;  
 }
 
 .PermissionScreen__progress-bottom {
@@ -41,6 +46,8 @@
   color: #fff;
   font-weight: 600;
   text-decoration: underline;
+  text-align: center;
+  font-size: 0.8em;
 }
 
 .PermissionScreen__modal-buttons {

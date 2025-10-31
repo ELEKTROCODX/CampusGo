@@ -9,12 +9,23 @@ import Modal from "../components/Modal/Modal";
 import Footer from "../components/Footer/Footer";
 import { toast } from "react-toastify";
 
+const infoSound = "/duca/sounds/noti.mp3";
+
+// 2. Crea una función de ayuda para reproducir el sonido
+const playSound = (soundFile) => {
+  try {
+    const audio = new Audio(soundFile);
+    audio.play().catch(e => console.warn("No se pudo reproducir el sonido:", e));
+  } catch (e) {
+    console.error("Error al crear el objeto Audio:", e);
+  }
+};
+
 function FormPage() {
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const userLog = localStorage.getItem('userLog');
-
-  // 1. Estado para manejar la carga/espera
+  
   const [loading, setLoading] = useState(false);
   // Estado para saber si la carga ya superó el tiempo mínimo
   const [showReloadOption, setShowReloadOption] = useState(false);
@@ -39,6 +50,20 @@ function FormPage() {
         toast.success("¡Permiso aceptado! Token guardado.");
 
         if (userLog && result.token) {
+    try {
+      const result = await generateToken();
+
+      if (result.reload) {
+        playSound(infoSound);
+        toast.info("Activando servicio de notificaciones...");
+        setTimeout(() => window.location.reload(), 2000);
+        return;
+      }
+
+      if (result.success) {
+        playSound(infoSound);
+        toast.success("¡Permiso aceptado! Token guardado.");
+        if (userLog) {
           try {
             const userRef = doc(db, "Usuarios", userLog);
             await updateDoc(userRef, { fcmToken: result.token });
@@ -47,7 +72,6 @@ function FormPage() {
             console.warn("Error (no crítico) al actualizar el token en Firestore:", error);
           }
         }
-
         navigate("/subscribe");
       } else {
         toast.info("Notificaciones no permitidas. Puedes activarlas más tarde.");
@@ -55,6 +79,15 @@ function FormPage() {
       }
     } catch (error) {
       setShowReloadOption(false);
+        navigate("/subscribe");
+      } else {
+        playSound(infoSound);
+        console.error("No se pudo generar el token de notificación.");
+        toast.error("No se pudo activar el permiso. Inténtalo de nuevo.");
+        navigate("/form");
+      }
+    } catch (error) {
+      playSound(infoSound);
       console.error("Error en handlePermission:", error);
       toast.error("Ocurrió un error inesperado al solicitar permisos.");
       navigate("/subscribe");
@@ -73,6 +106,7 @@ function FormPage() {
 
   const handleConfirmSkip = () => {
     localStorage.removeItem('fcmToken');
+    playSound(infoSound);
     toast.info("Permiso omitido.");
     setShowModal(false);
     navigate("/subscribe");
@@ -106,14 +140,16 @@ function FormPage() {
     );
   }
 
-  // 5. Página de formulario normal
+    navigate("/landing");
+  };
+
   return (
     <FormLayout>
       <div className="PermissionScreen">
         <img src={Sticker1} alt="Icono permisos" className="PermissionScreen__icon" />
         <h2 className="PermissionScreen__title">Activar las notificaciones</h2>
         <div className="PermissionScreen__text-container">
-          <p>
+          <p className="permissionScreen__text">
             Queremos guiarte en cada momento del evento, por lo que necesitamos tu permiso para enviarte notificaciones en tiempo real.
           </p>
         </div>
@@ -129,8 +165,8 @@ function FormPage() {
 
       {showModal && (
         <Modal onClose={handleModalClose}>
-          <h3>¿Estás seguro de que quieres saltarte las notificaciones?</h3>
-          <p>Si no aceptas, no podrás disfrutar de la experiencia completa.</p>
+          <h3>¿Estás seguro de que deseas no recibir notificaciones?</h3>
+          <p>No podrás disfrutar de la experiencia completa.</p>
           <div className="PermissionScreen__modal-buttons">
             <button className="btn btn-acento" onClick={handlePermission} disabled={loading}>Sí, Aceptar</button>
             <button className="btn btn-outline" onClick={handleConfirmSkip}>No, Omitir</button>

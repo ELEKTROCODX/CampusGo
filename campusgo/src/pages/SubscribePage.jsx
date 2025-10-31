@@ -7,8 +7,6 @@ import sticker1 from "../assets/stickers/elemento4.png";
 import sticker2 from "../assets/stickers/elemento6.png";
 import sticker3 from "../assets/stickers/elemento7.png";
 import sticker4 from "../assets/stickers/elemento8.png";
-
-// Importa TODO lo de firebase, incluyendo getDoc
 import { auth, db, functions, generateToken } from '../firebase/firebase';
 import { signInAnonymously } from 'firebase/auth';
 import { doc, runTransaction, setDoc} from 'firebase/firestore';
@@ -18,8 +16,6 @@ import FormInput from "../components/FormInput/FormInput";
 import { eventStartDate, postEventDate } from "../config";
 import { toast } from "react-toastify";
 
-// --- Variables de configuración de Fechas (DEBEN ESTAR DEFINIDAS FUERA DEL COMPONENTE) ---
-// Usaremos fechas de ejemplo aquí, asumiendo que vienen de una fuente externa real.
 
 const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
 const timeOptions = { hour: 'numeric', minute: 'numeric', hour12: true };
@@ -52,14 +48,12 @@ async function assignTopic() {
     return assignedTopic;
 }
 
-
 function SubscribePage() {
     const [currentStep, setCurrentStep] = useState(2);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-    // Estado de validación (muestra una pantalla de carga inicial)
     const [isValidating, setIsValidating] = useState(true);
 
     // --- LÓGICA DE NAVEGACIÓN Y REDIRECCIÓN ---
@@ -69,20 +63,15 @@ function SubscribePage() {
 
         const checkUserAndDate = async () => {
             try {
-                // 1. USUARIO YA REGISTRADO: Si hay userLog, vamos a la landing
                 if (userLog) {
                     navigate('/');
                     return;
                 }
-
-                // 2. USUARIO NUEVO: Validar fechas
                 if (now >= postEventDate) {
                     navigate("/pevent"); // Evento terminó
                 } else if (now >= eventStartDate) {
                     navigate("/landing"); // Evento en curso (se salta el registro)
                 } else {
-                    // Es un usuario nuevo Y el evento no ha comenzado.
-                    // ¡Mostramos el formulario de registro!
                     setIsValidating(false);
                 }
             } catch (err) {
@@ -106,7 +95,7 @@ function SubscribePage() {
         setFormData({ ...formData, [name]: value });
     };
 
-    // --- FUNCIÓN DE REGISTRO OPTIMIZADA POR PARALELIZACIÓN ---
+
     const handleRegistration = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -118,6 +107,7 @@ function SubscribePage() {
             const userCredential = await signInAnonymously(auth);
             const user = userCredential.user;
 
+
             toast.info("Por favor, acepta los permisos de notificación (solicitud externa).");
 
             // Paso 2: PARALELIZACIÓN DEL CUELLO DE BOTELLA
@@ -127,6 +117,8 @@ function SubscribePage() {
                 assignTopic()    // Medio (Transacción Firestore)
             ]);
 
+
+            const tokenResult = await generateToken();
             const fcmToken = tokenResult.success ? tokenResult.token : null;
 
             if (fcmToken) {

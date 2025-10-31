@@ -20,8 +20,10 @@ function Footer() {
       </div>
 
       <footer className="FooterInfo">
-        <p>Universidad Centroamericana José Simeón Cañas</p>
-        <p>Todos los derechos reservados</p>
+        <a href="https://uca.edu.sv/">
+          <p>Universidad Centroamericana "José Simeón Cañas"</p>
+        </a>
+        <p>© Todos los derechos reservados</p>
       </footer>
     </section>
   );
