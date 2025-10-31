@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { postEventDate } from "./config.js";
+import { postEventDate } from "./config.js"; 
 import CountdownPage from "./pages/CountdownPage.jsx";
 import WelcomePage from "./pages/WelcomePage.jsx";
 import RegistrationPage from "./pages/FormPage.jsx";
@@ -17,22 +17,22 @@ import { onMessage } from "firebase/messaging";
 function App() {
 
   useEffect(() => {
-    // Define la ruta a tu sonido de notificación
-    const notificationSound = "/sounds/notification.mp3";
+    const notificationSound = "/duca/sounds/notifi.mp3"; 
+    const audio = new Audio(notificationSound);
 
     onMessage(messaging, (payload) => {
       console.log("Mensaje recibido en primer plano: ", payload);
+
+      audio.play().catch(e => console.warn("El audio no se pudo reproducir automáticamente:", e));
+
       toast.info(
         <div>
           <strong>{payload.notification.title}</strong>
           <p>{payload.notification.body}</p>
-        </div>,
-        {
-          sound: notificationSound 
-        }
-      );
+        </div>
+      ); 
     });
-  }, []);
+  }, []); 
 
   const now = new Date();
   const isAfterEvent = now >= postEventDate;
@@ -47,16 +47,9 @@ function App() {
         <Route path="/landing" element={<LandingPage />} />
         <Route path="/map" element={<MapPage />} />
         <Route path="/subscribe" element={<SubscribePage />} />
-
-        <Route
-          path="/pevent"
-          element={
-            isAfterEvent ? (
-              <PostEventPage />
-            ) : (
-              <Navigate to="/" replace />
-            )
-          }
+        <Route 
+          path="/pevent" 
+          element={ isAfterEvent ? <PostEventPage /> : <Navigate to="/" replace /> }
         />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

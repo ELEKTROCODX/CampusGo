@@ -9,6 +9,18 @@ import Modal from "../components/Modal/Modal";
 import Footer from "../components/Footer/Footer";
 import { toast } from "react-toastify";
 
+const infoSound = "/duca/sounds/noti.mp3";
+
+// 2. Crea una función de ayuda para reproducir el sonido
+const playSound = (soundFile) => {
+  try {
+    const audio = new Audio(soundFile);
+    audio.play().catch(e => console.warn("No se pudo reproducir el sonido:", e));
+  } catch (e) {
+    console.error("Error al crear el objeto Audio:", e);
+  }
+};
+
 function FormPage() {
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
@@ -19,26 +31,19 @@ function FormPage() {
   const handlePermission = async () => {
     setLoading(true);
 
-    // 1. Define tus sonidos aquí
-    const infoSound = "/sounds/notification.mp3"; // O el que prefieras para 'info'
-    const successSound = "/sounds/notification.mp3";   // Un sonido para éxito
-    const errorSound = "/sounds/error.mp3";       // Un sonido para error
-
     try {
       const result = await generateToken();
 
       if (result.reload) {
-        toast.info("Activando servicio de notificaciones...", {
-          sound: infoSound 
-        });
+        playSound(infoSound);
+        toast.info("Activando servicio de notificaciones...");
         setTimeout(() => window.location.reload(), 2000);
         return;
       }
 
       if (result.success) {
-        toast.success("¡Permiso aceptado! Token guardado.", {
-          sound: successSound 
-        });
+        playSound(infoSound);
+        toast.success("¡Permiso aceptado! Token guardado.");
         if (userLog) {
           try {
             const userRef = doc(db, "Usuarios", userLog);
@@ -53,18 +58,15 @@ function FormPage() {
         }
         navigate("/subscribe");
       } else {
+        playSound(infoSound);
         console.error("No se pudo generar el token de notificación.");
-
-        toast.error("No se pudo activar el permiso. Inténtalo de nuevo.", {
-          sound: errorSound
-        });
+        toast.error("No se pudo activar el permiso. Inténtalo de nuevo.");
         navigate("/form");
       }
     } catch (error) {
+      playSound(infoSound);
       console.error("Error en handlePermission:", error);
-      toast.error("Ocurrió un error inesperado.", {
-        sound: errorSound // <-- Sonido de error
-      });
+      toast.error("Ocurrió un error inesperado.");
     } finally {
       setLoading(false);
     }
@@ -80,10 +82,13 @@ function FormPage() {
 
   const handleConfirmSkip = () => {
     localStorage.removeItem('fcmToken');
+    playSound(infoSound);
     toast.info("Permiso omitido.");
     setShowModal(false);
+    navigate("/landing");
   };
 
+  // ... (El resto de tu JSX de return no cambia) ...
   return (
     <FormLayout>
       <div className="PermissionScreen">

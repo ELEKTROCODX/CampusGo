@@ -87,7 +87,7 @@ function LandingPage() {
 
         </div>
         <div className="welcome-section__greeting">
-          <div className="welcome-section__user-name"></div> {/*Nombre del usuario */}
+          <div className="welcome-section__user-name"></div> 
           <div className="welcome-section__subtitle">¡Eres parte de nuestro primer</div>
           <div className="welcome-section__subtitle">networking de Diseño!</div>
         </div>
