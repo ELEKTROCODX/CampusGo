@@ -7,8 +7,6 @@ import sticker1 from "../assets/stickers/elemento4.png";
 import sticker2 from "../assets/stickers/elemento6.png";
 import sticker3 from "../assets/stickers/elemento7.png";
 import sticker4 from "../assets/stickers/elemento8.png";
-
-// Importa TODO lo de firebase, incluyendo getDoc
 import { auth, db, functions, generateToken } from '../firebase/firebase';
 import { signInAnonymously } from 'firebase/auth';
 import { doc, runTransaction, setDoc} from 'firebase/firestore';
@@ -18,7 +16,6 @@ import FormInput from "../components/FormInput/FormInput";
 import { eventStartDate, postEventDate } from "../config";
 import { toast } from "react-toastify";
 
-// ... (Formato de fechas, lógica de Tópicos, y assignTopic() - sin cambios) ...
 const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
 const timeOptions = { hour: 'numeric', minute: 'numeric', hour12: true };
 const friendlyDate = eventStartDate.toLocaleDateString("es-SV", dateOptions);
@@ -45,15 +42,12 @@ async function assignTopic() {
     return assignedTopic;
 }
 
-
 function SubscribePage() {
     const [currentStep, setCurrentStep] = useState(2);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-    // 1. AÑADIMOS ESTADO DE VALIDACIÓN
-    // La página no mostrará nada hasta que la validación termine.
     const [isValidating, setIsValidating] = useState(true);
 
     useEffect(() => {
@@ -62,21 +56,15 @@ function SubscribePage() {
 
         const checkUserAndDate = async () => {
             try {
-                // --- 1. VALIDACIÓN DE USUARIO (Tu nueva lógica) ---
                 if (userLog) {
                     navigate('/')
                 }
 
-                // --- 2. USUARIO NUEVO ---
-                // Si llegamos aquí, no hay un userLog válido.
-                // Aplicamos la lógica de fechas para un usuario nuevo.
                 if (now >= postEventDate) {
                     navigate("/pevent"); // Evento terminó
                 } else if (now >= eventStartDate) {
                     navigate("/landing"); // Evento en curso (se salta el registro)
                 } else {
-                    // Es un usuario nuevo Y el evento no ha comenzado.
-                    // ¡Mostramos el formulario de registro!
                     setIsValidating(false);
                 }
             } catch (err) {
@@ -103,7 +91,6 @@ function SubscribePage() {
         setFormData({ ...formData, [name]: value });
     };
 
-    // --- handleRegistration (Sin cambios) ---
     const handleRegistration = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -113,8 +100,6 @@ function SubscribePage() {
         try {
             const userCredential = await signInAnonymously(auth);
             const user = userCredential.user;
-
-            toast.info("Por favor, acepta los permisos de notificación.");
             const tokenResult = await generateToken();
             const fcmToken = tokenResult.success ? tokenResult.token : null;
 

@@ -17,17 +17,25 @@ import { onMessage } from "firebase/messaging";
 function App() {
 
   useEffect(() => {
+    const notificationSound = "/duca/sounds/notifi.mp3"; 
+    const audio = new Audio(notificationSound);
+
     onMessage(messaging, (payload) => {
       console.log("Mensaje recibido en primer plano: ", payload);
-      toast.info(<div>
-        <strong>{payload.notification.title}</strong>
-        <p>{payload.notification.body}</p>
-      </div>); 
+
+      audio.play().catch(e => console.warn("El audio no se pudo reproducir automáticamente:", e));
+
+      toast.info(
+        <div>
+          <strong>{payload.notification.title}</strong>
+          <p>{payload.notification.body}</p>
+        </div>
+      ); 
     });
-  }, []);
+  }, []); 
 
   const now = new Date();
-  const isAfterEvent = now >= postEventDate; 
+  const isAfterEvent = now >= postEventDate;
 
   return (
     <>
@@ -39,24 +47,16 @@ function App() {
         <Route path="/landing" element={<LandingPage />} />
         <Route path="/map" element={<MapPage />} />
         <Route path="/subscribe" element={<SubscribePage />} />
-        
         <Route 
           path="/pevent" 
-          element={
-            isAfterEvent ? (
-              <PostEventPage /> 
-            ) : (
-              <Navigate to="/" replace />
-            )
-          }
+          element={ isAfterEvent ? <PostEventPage /> : <Navigate to="/" replace /> }
         />
-
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
       <ToastContainer
-        position="bottom-center" 
-        autoClose={10000} 
+        position="bottom-center"
+        autoClose={10000}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick
@@ -64,7 +64,7 @@ function App() {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme="dark" 
+        theme="dark"
       />
     </>
   );

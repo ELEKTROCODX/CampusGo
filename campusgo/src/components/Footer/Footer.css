@@ -3,7 +3,6 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
   padding: 1em 0.5em;
   max-width: 700px;
   margin: 0 auto;
@@ -26,7 +25,7 @@
   color: var(--color-light-text);
 }
 .SocialMedia__brand-text { 
-  font-size: 1.4em; 
+  font-size: 1.2em; 
   font-weight: 800; 
   color: var(--color-light-text) !important; 
 }
@@ -47,19 +46,19 @@
   transform: scale(1.1); 
 }
 .SocialMedia__icons img { 
-  width: 30px; 
-  height: 30px; 
+  width: 20px; 
+  height: 20px; 
   filter: brightness(0) invert(1); 
 }
 
 .FooterInfo { 
   text-align: center; 
   border-top: 1px solid var(--card-border); 
-  padding-top: 1.5rem; 
+  padding-top: 0.5em; 
   width: 100%; 
 }
 .FooterInfo p { 
   margin: 0.2rem 0; 
-  font-size: 0.8rem; 
+  font-size: 0.7rem; 
   color: var(--color-muted-text); 
 }

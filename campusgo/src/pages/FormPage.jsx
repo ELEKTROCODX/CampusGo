@@ -9,30 +9,41 @@ import Modal from "../components/Modal/Modal";
 import Footer from "../components/Footer/Footer";
 import { toast } from "react-toastify";
 
+const infoSound = "/duca/sounds/noti.mp3";
+
+// 2. Crea una función de ayuda para reproducir el sonido
+const playSound = (soundFile) => {
+  try {
+    const audio = new Audio(soundFile);
+    audio.play().catch(e => console.warn("No se pudo reproducir el sonido:", e));
+  } catch (e) {
+    console.error("Error al crear el objeto Audio:", e);
+  }
+};
+
 function FormPage() {
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const userLog = localStorage.getItem('userLog');
-  const [status,setStatus] = useState("Esperando permiso...");
-
-  // 1. ESTE ESTADO ES LA CLAVE
+  const [status, setStatus] = useState("Esperando permiso...");
   const [loading, setLoading] = useState(false);
 
   const handlePermission = async () => {
-    // 2. PONER EL ESTADO DE CARGA AL INICIO
     setLoading(true);
 
     try {
       const result = await generateToken();
 
       if (result.reload) {
-        toast.info("Activando servicio de notificaciones... recargando.");
+        playSound(infoSound);
+        toast.info("Activando servicio de notificaciones...");
         setTimeout(() => window.location.reload(), 2000);
         return;
       }
 
       if (result.success) {
-        toast.success("¡Permiso aceptado! Token guardado."); // Toast de éxito
+        playSound(infoSound);
+        toast.success("¡Permiso aceptado! Token guardado.");
         if (userLog) {
           try {
             const userRef = doc(db, "Usuarios", userLog);
@@ -45,18 +56,18 @@ function FormPage() {
           setStatus("Permiso otorgado. Continuar a registro.");
           console.log("Permiso otorgado. El token está en localStorage.");
         }
-        // 3. ELIMINAMOS LA LÓGICA DE NAVEGACIÓN (como pediste antes)
         navigate("/subscribe");
       } else {
-        // El toast de error ya se maneja en firebase.js (si usas el Plan B)
+        playSound(infoSound);
         console.error("No se pudo generar el token de notificación.");
+        toast.error("No se pudo activar el permiso. Inténtalo de nuevo.");
         navigate("/form");
       }
     } catch (error) {
+      playSound(infoSound);
       console.error("Error en handlePermission:", error);
       toast.error("Ocurrió un error inesperado.");
     } finally {
-      // 4. QUITAR EL ESTADO DE CARGA AL FINAL (INCLUSO SI HAY ERROR)
       setLoading(false);
     }
   };
@@ -71,37 +82,23 @@ function FormPage() {
 
   const handleConfirmSkip = () => {
     localStorage.removeItem('fcmToken');
+    playSound(infoSound);
     toast.info("Permiso omitido.");
-    setShowModal(false); // Cierra el modal
-    // navigate("/landing"); // Eliminado
+    setShowModal(false);
+    navigate("/landing");
   };
 
-  // 5. ¡AQUÍ ESTÁ TU PANTALLA DE CARGA!
-  // Se renderiza ANTES que el return normal si 'loading' es true.
-  if (loading) {
-    return (
-      <FormLayout>
-        {/* Usamos FormLayout para mantener el fondo y el logo */}
-        <div className="PermissionScreen" style={{ justifyContent: 'center', height: '60vh', alignItems: 'center' }}>
-          <h2 style={{ color: 'white', fontSize: '1.5rem', textAlign: 'center' }}>Validando permisos...</h2>
-          {/* Aquí puedes agregar un spinner CSS si quieres */}
-        </div>
-      </FormLayout>
-    );
-  }
-
-  // 6. Si loading es false, se muestra la página normal
+  // ... (El resto de tu JSX de return no cambia) ...
   return (
     <FormLayout>
       <div className="PermissionScreen">
         <img src={Sticker1} alt="Icono permisos" className="PermissionScreen__icon" />
         <h2 className="PermissionScreen__title">Activar las notificaciones</h2>
         <div className="PermissionScreen__text-container">
-          <p>
+          <p className="permissionScreen__text">
             Queremos guiarte en cada momento del evento, por lo que necesitamos tu permiso para enviarte notificaciones en tiempo real.
           </p>
         </div>
-        {/* 7. El botón ahora usa el estado 'loading' (como en tu JSX) */}
         <button className="btn btn-acento" onClick={handlePermission} disabled={loading}>
           {loading ? "Comprobando..." : "Permitir"}
         </button>
@@ -114,8 +111,8 @@ function FormPage() {
 
       {showModal && (
         <Modal onClose={handleModalClose}>
-          <h3>¿Estás seguro de que quieres saltarte las notificaciones?</h3>
-          <p>Si no aceptas, no podrás disfrutar de la experiencia completa.</p>
+          <h3>¿Estás seguro de que deseas no recibir notificaciones?</h3>
+          <p>No podrás disfrutar de la experiencia completa.</p>
           <div className="PermissionScreen__modal-buttons">
             <button className="btn btn-acento" onClick={handlePermission} disabled={loading}>Aceptar</button>
             <button className="btn btn-outline" onClick={handleConfirmSkip}>No aceptar</button>
