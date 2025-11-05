@@ -8,6 +8,7 @@ import FormLayout from "../layouts/FormLayout/FormLayout";
 import Modal from "../components/Modal/Modal";
 import Footer from "../components/Footer/Footer";
 import { toast } from "react-toastify";
+import { isIosSafari } from "../utils/functions";
 const infoSound = "/duca/sounds/noti.mp3";
 
 // 2. Crea una función de ayuda para reproducir el sonido
@@ -40,53 +41,86 @@ function FormPage() {
     setLoading(true);
 
     try {
-      // 3. Lógica anterior: Llama a generateToken UNA SOLA VEZ
-      const result = await generateToken();
+      if (isIosSafari()) {
+        await new Promise((resolve) => {
+          const check = () => {
+            if (window.OneSignal && window.OneSignal.push) return resolve();
+            setTimeout(check, 100);
+          };
+          check();
+        });
 
-      // 4. Lógica nueva: Oculta la opción de recarga (asumiendo que 'setShowReloadOption' existe en tu estado)
-      // setShowReloadOption(false); // <-- Descomenta esto si tienes este estado
+        // --- Inicialización de OneSignal ---
+        window.OneSignal = window.OneSignal || [];
+        window.OneSignal.push(function () {
+          window.OneSignal.init({
+            appId: process.env.REACT_APP_ONESIGNAL_APPID, 
+            safari_web_id: process.env.REACT_APP_ONESIGNAL_SAFARI_WEB_ID,
+            allowLocalhostAsSecureOrigin: true, 
+          });
 
-      // 5. Lógica anterior: Maneja el caso de recarga del Service Worker
-      if (result.reload) {
-        playSound(infoSound);
-        toast.info("Activando servicio de notificaciones...");
-        setTimeout(() => window.location.reload(), 2000);
-        setLoading(false); // Asegúrate de detener la carga aquí
-        return;
-      }
+          window.OneSignal.showSlidedownPrompt();
+          
+          const user = window.OneSignal.User.get();
+          const isSubscribed = !!user.subscriptionId;
 
-      // 6. Lógica anterior: Maneja el ÉXITO
-      if (result.success) {
-        playSound(infoSound); // (Estás usando 'infoSound' para éxito, lo cual está bien)
-        toast.success("¡Permiso aceptado! Token guardado.");
-
-        if (userLog && result.token) { // Si el usuario existe Y tenemos token
-          try {
-            const userRef = doc(db, "Usuarios", userLog);
-            // 7. Usa el 'result.token' de la PRIMERA llamada
-            await updateDoc(userRef, { fcmToken: result.token });
-            console.log("Token actualizado en Firestore para usuario existente.");
-          } catch (error) {
-            console.warn("Error (no crítico) al actualizar el token en Firestore:", error);
+          window.OneSignal.on('subscriptionChange', function (isSubscribed) {
+            console.log("Estado de suscripción:", isSubscribed);
+          });
+          
+          if(isSubscribed){
+            console.log("Esta suscrito");
+            navigate("/suscribe");
+          }else{
+            console.log("fallo al suscribirse");
           }
-        } else if (!userLog) {
-          // Si es un usuario nuevo (no hay userLog)
-          setStatus("Permiso otorgado. Continuar a registro.");
-          console.log("Permiso otorgado. El token está en localStorage.");
+        });
+      } else {
+        console.log("No es ios");
+        const result = await generateToken();
+
+        if (result.reload) {
+          playSound(infoSound);
+          toast.info("Activando servicio de notificaciones...");
+          setTimeout(() => window.location.reload(), 2000);
+          setLoading(false); // Asegúrate de detener la carga aquí
+          return;
         }
 
-        // 8. Lógica anterior: Navega a /subscribe al tener éxito
-        navigate("/subscribe");
+        // 6. Lógica anterior: Maneja el ÉXITO
+        if (result.success) {
+          playSound(infoSound); // (Estás usando 'infoSound' para éxito, lo cual está bien)
+          toast.success("¡Permiso aceptado! Token guardado.");
 
-      } else {
-        // 9. Lógica anterior: Maneja el FALLO (permiso denegado, etc.)
-        playSound(infoSound);
-        console.error("No se pudo generar el token de notificación.");
-        toast.error("No se pudo activar el permiso. Inténtalo de nuevo.");
+          if (userLog && result.token) { // Si el usuario existe Y tenemos token
+            try {
+              const userRef = doc(db, "Usuarios", userLog);
+              // 7. Usa el 'result.token' de la PRIMERA llamada
+              await updateDoc(userRef, { fcmToken: result.token });
+              console.log("Token actualizado en Firestore para usuario existente.");
+            } catch (error) {
+              console.warn("Error (no crítico) al actualizar el token en Firestore:", error);
+            }
+          } else if (!userLog) {
+            // Si es un usuario nuevo (no hay userLog)
+            setStatus("Permiso otorgado. Continuar a registro.");
+            console.log("Permiso otorgado. El token está en localStorage.");
+          }
 
-        // 10. Lógica anterior: Se queda en /form si falla
-        navigate("/form");
+          // 8. Lógica anterior: Navega a /subscribe al tener éxito
+          navigate("/subscribe");
+
+        } else {
+          // 9. Lógica anterior: Maneja el FALLO (permiso denegado, etc.)
+          playSound(infoSound);
+          console.error("No se pudo generar el token de notificación.");
+          toast.error("No se pudo activar el permiso. Inténtalo de nuevo.");
+
+          // 10. Lógica anterior: Se queda en /form si falla
+          navigate("/form");
+        }
       }
+
     } catch (error) {
       // 11. Lógica anterior: Maneja errores inesperados
       playSound(infoSound);
@@ -121,7 +155,6 @@ function FormPage() {
     return (
       <FormLayout>
         <div className="PermissionScreen" style={{ justifyContent: 'center', height: '60vh', alignItems: 'center', display: 'flex', flexDirection: 'column' }}>
-          {/* Eliminamos la imagen rotando y ponemos un mensaje */}
           <h2 style={{ color: 'white', fontSize: '1.5rem', textAlign: 'center', marginTop: '1rem' }}>
             Activando servicio de notificaciones... <br />
             Estableciendo conexion con Google

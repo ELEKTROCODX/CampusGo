@@ -7,14 +7,14 @@ import sticker1 from "../assets/stickers/elemento4.png";
 import sticker2 from "../assets/stickers/elemento6.png";
 import sticker3 from "../assets/stickers/elemento7.png";
 import sticker4 from "../assets/stickers/elemento8.png";
-import { auth, db, functions, generateToken } from '../firebase/firebase'; 
+import { auth, db, functions, generateToken } from '../firebase/firebase';
 import { signInAnonymously } from 'firebase/auth';
-import { doc, runTransaction, setDoc } from 'firebase/firestore';
+import { doc, runTransaction, setDoc, updateDoc } from 'firebase/firestore';
 import { httpsCallable } from "firebase/functions";
 
 import FormInput from "../components/FormInput/FormInput";
 import { eventStartDate, postEventDate } from "../config";
-import { toast } from "react-toastify"; 
+import { toast } from "react-toastify";
 
 // --- INICIO DE CAMBIOS PARA SONIDO ---
 
@@ -23,13 +23,13 @@ const soundPath = "/duca/sounds/noti.mp3";
 
 // 2. Crea una función de ayuda para reproducir el sonido
 const playSound = () => {
-  try {
-    // Crea una nueva instancia cada vez para evitar errores de interrupción
-    const audio = new Audio(soundPath); 
-    audio.play().catch(e => console.warn("No se pudo reproducir el sonido:", e));
-  } catch (e) {
-    console.error("Error al crear el objeto Audio:", e);
-  }
+    try {
+        // Crea una nueva instancia cada vez para evitar errores de interrupción
+        const audio = new Audio(soundPath);
+        audio.play().catch(e => console.warn("No se pudo reproducir el sonido:", e));
+    } catch (e) {
+        console.error("Error al crear el objeto Audio:", e);
+    }
 };
 // --- FIN DE CAMBIOS PARA SONIDO ---
 
@@ -44,19 +44,19 @@ const subscribeToTopicCallable = httpsCallable(functions, 'subscribeUserToTopicC
 async function assignTopic() {
     let assignedTopic = null;
     await runTransaction(db, async (transaction) => {
-      const counterRef = doc(db, "Metadatos", "asignacionTemas");
-      const counterDoc = await transaction.get(counterRef);
-      let currentIndex = 0;
-      if (counterDoc.exists()) {
-          currentIndex = counterDoc.data().lastAssignedIndex;
-      }
-      assignedTopic = topics[currentIndex % topics.length];
-      const nextIndex = (currentIndex + 1) % topics.length;
-      if (counterDoc.exists()) {
-          transaction.update(counterRef, { lastAssignedIndex: nextIndex });
-      } else {
-          transaction.set(counterRef, { lastAssignedIndex: nextIndex, topics: topics });
-      }
+        const counterRef = doc(db, "Metadatos", "asignacionTemas");
+        const counterDoc = await transaction.get(counterRef);
+        let currentIndex = 0;
+        if (counterDoc.exists()) {
+            currentIndex = counterDoc.data().lastAssignedIndex;
+        }
+        assignedTopic = topics[currentIndex % topics.length];
+        const nextIndex = (currentIndex + 1) % topics.length;
+        if (counterDoc.exists()) {
+            transaction.update(counterRef, { lastAssignedIndex: nextIndex });
+        } else {
+            transaction.set(counterRef, { lastAssignedIndex: nextIndex, topics: topics });
+        }
     });
     return assignedTopic;
 }
@@ -121,16 +121,15 @@ function SubscribePage() {
             const user = userCredential.user;
 
             // 3. Reproduce sonido ANTES del toast
-            playSound(); 
+            playSound();
             toast.info("Por favor, acepta los permisos de notificación (solicitud externa).");
 
             const [tokenResult, assignedTopic] = await Promise.all([
-                generateToken(), 
+                generateToken(),
                 assignTopic()
             ]);
 
             const fcmToken = tokenResult.success ? tokenResult.token : null;
-
             if (fcmToken) {
                 playSound(); // 3. Reproduce sonido
                 toast.success("¡Permiso aceptado y token obtenido!");
@@ -162,8 +161,41 @@ function SubscribePage() {
                     })
                 );
             }
-            
+
             await Promise.all(promises);
+
+            window.OneSignalDeferred = window.OneSignalDeferred || [];
+            const OneSignalDeferred = window.OneSignalDeferred;
+
+            OneSignalDeferred.push(async function (OneSignal) {
+                try {
+                    const oneSignalUser = await OneSignal.User.get();
+
+                    if (oneSignalUser.subscriptionId) {
+                        console.log("Usuario con notificaciones activas:", oneSignalUser.subscriptionId);
+
+                        await updateDoc(doc(db, "Usuarios", user.uid), {
+                            oneSignalId: oneSignalUser.subscriptionId
+                        });
+
+
+                        await OneSignal.login(user.uid); 
+
+                        await OneSignal.User.addTags({
+                            nombre: name,
+                            email: email,
+                            institucion: company || "N/A",
+                            grupo: assignedTopic || "Sin Grupo"
+                        });
+
+                        console.log("✅ Usuario vinculado a OneSignal con tags personalizados.");
+                    } else {
+                        console.warn("⚠️ Usuario no tiene permisos activos en OneSignal.");
+                    }
+                } catch (error) {
+                    console.error("Error al registrar en OneSignal:", error);
+                }
+            });
 
             localStorage.setItem('userLog', user.uid);
             playSound(); // 3. Reproduce sonido
@@ -176,9 +208,9 @@ function SubscribePage() {
             if (err.code) {
                 errorMessage = `Error: ${err.code}. Revisa la consola.`;
             } else if (err.message) {
-                 errorMessage = `Error: ${err.message}.`;
+                errorMessage = `Error: ${err.message}.`;
             }
-            
+
             setError(errorMessage);
             playSound(); // 3. Reproduce sonido
             toast.error(errorMessage);
