@@ -132,6 +132,7 @@ function FormPage() {
                     setLoading(false); // Detenemos la carga después de configurar listeners
                 });
             } else {
+                toast.success("NOOO ES IOS");
                 console.log("No es ios. Usando Firebase.");
                 logToFirestore("Detection", "Identificado como NO iOS/Safari. Usando Firebase FCM.");
                 
