@@ -10,7 +10,6 @@ function CountdownPage() {
     const navigate = useNavigate();
     const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
     const [Logged, setLogged] = useState(false);
-    console.log("fecha: ", eventStartDate);
     useEffect(() => {
         const now = new Date();
 
