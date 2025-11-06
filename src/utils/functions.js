@@ -1,5 +1,5 @@
 import { db } from "../firebase/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, doc,updateDoc } from "firebase/firestore";
 
 export const isIosSafari = () => {
   return (
@@ -39,3 +39,25 @@ export const logToFirestore = async (source, message, data = {}) => {
         console.error("ERROR CRÍTICO: No se pudo enviar el log a Firestore.", error);
     }
 };
+
+export async function handleSubscriptionSuccess(navigate, userId, tokenOrId) {
+    if (!userId || !tokenOrId) {
+        console.error("handleSubscriptionSuccess: Falta userId o token/ID.");
+        return;
+    }
+
+    try {
+        const userRef = doc(db, "Usuarios", userId);
+
+        await updateDoc(userRef, { ffcmToken: tokenOrId });
+
+        localStorage.setItem('userLog', userId);
+
+        console.log(`Suscripción exitosa para ${userId}. Navegando a la página principal.`);
+        navigate("/");
+
+    } catch (error) {
+        console.error("Error al finalizar la suscripción en Firestore:", error);
+        navigate("/error_page"); 
+    }
+}

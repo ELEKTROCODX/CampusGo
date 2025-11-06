@@ -9,6 +9,7 @@ import Modal from "../components/Modal/Modal";
 import Footer from "../components/Footer/Footer";
 import { toast } from "react-toastify";
 import { isIosSafari } from "../utils/functions";
+import { handleSubscriptionSuccess } from "../utils/functions";
 const infoSound = "/duca/sounds/noti.mp3";
 
 // 2. Crea una función de ayuda para reproducir el sonido
@@ -42,6 +43,7 @@ function FormPage() {
 
     try {
       if (isIosSafari()) {
+        toast.success("ES IOS");
         await new Promise((resolve) => {
           const check = () => {
             if (window.OneSignal && window.OneSignal.push) return resolve();
