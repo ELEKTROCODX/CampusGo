@@ -50,30 +50,51 @@ function FormPage() {
           check();
         });
 
-        // --- Inicialización de OneSignal ---
-        window.OneSignal = window.OneSignal || [];
         window.OneSignal.push(function () {
           window.OneSignal.init({
-            appId: process.env.REACT_APP_ONESIGNAL_APPID, 
+            appId: process.env.REACT_APP_ONESIGNAL_APPID,
             safari_web_id: process.env.REACT_APP_ONESIGNAL_SAFARI_WEB_ID,
-            allowLocalhostAsSecureOrigin: true, 
+            allowLocalhostAsSecureOrigin: true,
           });
 
-          window.OneSignal.showSlidedownPrompt();
-          
-          const user = window.OneSignal.User.get();
-          const isSubscribed = !!user.subscriptionId;
+          window.OneSignal.showSlidedowPrompt();
 
           window.OneSignal.on('subscriptionChange', function (isSubscribed) {
-            console.log("Estado de suscripción:", isSubscribed);
+            console.log("Estado de suscripcion", isSubscribed);
+            if (isSubscribed) {
+              window.OneSignal.User.get().getId().then(playerId => {
+                playSound(infoSound);
+                toast.success("¡Permiso aceptado!");
+
+                // Si tienes un token (de Firebase) y un userLog, actualiza Firestore
+                if (userLog && playerId) {
+                  try {
+                    const userRef = doc(db, "Usuarios", userLog);
+                    // La propiedad del token será diferente (fcmToken o osPlayerId, se asume fcmToken para Firebase)
+                    updateDoc(userRef, { fcmToken: playSound });
+                    console.log("Token/ID de suscripción actualizado en Firestore.");
+                  } catch (error) {
+                    console.warn("Error (no crítico) al actualizar el token en Firestore:", error);
+                  }
+                }
+
+                navigate("/subscribe");
+              })
+            }else{
+              console.log("Suscripcion denegada");
+              toast.error("Permiso de notificación denegado en Safari.");
+              navigate("/form");
+            }
           });
           
-          if(isSubscribed){
-            console.log("Esta suscrito");
-            navigate("/suscribe");
-          }else{
-            console.log("fallo al suscribirse");
-          }
+          window.OneSignal.User.get().then(user => {
+            if (user.subscriptionId) {
+                console.log("Ya estaba suscrito.");
+                handleSubscriptionSuccess(navigate, userLog, user.subscriptionId);
+                setLoading(false); 
+            }
+          });
+
         });
       } else {
         console.log("No es ios");
