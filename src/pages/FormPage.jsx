@@ -86,7 +86,7 @@ function FormPage() {
               navigate("/form");
             }
           });
-          
+
           window.OneSignal.User.get().then(user => {
             if (user.subscriptionId) {
                 console.log("Ya estaba suscrito.");

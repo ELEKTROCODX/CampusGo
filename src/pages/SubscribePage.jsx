@@ -1,268 +1,320 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import "./FormPage.css";
-import Sticker1 from "../assets/stickers/elemento1.png";
-import { generateToken, db } from "../firebase/firebase";
-import { doc, updateDoc } from "firebase/firestore";
-import FormLayout from "../layouts/FormLayout/FormLayout";
-import Modal from "../components/Modal/Modal";
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import "./SubscribePage.css";
 import Footer from "../components/Footer/Footer";
+import Logo from "../assets/logo/06logotipo-60-aniversario-horizontalblanco-3762.png";
+import sticker1 from "../assets/stickers/elemento4.png";
+import sticker2 from "../assets/stickers/elemento6.png";
+import sticker3 from "../assets/stickers/elemento7.png";
+import sticker4 from "../assets/stickers/elemento8.png";
+import { auth, db, functions, generateToken } from '../firebase/firebase';
+import { signInAnonymously } from 'firebase/auth';
+import { doc, runTransaction, setDoc, updateDoc } from 'firebase/firestore';
+import { httpsCallable } from "firebase/functions";
+
+import FormInput from "../components/FormInput/FormInput";
+import { eventStartDate, postEventDate } from "../config";
 import { toast } from "react-toastify";
-import { isIosSafari } from "../utils/functions";
-import { logToFirestore } from "../utils/logger"; // Importar el helper de logging
 
-const infoSound = "/duca/sounds/noti.mp3";
+// --- INICIO DE CAMBIOS PARA SONIDO ---
 
-// Crea una función de ayuda para reproducir el sonido
-const playSound = (soundFile) => {
+// 1. Define la ruta de tu sonido (debe estar en public/sounds/noti.mp3)
+const soundPath = "/duca/sounds/noti.mp3";
+
+// 2. Crea una función de ayuda para reproducir el sonido
+const playSound = () => {
     try {
-        const audio = new Audio(soundFile);
+        // Crea una nueva instancia cada vez para evitar errores de interrupción
+        const audio = new Audio(soundPath);
         audio.play().catch(e => console.warn("No se pudo reproducir el sonido:", e));
     } catch (e) {
         console.error("Error al crear el objeto Audio:", e);
     }
 };
+// --- FIN DE CAMBIOS PARA SONIDO ---
 
-// Función para manejar el éxito de la suscripción (usada para evitar código repetido)
-const handleSubscriptionSuccess = async (navigate, userLog, playerId) => {
-    playSound(infoSound);
-    toast.success("¡Permiso aceptado!");
 
-    if (userLog && playerId) {
-        try {
-            const userRef = doc(db, "Usuarios", userLog);
-            await updateDoc(userRef, { osPlayerId: playerId });
-            logToFirestore("Firestore Update", "osPlayerId actualizado en Firestore.", { playerId, userLog });
-        } catch (error) {
-            logToFirestore("Firestore Error", "Error al actualizar osPlayerId en Firestore.", { error: error.message, playerId });
-            console.warn("Error (no crítico) al actualizar el token en Firestore:", error);
+const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+const timeOptions = { hour: 'numeric', minute: 'numeric', hour12: true };
+const friendlyDate = eventStartDate.toLocaleDateString("es-SV", dateOptions);
+const friendlyTime = eventStartDate.toLocaleTimeString("es-SV", timeOptions);
+const topics = ["Grupo_1", "Grupo_2", "Grupo_3", "Grupo_4"];
+const subscribeToTopicCallable = httpsCallable(functions, 'subscribeUserToTopicCallable');
+
+async function assignTopic() {
+    let assignedTopic = null;
+    await runTransaction(db, async (transaction) => {
+        const counterRef = doc(db, "Metadatos", "asignacionTemas");
+        const counterDoc = await transaction.get(counterRef);
+        let currentIndex = 0;
+        if (counterDoc.exists()) {
+            currentIndex = counterDoc.data().lastAssignedIndex;
         }
-    } else {
-        logToFirestore("User Data Missing", "Suscripción exitosa, pero falta userLog para guardar ID.", { playerId, userLog });
-    }
+        assignedTopic = topics[currentIndex % topics.length];
+        const nextIndex = (currentIndex + 1) % topics.length;
+        if (counterDoc.exists()) {
+            transaction.update(counterRef, { lastAssignedIndex: nextIndex });
+        } else {
+            transaction.set(counterRef, { lastAssignedIndex: nextIndex, topics: topics });
+        }
+    });
+    return assignedTopic;
+}
 
-    navigate("/subscribe");
-};
 
-
-function FormPage() {
-    const [showModal, setShowModal] = useState(false);
-    const navigate = useNavigate();
-    const userLog = localStorage.getItem('userLog');
+function SubscribePage() {
+    const [currentStep, setCurrentStep] = useState(2);
     const [loading, setLoading] = useState(false);
-    // showReloadOption no se usa en el código, pero lo dejo por si acaso
-    // eslint-disable-next-line no-unused-vars
-    const [showReloadOption] = useState(false); 
-    
-    const handleManualReload = () => {
-        toast.info("Reiniciando la página para completar la activación...");
-        window.location.reload();
-    };
-    
-    const handlePermission = async () => {
-        if (loading) return;
+    const [error, setError] = useState(null);
+    const navigate = useNavigate();
 
-        setShowModal(false);
-        setLoading(true);
+    const [isValidating, setIsValidating] = useState(true);
 
-        try {
-            if (isIosSafari()) {
-                toast.success("ES IOS");
-                console.log("Es iOS/Safari. Usando OneSignal.");
-                logToFirestore("Detection", "Identificado como iOS/Safari. Iniciando OneSignal.");
+    // --- LÓGICA DE NAVEGACIÓN Y REDIRECCIÓN ---
+    useEffect(() => {
+        const userLog = localStorage.getItem('userLog');
+        const now = new Date();
 
-                // 1. Esperar a que el SDK de OneSignal esté listo
-                await new Promise((resolve) => {
-                    const check = () => {
-                        if (window.OneSignal && window.OneSignal.push) return resolve();
-                        setTimeout(check, 100);
-                    };
-                    check();
-                });
-
-                window.OneSignal.push(function () {
-                    
-                    // --- HABILITAR LOGGING DETALLADO PARA DEPURACIÓN ---
-                    window.OneSignal.Debug.setLogLevel('VERBOSE'); 
-                    logToFirestore("OneSignal Debug", "Nivel de log Verbose habilitado.");
-                    // --------------------------------------------------
-
-                    // 2. Inicialización
-                    window.OneSignal.init({
-                        appId: process.env.REACT_APP_ONESIGNAL_APPID,
-                        safari_web_id: process.env.REACT_APP_ONESIGNAL_SAFARI_WEB_ID,
-                        allowLocalhostAsSecureOrigin: true,
-                    });
-                    logToFirestore("OneSignal Init", "SDK inicializado con IDs del entorno.");
-
-                    // 3. Mostrar el prompt de permisos
-                    window.OneSignal.showSlidedownPrompt();
-                    logToFirestore("OneSignal Prompt", "Slidedown prompt mostrado.");
-
-                    // 4. Listener de cambio de suscripción
-                    window.OneSignal.on('subscriptionChange', function (isSubscribed) {
-                        console.log("Estado de suscripcion", isSubscribed);
-                        if (isSubscribed) {
-                            window.OneSignal.User.get().getId().then(playerId => {
-                                logToFirestore("OneSignal Success", "Player ID obtenido con éxito.", { playerId, userLog });
-                                handleSubscriptionSuccess(navigate, userLog, playerId); 
-                            });
-                        } else {
-                            // El usuario denegó o canceló la suscripción
-                            logToFirestore("OneSignal Denied", "Suscripción denegada por el usuario.");
-                            toast.error("Permiso de notificación denegado en Safari.");
-                            navigate("/form"); 
-                        }
-                        setLoading(false); 
-                    });
-                    
-                    // 5. Comprobar si ya estaba suscrito (útil después de recargas)
-                    window.OneSignal.User.get().then(user => {
-                        if (user && user.subscriptionId) {
-                            console.log("Ya estaba suscrito.");
-                            logToFirestore("OneSignal Check", "Usuario ya suscrito, Player ID existente.", { playerId: user.subscriptionId, userLog });
-                            handleSubscriptionSuccess(navigate, userLog, user.subscriptionId);
-                        } else {
-                             logToFirestore("OneSignal Check", "No estaba suscrito previamente o ID no encontrado.", { userLog });
-                        }
-                    }).catch(err => {
-                        logToFirestore("OneSignal Check Error", "Error al verificar suscripción inicial.", { error: err.message });
-                    });
-                    
-                    setLoading(false); // Detenemos la carga después de configurar listeners
-                });
-            } else {
-                toast.success("NOOO ES IOS");
-                console.log("No es ios. Usando Firebase.");
-                logToFirestore("Detection", "Identificado como NO iOS/Safari. Usando Firebase FCM.");
-                
-                const result = await generateToken();
-
-                if (result.reload) {
-                    playSound(infoSound);
-                    toast.info("Activando servicio de notificaciones...");
-                    logToFirestore("FCM Reload", "Se necesita recarga para Service Worker de Firebase.");
-                    setTimeout(() => window.location.reload(), 2000);
-                    setLoading(false); 
+        const checkUserAndDate = async () => {
+            try {
+                if (userLog) {
+                    navigate('/');
                     return;
                 }
-
-                if (result.success) {
-                    playSound(infoSound);
-                    toast.success("¡Permiso aceptado! Token guardado.");
-                    logToFirestore("FCM Success", "Token de Firebase generado con éxito.", { token: result.token.substring(0, 20) + '...' });
-
-                    if (userLog && result.token) { 
-                        try {
-                            const userRef = doc(db, "Usuarios", userLog);
-                            await updateDoc(userRef, { fcmToken: result.token });
-                            logToFirestore("Firestore Update", "fcmToken actualizado en Firestore.", { userLog });
-                        } catch (error) {
-                            logToFirestore("Firestore Error", "Error al actualizar fcmToken en Firestore.", { error: error.message });
-                            console.warn("Error (no crítico) al actualizar el token en Firestore:", error);
-                        }
-                    } else if (!userLog) {
-                        logToFirestore("FCM Log", "Permiso otorgado. Continuar a registro (token en localStorage).");
-                    }
-
-                    navigate("/subscribe");
-
+                if (now >= postEventDate) {
+                    navigate("/pevent");
+                } else if (now >= eventStartDate) {
+                    navigate("/landing");
                 } else {
-                    playSound(infoSound);
-                    console.error("No se pudo generar el token de notificación.");
-                    logToFirestore("FCM Denied", "Permiso de notificación denegado o fallo al generar token.", { error: result.error });
-                    toast.error("No se pudo activar el permiso. Inténtalo de nuevo.");
-                    navigate("/form");
+                    setIsValidating(false);
                 }
+            } catch (err) {
+                console.error("Error durante la validación:", err);
+                setIsValidating(false);
+            }
+        };
+
+        checkUserAndDate();
+
+    }, [navigate]);
+
+    const [formData, setFormData] = useState({
+        name: "",
+        email: "",
+        company: "",
+    });
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+    };
+
+
+    const handleRegistration = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError(null);
+        const { email, name, company } = formData;
+
+        try {
+            const userCredential = await signInAnonymously(auth);
+            const user = userCredential.user;
+
+            // 3. Reproduce sonido ANTES del toast
+            playSound();
+            toast.info("Por favor, acepta los permisos de notificación (solicitud externa).");
+
+            const [tokenResult, assignedTopic] = await Promise.all([
+                generateToken(),
+                assignTopic()
+            ]);
+
+            const fcmToken = tokenResult.success ? tokenResult.token : null;
+            if (fcmToken) {
+                playSound(); // 3. Reproduce sonido
+                toast.success("¡Permiso aceptado y token obtenido!");
+            } else {
+                playSound(); // 3. Reproduce sonido
+                toast.warn("No se aceptaron las notificaciones. Puedes activarlas luego.");
             }
 
-        } catch (error) {
-            playSound(infoSound);
-            console.error("Error en handlePermission:", error);
-            logToFirestore("Fatal Error", "Error inesperado en handlePermission.", { error: error.message, stack: error.stack });
-            toast.error("Ocurrió un error inesperado.");
+            const registrationDate = new Date().toISOString();
+            const userData = {
+                name,
+                email,
+                company: company || "N/A",
+                registeredAt: registrationDate,
+                topic: assignedTopic,
+                fcmToken: fcmToken,
+            };
+
+            const promises = [
+                setDoc(doc(db, "Usuarios", user.uid), userData),
+            ];
+
+            if (fcmToken && assignedTopic) {
+                promises.push(
+                    subscribeToTopicCallable({
+                        token: fcmToken,
+                        topic: assignedTopic,
+                        userId: user.uid
+                    })
+                );
+            }
+
+            await Promise.all(promises);
+
+            window.OneSignalDeferred = window.OneSignalDeferred || [];
+            const OneSignalDeferred = window.OneSignalDeferred;
+
+            OneSignalDeferred.push(async function (OneSignal) {
+                try {
+                    const oneSignalUser = await OneSignal.User.get();
+
+                    if (oneSignalUser.subscriptionId) {
+                        console.log("Usuario con notificaciones activas:", oneSignalUser.subscriptionId);
+
+                        await updateDoc(doc(db, "Usuarios", user.uid), {
+                            oneSignalId: oneSignalUser.subscriptionId
+                        });
+
+
+                        await OneSignal.login(user.uid); 
+
+                        await OneSignal.User.addTags({
+                            nombre: name,
+                            email: email,
+                            institucion: company || "N/A",
+                            grupo: assignedTopic || "Sin Grupo"
+                        });
+
+                        console.log("✅ Usuario vinculado a OneSignal con tags personalizados.");
+                    } else {
+                        console.warn("⚠️ Usuario no tiene permisos activos en OneSignal.");
+                    }
+                } catch (error) {
+                    console.error("Error al registrar en OneSignal:", error);
+                }
+            });
+
+            localStorage.setItem('userLog', user.uid);
+            playSound(); // 3. Reproduce sonido
+            toast.success("¡Registro completado!");
+            setCurrentStep(3);
+        } catch (err) {
+            console.error("Error al registrar:", err);
+            let errorMessage = "Error desconocido. Inténtalo de nuevo.";
+
+            if (err.code) {
+                errorMessage = `Error: ${err.code}. Revisa la consola.`;
+            } else if (err.message) {
+                errorMessage = `Error: ${err.message}.`;
+            }
+
+            setError(errorMessage);
+            playSound(); // 3. Reproduce sonido
+            toast.error(errorMessage);
         } finally {
             setLoading(false);
         }
+    }
+
+    const handleNext = () => {
+        if (currentStep === 3) {
+            navigate("/");
+        }
     };
 
-
-    const handleSkip = () => {
-        setShowModal(true);
-    };
-
-    const handleModalClose = () => {
-        setShowModal(false);
-    };
-
-    const handleConfirmSkip = () => {
-        localStorage.removeItem('fcmToken');
-        logToFirestore("User Skip", "Usuario decidió saltar el paso de permisos.");
-        playSound(infoSound);
-        toast.info("Permiso omitido.");
-        setShowModal(false);
-        navigate("/subscribe");
-    };
-
-    if (loading) {
+    if (isValidating) {
         return (
-            <FormLayout>
-                <div className="PermissionScreen" style={{ justifyContent: 'center', height: '60vh', alignItems: 'center', display: 'flex', flexDirection: 'column' }}>
-                    <h2 style={{ color: 'white', fontSize: '1.5rem', textAlign: 'center', marginTop: '1rem' }}>
-                        Activando servicio de notificaciones... <br />
-                        Estableciendo conexión con Google / OneSignal
-                    </h2>
-                    <button className="btn btn-outline" onClick={handleManualReload}>
-                        Reiniciar la Página
-                    </button>
-                    <p style={{ color: 'white', opacity: 0.8, textAlign: 'center', margin: '0.5rem 0 2rem' }}>
-                        (Esto puede tardar unos segundos <br />
-                        Si tarda demasiado, recarga la página)
-                    </p>
-
-                    {showReloadOption && (
-                        <button className="btn btn-outline" onClick={handleManualReload}>
-                            Reiniciar la Página
-                        </button>
-                    )}
+            <div className="SubscribePage page-background--radial-blue-top flex items-center justify-center min-h-screen">
+                <div className="text-center text-white">
+                    <h2 className="text-3xl font-bold mb-4">Validando acceso...</h2>
+                    <p>Por favor, espera un momento.</p>
                 </div>
-            </FormLayout>
+            </div>
         );
     }
 
     return (
-        <FormLayout>
-            <div className="PermissionScreen">
-                <img src={Sticker1} alt="Icono permisos" className="PermissionScreen__icon" />
-                <h2 className="PermissionScreen__title">Activar las notificaciones</h2>
-                <div className="PermissionScreen__text-container">
-                    <p className="permissionScreen__text">
-                        Queremos guiarte en cada momento del evento, por lo que necesitamos tu permiso para enviarte notificaciones en tiempo real.
-                    </p>
-                </div>
-                <button className="btn btn-acento" onClick={handlePermission} disabled={loading}>
-                    {"Permitir"}
-                </button>
-                <div className="PermissionScreen__progress-bottom">
-                    <span className="PermissionScreen__skip-text" onClick={handleSkip}>
-                        Saltar paso
-                    </span>
-                </div>
+        <div className="SubscribePage page-background--radial-blue-top">
+            <Link to="/">
+                <img src={Logo} alt="UCA Logo" className="logo" />
+            </Link>
+
+            {/* Stickers */}
+            <img src={sticker1} alt="" className="SubscribePage__sticker SubscribePage__sticker--planet" />
+            <img src={sticker2} alt="" className="SubscribePage__sticker SubscribePage__sticker--wifi" />
+            <img src={sticker3} alt="" className="SubscribePage__sticker SubscribePage__sticker--cat" />
+            <img src={sticker4} alt="" className="SubscribePage__sticker SubscribePage__sticker--cassette" />
+
+            <div className="SubscribePage__content">
+
+                {/* PASO 2 (Formulario) */}
+                {currentStep === 2 && (
+                    <div className="SubscribePage__step SubscribePage__fade-in">
+                        <h2>Crear perfil</h2>
+                        <form className="card card--form" onSubmit={handleRegistration}>
+                            <FormInput
+                                label="Nombre y apellido*"
+                                name="name"
+                                placeholder="Nombre completo"
+                                value={formData.name}
+                                onChange={handleChange}
+                                required
+                            />
+                            <FormInput
+                                label="Correo electrónico*"
+                                type="email"
+                                name="email"
+                                placeholder="Correo electrónico"
+                                value={formData.email}
+                                onChange={handleChange}
+                                required
+                            />
+                            <FormInput
+                                label="Empresa"
+                                name="company"
+                                placeholder="Empresa"
+                                value={formData.company}
+                                onChange={handleChange}
+                            />
+                            <button
+                                type="submit"
+                                className="btn btn-acento"
+                                disabled={loading}
+                            >
+                                {loading ? 'Registrando y activando notificaciones...' : 'Confirmar'}
+                            </button>
+                            {error && <p className="FormInput__error">{error}</p>}
+                        </form>
+                    </div>
+                )}
+
+                {/* PASO 3 (Gracias) */}
+                {currentStep === 3 && (
+                    <div className="SubscribePage__step SubscribePage__fade-in">
+                        <h2>Gracias por compartir tus datos</h2>
+                        <p>¡Te esperamos en el <b>primer networking de Diseño de la UCA!</b></p>
+                        <div className="SubscribePage__event-info">
+                            <p><strong>Día y hora del evento:</strong><br />{friendlyDate} – {friendlyTime}</p>
+                            <p><strong>Lugar:</strong><br />UCA Edificio ICAS</p>
+                        </div>
+                        <button className="btn btn-acento" onClick={handleNext}>
+                            Finalizar
+                        </button>
+                    </div>
+                )}
             </div>
 
-            {showModal && (
-                <Modal onClose={handleModalClose}>
-                    <h3>¿Estás seguro de que deseas no recibir notificaciones?</h3>
-                    <p>No podrás disfrutar de la experiencia completa.</p>
-                    <div className="PermissionScreen__modal-buttons">
-                        <button className="btn btn-acento" onClick={handlePermission} disabled={loading}>Sí, Aceptar</button>
-                        <button className="btn btn-outline" onClick={handleConfirmSkip}>No, Omitir</button>
-                    </div>
-                </Modal>
-            )}
+            {/* Indicador de pasos */}
+            <div className="SubscribePage__step-indicator">
+                <span className={`SubscribePage__step-dot ${currentStep === 2 ? "SubscribePage__step-dot--active" : ""}`}></span>
+                <span className={`SubscribePage__step-dot ${currentStep === 3 ? "SubscribePage__step-dot--active" : ""}`}></span>
+            </div>
             <Footer />
-        </FormLayout>
+        </div>
     );
 }
 
-export default FormPage;
+export default SubscribePage;
