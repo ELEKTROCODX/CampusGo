@@ -63,6 +63,7 @@ function FormPage() {
 
           window.OneSignal.on('subscriptionChange', function (isSubscribed) {
             console.log("Estado de suscripcion", isSubscribed);
+            toast.error(isSubscribed);
             if (isSubscribed) {
               window.OneSignal.User.get().getId().then(playerId => {
                 playSound(infoSound);
