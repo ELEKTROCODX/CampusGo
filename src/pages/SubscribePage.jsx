@@ -67,6 +67,7 @@ function FormPage() {
 
         try {
             if (isIosSafari()) {
+                toast.success("ES IOS");
                 console.log("Es iOS/Safari. Usando OneSignal.");
                 logToFirestore("Detection", "Identificado como iOS/Safari. Iniciando OneSignal.");
 
