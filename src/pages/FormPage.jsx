@@ -42,15 +42,25 @@ function FormPage() {
     try {
       if (isIosSafari()) {
         toast.success("es iOS");
-        let permission = await Notification.requestPermission();
-        if(permission === "granted"){
-          let token = await messaging.getToken({
-            vapidKey: process.env.REACT_APP_VAPID_KEY
-          })
-          toast.success("TOKEN OBTENIDO");
-        }else{
-          toast.success("Permisos denegados");
-        } 
+        try {
+          const permission = await Notification.requestPermission();
+          if (permission === "granted") {
+            try {
+              const token = await messaging.getToken({
+                vapidKey: process.env.REACT_APP_VAPID_KEY
+              });
+              toast.success("TOKEN OBTENIDO");
+            } catch (tokenError) {
+              toast.error("Error obtaining token on iOS");
+              console.error("Messaging getToken error:", tokenError);
+            }
+          } else {
+            toast.success("Permisos denegados");
+          }
+        } catch (permissionError) {
+          toast.error("Error requesting permission on iOS");
+          console.error("Notification permission error:", permissionError);
+        }
       } else {
         const result = await generateToken();
         if (result.reload) {
@@ -63,7 +73,7 @@ function FormPage() {
 
         // 6. Lógica anterior: Maneja el ÉXITO
         if (result.success) {
-          playSound(infoSound); 
+          playSound(infoSound);
           toast.success("¡Permiso aceptado! Token guardado.");
 
           if (userLog && result.token) { // Si el usuario existe Y tenemos token
@@ -94,11 +104,11 @@ function FormPage() {
         }
       }
 
-    }catch (error) {
+    } catch (error) {
       // 11. Lógica anterior: Maneja errores inesperados
       playSound(infoSound);
       console.error("Error en handlePermission:", error);
-      logToFirestore("FORMPAGE",error);
+      logToFirestore("FORMPAGE", error);
       toast.error("Ocurrió un error inesperado.");
       // No navegues si hay un error, quédate en la página
     } finally {
