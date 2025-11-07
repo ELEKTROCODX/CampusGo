@@ -47,7 +47,7 @@ function FormPage() {
         let permission = await Notification.requestPermission();
         if(permission === "granted"){
           let token = await messaging.getToken({
-            vapidKey: process.env.REACT_APP_VAPID_KEY;
+            vapidKey: process.env.REACT_APP_VAPID_KEY
           })
         }else{
           toast.success("Permisos denegados");
