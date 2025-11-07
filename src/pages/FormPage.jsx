@@ -44,6 +44,8 @@ function FormPage() {
         if(isIosSafari){
           if(firebase.messaging.isSupported()){
               toast.success("Si soporta Firebase");
+          }else{
+            toast.error("No soporta Firebase");
           }
         }else{
         const result = await generateToken();
