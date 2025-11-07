@@ -43,21 +43,16 @@ function FormPage() {
       if (isIosSafari()) {
         toast.success("es iOS");
         try {
-          const permission = await Notification.requestPermission();
-          if (permission === "granted") {
-            try {
-              const token = await messaging.getToken({
-                vapidKey: process.env.REACT_APP_VAPID_KEY
-              });
-              toast.success("TOKEN OBTENIDO");
-            } catch (tokenError) {
-              toast.error("Error obtaining token on iOS");
-              console.error("Messaging getToken error:", tokenError);
+          Notification.requestPermission(permission => {
+            console.log("Permiso iOS:", permission);
+            if (permission === "granted") {
+              toast.success("PERMISOS")
+            } else {
+              toast.error("NO PERMISOS")
             }
-          } else {
-            toast.success("Permisos denegados");
-          }
-        } catch (permissionError) {
+          });
+        }
+         catch (permissionError) {
           toast.error("Error requesting permission on iOS");
           console.error("Notification permission error:", permissionError);
         }
