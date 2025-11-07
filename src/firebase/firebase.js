@@ -30,61 +30,84 @@ export const functions = getFunctions(app, 'us-central1');
  * @returns {object} { success: boolean, token: string | null }
  */
 export const generateToken = async () => {
-    // 1. Verificar soporte
-    if (!messaging) {
-        console.warn("FCM: Messaging no inicializado (puede ser un entorno no seguro/incompatible).");
-        return { success: false, token: null };
-    }
-    
-    // 2. OPTIMIZACIÓN CLAVE: Verificar si el token ya existe en localStorage
+    // 1. OPTIMIZACIÓN CLAVE: Verificar si el token ya existe
     const cachedToken = localStorage.getItem("fcmToken");
     if (cachedToken) {
         console.log("FCM: Token encontrado en localStorage. Devolución instantánea.");
         return { success: true, token: cachedToken };
     }
     
+    // Si no está en caché, procedemos con la solicitud costosa
+    const startTime = performance.now();
     console.log("FCM: INICIO de la solicitud de token (Token no encontrado en caché).");
 
-    const swPath = "/duca/firebase-messaging-sw.js";
-    const scope = "/duca/";
+    const permission = await Notification.requestPermission();
+    if (permission !== "granted") {
+        console.log("FCM: Permiso de notificación denegado.");
+        toast.info("Permiso denegado para notificaciones.");
+        return { success: false, token: null };
+    }
 
     try {
-        const registration = await navigator.serviceWorker.register(swPath, { scope: scope });
+        const swPath = "/duca/firebase-messaging-sw.js";
+        const scope = "/duca/";
+        let registration;
+
+        // 2. INICIO: Registro y espera de Service Worker (rápido)
+        const swRegStart = performance.now();
+        console.log(`FCM: Intentando registrar Service Worker en ${swPath} con scope ${scope}`);
         
-        console.log(`FCM: Service Worker registrado/recuperado en scope: ${registration.scope}`);
+        registration = await navigator.serviceWorker.register(swPath, { scope: scope });
+        
+        if (registration.installing) {
+            console.log("FCM: Esperando a que el Service Worker pase a activo...");
+            await new Promise((resolve) => {
+                const newWorker = registration.installing;
+                newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'activated') {
+                        resolve();
+                    }
+                });
+            });
+        }
+
+        const swRegEnd = performance.now();
+        console.log(`FCM: Service Worker activo. Duración de activación: ${(swRegEnd - swRegStart).toFixed(2)} ms.`);
 
         const vapidKey = process.env.REACT_APP_VAPID_KEY;
         if (!vapidKey) {
-            console.error("FCM: Error: REACT_APP_VAPID_KEY no definida. Verifica el archivo .env.");
+            console.error("FCM: Error: REACT_APP_VAPID_KEY no definida en .env");
+            toast.error("Error de configuración (VAPID Key).");
             return { success: false, token: null };
         }
+
+        // 3. INICIO: Solicitud de Token a Google/FCM (lento, 4.5s)
+        const tokenReqStart = performance.now();
+        console.log("FCM: INICIO de la solicitud de token a los servidores de Google...");
 
         const fcmToken = await getToken(messaging, {
             serviceWorkerRegistration: registration,
             vapidKey: vapidKey,
         });
-        console.log("FCM TOKEN OBTENIENDO...")
+        
+        const tokenReqEnd = performance.now();
+        console.log(`FCM: FIN de la solicitud de token. Duración: ${(tokenReqEnd - tokenReqStart).toFixed(2)} ms.`);
 
-        // 5. Manejo del resultado
+
         if (fcmToken) {
             localStorage.setItem("fcmToken", fcmToken);
-            console.log("FCM: Proceso COMPLETO exitoso. Token generado.");
+            const totalTime = (performance.now() - startTime).toFixed(2);
+            console.log(`FCM: Proceso COMPLETO exitoso. Tiempo total: ${totalTime} ms.`);
             return { success: true, token: fcmToken };
         } else {
-            // Esto ocurre si el permiso se deniega después de la solicitud implícita de getToken
-            console.warn("FCM: Permiso de notificación denegado durante getToken o token no generado.");
+            console.log("FCM: No se pudo generar el token.");
+            toast.error("No se pudo obtener el token de FCM.");
             return { success: false, token: null };
         }
     } catch (error) {
-        // Manejo de errores de red, seguridad, registro de SW, o si el usuario deniega el permiso
+        // Manejo de errores generales (red, seguridad, etc.)
         console.error("FCM: Error grave durante la generación de token:", error);
-        
-        // Comprobación de permiso denegado explícito
-        const permission = Notification.permission;
-        if (permission === 'denied') {
-            console.warn("FCM: El usuario ha denegado el permiso de notificación permanentemente.");
-        }
-        
+        toast.error("Error de red o seguridad. Consulte la consola.");
         return { success: false, token: null };
     }
-}
+};
