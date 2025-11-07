@@ -42,20 +42,6 @@ function FormPage() {
     setLoading(true);
 
     try {
-      if (isIosSafari) {
-        toast.success("Usuario iOS")
-        isSupported().then((supported) => {
-          if (supported) {
-            toast.success("Safari iOS soporta Firebase Messaging (PWA instalada)");
-          } else {
-            toast.error("Safari iOS no soporta Firebase Messaging (abrir como PWA)");
-          }
-        });
-        const tokenR = generateToken();
-        if(tokenR.token){
-          toast.success("Se ha obtenido el token");
-        }
-      } else {
         const result = await generateToken();
         if (result.reload) {
           playSound(infoSound);
@@ -96,8 +82,6 @@ function FormPage() {
           // 10. Lógica anterior: Se queda en /form si falla
           navigate("/form");
         }
-      }
-
     } catch (error) {
       // 11. Lógica anterior: Maneja errores inesperados
       playSound(infoSound);
