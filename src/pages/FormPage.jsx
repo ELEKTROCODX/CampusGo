@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./FormPage.css";
 import Sticker1 from "../assets/stickers/elemento1.png";
-import { generateToken, db, messaging } from "../firebase/firebase";
+import { generateToken, db, messaging, requestNotificationPermission } from "../firebase/firebase";
 import { doc, updateDoc } from "firebase/firestore";
 import FormLayout from "../layouts/FormLayout/FormLayout";
 import Modal from "../components/Modal/Modal";
@@ -41,20 +41,9 @@ function FormPage() {
 
     try {
       if (isIosSafari()) {
-        toast.success("es iOS");
-        try {
-          Notification.requestPermission(permission => {
-            console.log("Permiso iOS:", permission);
-            if (permission === "granted") {
-              toast.success("PERMISOS")
-            } else {
-              toast.error("NO PERMISOS")
-            }
-          });
-        }
-         catch (permissionError) {
-          toast.error("Error requesting permission on iOS");
-          console.error("Notification permission error:", permissionError);
+        const iosResult = requestNotificationPermission();
+        if(iosResult.success){
+          toast.success("SI PASO LA FUNCION");
         }
       } else {
         const result = await generateToken();
@@ -68,7 +57,7 @@ function FormPage() {
 
         // 6. Lógica anterior: Maneja el ÉXITO
         if (result.success) {
-          playSound(infoSound);
+          playSound(infoSound); 
           toast.success("¡Permiso aceptado! Token guardado.");
 
           if (userLog && result.token) { // Si el usuario existe Y tenemos token
@@ -99,11 +88,11 @@ function FormPage() {
         }
       }
 
-    } catch (error) {
+    }catch (error) {
       // 11. Lógica anterior: Maneja errores inesperados
       playSound(infoSound);
       console.error("Error en handlePermission:", error);
-      logToFirestore("FORMPAGE", error);
+      logToFirestore("FORMPAGE",error);
       toast.error("Ocurrió un error inesperado.");
       // No navegues si hay un error, quédate en la página
     } finally {

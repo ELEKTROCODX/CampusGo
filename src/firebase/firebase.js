@@ -111,3 +111,25 @@ export const generateToken = async () => {
         return { success: false, token: null };
     }
 };
+
+export const requestNotificationPermission = async () =>{
+    try {
+      toast.success("intentando notificacion")      
+      let permission = await Notification.requestPermission();
+      
+      if (permission === "granted") {
+        console.log("✅ Permiso de notificación concedido. Solicitando token.");
+
+        // 2. Obtener el token de registro de FCM
+        let token = await messaging.getToken({ vapidKey: process.env.REACT_APP_VAPID_KEY});
+        console.log("🔑 FCM Token:", token);
+        return{success: true}
+      } else {
+        console.log("❌ Permiso de notificación denegado.");
+        
+      }
+    } catch (error) {
+        toast.error("ERROR en firebase.js")
+      console.error("⚠️ Error al solicitar permiso o token:", error);
+    }
+}
