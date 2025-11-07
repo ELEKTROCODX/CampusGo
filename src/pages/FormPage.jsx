@@ -10,6 +10,7 @@ import Footer from "../components/Footer/Footer";
 import { toast } from "react-toastify";
 import { isIosSafari, logToFirestore } from "../utils/functions";
 import { handleSubscriptionSuccess } from "../utils/functions";
+import { getMessaging, isSupported } from "firebase/messaging"
 import firebase from "firebase/compat/app";
 const infoSound = "/duca/sounds/noti.mp3";
 
@@ -41,14 +42,16 @@ function FormPage() {
     setLoading(true);
 
     try {
-        if(isIosSafari){
-          toast.success("Usuario iOS")
-          if(firebase.messaging.isSupported()){
-              toast.success("Si soporta Firebase");
-          }else{
-            toast.error("No soporta Firebase");
+      if (isIosSafari) {
+        toast.success("Usuario iOS")
+        isSupported().then((supported) => {
+          if (supported) {
+            toast.success("Safari iOS soporta Firebase Messaging (PWA instalada)");
+          } else {
+            toast.error("Safari iOS no soporta Firebase Messaging (abrir como PWA)");
           }
-        }else{
+        });
+      } else {
         const result = await generateToken();
         if (result.reload) {
           playSound(infoSound);
@@ -60,7 +63,7 @@ function FormPage() {
 
         // 6. Lógica anterior: Maneja el ÉXITO
         if (result.success) {
-          playSound(infoSound); 
+          playSound(infoSound);
           toast.success("¡Permiso aceptado! Token guardado.");
 
           if (userLog && result.token) { // Si el usuario existe Y tenemos token
@@ -91,11 +94,11 @@ function FormPage() {
         }
       }
 
-    }catch (error) {
+    } catch (error) {
       // 11. Lógica anterior: Maneja errores inesperados
       playSound(infoSound);
       console.error("Error en handlePermission:", error);
-      logToFirestore("FORMPAGE",error);
+      logToFirestore("FORMPAGE", error);
       toast.error("Ocurrió un error inesperado.");
       // No navegues si hay un error, quédate en la página
     } finally {
