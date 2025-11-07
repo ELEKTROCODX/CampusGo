@@ -40,21 +40,6 @@ function FormPage() {
     setLoading(true);
 
     try {
-      if (isIosSafari()) {
-        toast.success("Eres usuario iOS");
-        let permission = await Notification.requestPermission();
-        if (permission === "granted") {
-          console.log("Notification permission granted. Requesting for token.");
-          let token = await getToken(messaging, {
-            vapidKey: process.env.REACT_APP_VAPID_KEY,
-          });
-
-          // do something with the FCM token
-        } else {
-          console.log("Notification permission denied");
-          // Handle denied permission
-        }
-      } else {
         const result = await generateToken();
 
         if (result.reload) {
@@ -67,7 +52,7 @@ function FormPage() {
 
         // 6. Lógica anterior: Maneja el ÉXITO
         if (result.success) {
-          playSound(infoSound);
+          playSound(infoSound); 
           toast.success("¡Permiso aceptado! Token guardado.");
 
           if (userLog && result.token) { // Si el usuario existe Y tenemos token
@@ -97,7 +82,6 @@ function FormPage() {
           navigate("/form");
         }
       }
-    }
 
     catch (error) {
       // 11. Lógica anterior: Maneja errores inesperados
