@@ -45,7 +45,7 @@ function FormPage() {
         let permission = await Notification.requestPermission();
         if (permission === "granted") {
           console.log("Notification permission granted. Requesting for token.");
-          let token = await messaging.getToken({
+          let token = await getToken(messaging, {
             vapidKey: process.env.REACT_APP_VAPID_KEY,
           });
 
