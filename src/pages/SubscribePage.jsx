@@ -162,41 +162,6 @@ function SubscribePage() {
                 );
             }
 
-            await Promise.all(promises);
-
-            window.OneSignalDeferred = window.OneSignalDeferred || [];
-            const OneSignalDeferred = window.OneSignalDeferred;
-
-            OneSignalDeferred.push(async function (OneSignal) {
-                try {
-                    const oneSignalUser = await OneSignal.User.get();
-
-                    if (oneSignalUser.subscriptionId) {
-                        console.log("Usuario con notificaciones activas:", oneSignalUser.subscriptionId);
-
-                        await updateDoc(doc(db, "Usuarios", user.uid), {
-                            oneSignalId: oneSignalUser.subscriptionId
-                        });
-
-
-                        await OneSignal.login(user.uid); 
-
-                        await OneSignal.User.addTags({
-                            nombre: name,
-                            email: email,
-                            institucion: company || "N/A",
-                            grupo: assignedTopic || "Sin Grupo"
-                        });
-
-                        console.log("✅ Usuario vinculado a OneSignal con tags personalizados.");
-                    } else {
-                        console.warn("⚠️ Usuario no tiene permisos activos en OneSignal.");
-                    }
-                } catch (error) {
-                    console.error("Error al registrar en OneSignal:", error);
-                }
-            });
-
             localStorage.setItem('userLog', user.uid);
             playSound(); // 3. Reproduce sonido
             toast.success("¡Registro completado!");

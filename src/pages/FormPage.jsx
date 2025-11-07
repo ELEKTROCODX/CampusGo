@@ -8,7 +8,7 @@ import FormLayout from "../layouts/FormLayout/FormLayout";
 import Modal from "../components/Modal/Modal";
 import Footer from "../components/Footer/Footer";
 import { toast } from "react-toastify";
-import { isIosSafari } from "../utils/functions";
+import { isIosSafari, logToFirestore } from "../utils/functions";
 import { handleSubscriptionSuccess } from "../utils/functions";
 const infoSound = "/duca/sounds/noti.mp3";
 
@@ -98,6 +98,7 @@ function FormPage() {
       // 11. Lógica anterior: Maneja errores inesperados
       playSound(infoSound);
       console.error("Error en handlePermission:", error);
+      logToFirestore("FORMPAGE",error);
       toast.error("Ocurrió un error inesperado.");
       // No navegues si hay un error, quédate en la página
     } finally {
