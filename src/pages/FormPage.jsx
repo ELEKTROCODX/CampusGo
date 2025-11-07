@@ -51,6 +51,10 @@ function FormPage() {
             toast.error("Safari iOS no soporta Firebase Messaging (abrir como PWA)");
           }
         });
+        const tokenR = generateToken();
+        if(tokenR.token){
+          toast.success("Se ha obtenido el token");
+        }
       } else {
         const result = await generateToken();
         if (result.reload) {
