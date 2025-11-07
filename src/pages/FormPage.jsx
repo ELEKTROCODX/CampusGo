@@ -42,6 +42,7 @@ function FormPage() {
 
     try {
         if(isIosSafari){
+          toast.success("Usuario iOS")
           if(firebase.messaging.isSupported()){
               toast.success("Si soporta Firebase");
           }else{
