@@ -40,8 +40,19 @@ function FormPage() {
     setLoading(true);
 
     try {
+      if (isIosSafari()) {
+        toast.success("es iOS");
+        let permission = await Notification.requestPermission();
+        if(permission === "granted"){
+          let token = await messaging.getToken({
+            vapidKey: process.env.REACT_APP_VAPID_KEY
+          })
+          toast.success("TOKEN OBTENIDO");
+        }else{
+          toast.success("Permisos denegados");
+        } 
+      } else {
         const result = await generateToken();
-
         if (result.reload) {
           playSound(infoSound);
           toast.info("Activando servicio de notificaciones...");
@@ -83,7 +94,7 @@ function FormPage() {
         }
       }
 
-    catch (error) {
+    }catch (error) {
       // 11. Lógica anterior: Maneja errores inesperados
       playSound(infoSound);
       console.error("Error en handlePermission:", error);
