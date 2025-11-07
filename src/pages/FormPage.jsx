@@ -49,6 +49,7 @@ function FormPage() {
           let token = await messaging.getToken({
             vapidKey: process.env.REACT_APP_VAPID_KEY
           })
+          toast.success("TOKEN OBTENIDO");
         }else{
           toast.success("Permisos denegados");
         } 
