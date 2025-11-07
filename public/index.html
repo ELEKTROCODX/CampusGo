@@ -31,6 +31,21 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
+      <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        // MUY IMPORTANTE: Asegúrate de que esta ruta coincida con donde se sirve tu aplicación.
+        // Si usas el subdirectorio /duca/, debe ser: '/duca/firebase-messaging-sw.js'
+        navigator.serviceWorker.register('/duca/firebase-messaging-sw.js', { scope: '/duca/' }) 
+          .then(registration => {
+            console.log('SW Registrado:', registration.scope);
+          })
+          .catch(error => {
+            console.error('Fallo en el registro del SW:', error);
+          });
+      });
+    }
+  </script>
     <title>DUCA</title>
   </head>
   <body>

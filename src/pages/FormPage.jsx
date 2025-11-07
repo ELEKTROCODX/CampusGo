@@ -34,15 +34,27 @@ function FormPage() {
     window.location.reload();
   };
   const handlePermission = async () => {
-    // 1. Lógica nueva: Evita doble clic
     if (loading) return;
 
-    // 2. Lógica nueva: Cierra el modal y activa la carga
     setShowModal(false);
     setLoading(true);
 
     try {
-        console.log("No es ios");
+      if (isIosSafari()) {
+        toast.success("Eres usuario iOS");
+        let permission = await Notification.requestPermission();
+        if (permission === "granted") {
+          console.log("Notification permission granted. Requesting for token.");
+          let token = await messaging.getToken({
+            vapidKey: process.env.REACT_APP_VAPID_KEY,
+          });
+
+          // do something with the FCM token
+        } else {
+          console.log("Notification permission denied");
+          // Handle denied permission
+        }
+      } else {
         const result = await generateToken();
 
         if (result.reload) {
@@ -55,13 +67,12 @@ function FormPage() {
 
         // 6. Lógica anterior: Maneja el ÉXITO
         if (result.success) {
-          playSound(infoSound); // (Estás usando 'infoSound' para éxito, lo cual está bien)
+          playSound(infoSound);
           toast.success("¡Permiso aceptado! Token guardado.");
 
           if (userLog && result.token) { // Si el usuario existe Y tenemos token
             try {
               const userRef = doc(db, "Usuarios", userLog);
-              // 7. Usa el 'result.token' de la PRIMERA llamada
               await updateDoc(userRef, { fcmToken: result.token });
               console.log("Token actualizado en Firestore para usuario existente.");
             } catch (error) {
@@ -86,6 +97,7 @@ function FormPage() {
           navigate("/form");
         }
       }
+    }
 
     catch (error) {
       // 11. Lógica anterior: Maneja errores inesperados
