@@ -10,6 +10,7 @@ import Footer from "../components/Footer/Footer";
 import { toast } from "react-toastify";
 import { isIosSafari, logToFirestore } from "../utils/functions";
 import { handleSubscriptionSuccess } from "../utils/functions";
+import firebase from "firebase/compat/app";
 const infoSound = "/duca/sounds/noti.mp3";
 
 // 2. Crea una función de ayuda para reproducir el sonido
@@ -40,12 +41,11 @@ function FormPage() {
     setLoading(true);
 
     try {
-      if (isIosSafari()) {
-        const iosResult = requestNotificationPermission();
-        if(iosResult.success){
-          toast.success("SI PASO LA FUNCION");
-        }
-      } else {
+        if(isIosSafari){
+          if(firebase.messaging.isSupported()){
+              toast.success("Si soporta Firebase");
+          }
+        }else{
         const result = await generateToken();
         if (result.reload) {
           playSound(infoSound);
