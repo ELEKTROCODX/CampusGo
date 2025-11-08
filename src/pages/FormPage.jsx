@@ -12,6 +12,7 @@ import { isIosSafari, logToFirestore } from "../utils/functions";
 import { handleSubscriptionSuccess } from "../utils/functions";
 import { getMessaging, isSupported } from "firebase/messaging"
 import firebase from "firebase/compat/app";
+import OneSignal from "react-onesignal";
 const infoSound = "/duca/sounds/noti.mp3";
 
 // 2. Crea una función de ayuda para reproducir el sonido
@@ -42,46 +43,87 @@ function FormPage() {
     setLoading(true);
 
     try {
-        const result = await generateToken();
-        if (result.reload) {
-          playSound(infoSound);
-          toast.info("Activando servicio de notificaciones...");
-          setTimeout(() => window.location.reload(), 2000);
-          setLoading(false); // Asegúrate de detener la carga aquí
-          return;
-        }
+      if (isIosSafari()) {
+        toast.info("Usando OneSignal para las notificaiones...");
 
-        // 6. Lógica anterior: Maneja el ÉXITO
-        if (result.success) {
-          playSound(infoSound);
-          toast.success("¡Permiso aceptado! Token guardado.");
+        await OneSignal.init({
+          appId: process.env.REACT_APP_ONESIGNAL_APPID,
+          safari_web_id: process.env.REACT_APP_ONESIGNAL_SAFARI_WEB_ID,
+          notifyButton: { enable: true },
+          allowLocalhostAsSecureOrigin: true,
+        });
 
-          if (userLog && result.token) { // Si el usuario existe Y tenemos token
+        const permission = await OneSignal.Notifications.requestPermission(true);
+
+        if (permission === "granted") {
+          playSound(infoSound);
+          toast.success("Permiso concedido");
+
+          const playerId = await OneSignal.User.getId();
+
+          if (userLog && playerId) {
             try {
               const userRef = doc(db, "Usuarios", userLog);
-              await updateDoc(userRef, { fcmToken: result.token });
-              console.log("Token actualizado en Firestore para usuario existente.");
+              await updateDoc(userRef, { oneSignalId: playerId });
+              console.log("OneSignal ID guardado en Firestore.");
             } catch (error) {
-              console.warn("Error (no crítico) al actualizar el token en Firestore:", error);
+              console.warn("Error al guardar OneSignal ID en Firestore:", error);
             }
           } else if (!userLog) {
-            // Si es un usuario nuevo (no hay userLog)
-            setStatus("Permiso otorgado. Continuar a registro.");
-            console.log("Permiso otorgado. El token está en localStorage.");
+            setStatus("Permiso otorgado. Continuar a registro");
+            navigate("/subscribe");
+          } else {
+            playSound(infoSound);
+            toast.error("Permiso de notificación denegado en Safari.");
+            navigate("/form");
           }
 
-          // 8. Lógica anterior: Navega a /subscribe al tener éxito
-          navigate("/subscribe");
 
-        } else {
-          // 9. Lógica anterior: Maneja el FALLO (permiso denegado, etc.)
-          playSound(infoSound);
-          console.error("No se pudo generar el token de notificación.");
-          toast.error("No se pudo activar el permiso. Inténtalo de nuevo.");
-
-          // 10. Lógica anterior: Se queda en /form si falla
-          navigate("/form");
         }
+        
+        return;
+      }
+
+      const result = await generateToken();
+      if (result.reload) {
+        playSound(infoSound);
+        toast.info("Activando servicio de notificaciones...");
+        setTimeout(() => window.location.reload(), 2000);
+        setLoading(false); // Asegúrate de detener la carga aquí
+        return;
+      }
+
+      // 6. Lógica anterior: Maneja el ÉXITO
+      if (result.success) {
+        playSound(infoSound);
+        toast.success("¡Permiso aceptado! Token guardado.");
+
+        if (userLog && result.token) { // Si el usuario existe Y tenemos token
+          try {
+            const userRef = doc(db, "Usuarios", userLog);
+            await updateDoc(userRef, { fcmToken: result.token });
+            console.log("Token actualizado en Firestore para usuario existente.");
+          } catch (error) {
+            console.warn("Error (no crítico) al actualizar el token en Firestore:", error);
+          }
+        } else if (!userLog) {
+          // Si es un usuario nuevo (no hay userLog)
+          setStatus("Permiso otorgado. Continuar a registro.");
+          console.log("Permiso otorgado. El token está en localStorage.");
+        }
+
+        // 8. Lógica anterior: Navega a /subscribe al tener éxito
+        navigate("/subscribe");
+
+      } else {
+        // 9. Lógica anterior: Maneja el FALLO (permiso denegado, etc.)
+        playSound(infoSound);
+        console.error("No se pudo generar el token de notificación.");
+        toast.error("No se pudo activar el permiso. Inténtalo de nuevo.");
+
+        // 10. Lógica anterior: Se queda en /form si falla
+        navigate("/form");
+      }
     } catch (error) {
       // 11. Lógica anterior: Maneja errores inesperados
       playSound(infoSound);
