@@ -53,8 +53,9 @@ function FormPage() {
           allowLocalhostAsSecureOrigin: true,
         });
 
-        const permission = await OneSignal.Notifications.requestPermission(true);
-        toast.success(permission);
+        await OneSignal.Notifications.requestPermission(true);
+        const permission = await OneSignal.Notifications.permission;
+        
         if (permission === "granted") {
           playSound(infoSound);
           toast.success("Permiso concedido");
