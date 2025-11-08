@@ -55,7 +55,7 @@ function FormPage() {
 
         await OneSignal.Notifications.requestPermission(true);
         const permission = await OneSignal.Notifications.permission;
-        
+        console.log("Permission OneSignal: ", permission);
         if (permission === "granted") {
           playSound(infoSound);
           toast.success("Permiso concedido");
