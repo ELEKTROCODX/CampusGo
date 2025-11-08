@@ -45,8 +45,7 @@ function FormPage() {
     try {
       if(isWebView()){
         console.log("Estas usando un In App Browser");
-        toast.info("Los permisos no están permitidos en In App Browser");
-        toast.info("Usar navegador ");
+        toast.info("Estás en un In-App Browser o WebView, pasarse a un navegador nativo");
         return;
       }
       if (isIosSafari()) {
