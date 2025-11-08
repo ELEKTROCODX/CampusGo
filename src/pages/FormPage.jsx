@@ -8,7 +8,7 @@ import FormLayout from "../layouts/FormLayout/FormLayout";
 import Modal from "../components/Modal/Modal";
 import Footer from "../components/Footer/Footer";
 import { toast } from "react-toastify";
-import { isIosSafari, logToFirestore } from "../utils/functions";
+import { isIosSafari, isWebView, logToFirestore } from "../utils/functions";
 import { handleSubscriptionSuccess } from "../utils/functions";
 import { getMessaging, isSupported } from "firebase/messaging"
 import firebase from "firebase/compat/app";
@@ -43,6 +43,12 @@ function FormPage() {
     setLoading(true);
 
     try {
+      if(isWebView()){
+        console.log("Estas usando un In App Browser");
+        toast.info("Los permisos no están permitidos en In App Browser");
+        toast.info("Usar navegador ");
+        return;
+      }
       if (isIosSafari()) {
         toast.info("Usando OneSignal para las notificaiones...");
 

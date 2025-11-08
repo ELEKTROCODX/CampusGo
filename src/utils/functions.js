@@ -61,3 +61,42 @@ export async function handleSubscriptionSuccess(navigate, userId, tokenOrId) {
         navigate("/error_page"); 
     }
 }
+
+export function isWebView() {
+  const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+
+  if (userAgent.includes('Android') && (userAgent.includes('wv') || userAgent.includes('WebView'))) {
+    return true;
+  }
+
+  // 2. Indicadores específicos de aplicaciones populares (ejemplos)
+  const specificAppIndicators = [
+    'FBAV', // Facebook (común en iOS y Android)
+    'FBBV', // Facebook App Version
+    'Messenger', // Facebook Messenger
+    'Instagram', // Instagram
+    'Line',      // Line
+    'Twitter',   // Twitter (X)
+    'VKSA',      // VKontakte
+    'QQ',        // QQ Browser
+    'MicroMessenger', // WeChat
+    'AlipayClient',   // Alipay
+    'DingTalk',       // DingTalk
+    'Safari/604.1', 
+  ];
+  
+  const uaLower = userAgent.toLowerCase();
+
+  for (const indicator of specificAppIndicators) {
+    if (uaLower.includes(indicator.toLowerCase())) {
+      return true;
+    }
+  }
+
+  if (/(iPhone|iPad|iPod).*AppleWebKit(?!.*Safari)/i.test(userAgent)) {
+    return true;
+  }
+
+  return false;
+}
