@@ -8,7 +8,7 @@ import FormLayout from "../layouts/FormLayout/FormLayout";
 import Modal from "../components/Modal/Modal";
 import Footer from "../components/Footer/Footer";
 import { toast } from "react-toastify";
-import { isIosSafari, isRunningAsPWA, isWebView, logToFirestore } from "../utils/functions";
+import { checkAndWarnIOSVersion, isIosSafari, isRunningAsPWA, isWebView, logToFirestore } from "../utils/functions";
 import { handleSubscriptionSuccess } from "../utils/functions";
 import { getMessaging, isSupported } from "firebase/messaging"
 import firebase from "firebase/compat/app";
@@ -51,6 +51,9 @@ function FormPage() {
       if(!isRunningAsPWA()){
         toast.info("Para activar notificaciones debes usar la página web desde la pantalla de inicio");
         return;
+      }
+      if(isIosSafari() && !checkAndWarnIOSVersion(16,4)){
+        toast.info("Version de iOS no compatible, versión esperada 16.4+")
       }
       if (isIosSafari()) {
         toast.info("Usando OneSignal para las notificaiones...");

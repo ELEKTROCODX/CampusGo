@@ -106,11 +106,55 @@ export function isRunningAsPWA() {
     return true;
   }
   
-
-
   if (isIosSafari() && ('standalone' in window.navigator) && (window.navigator.standalone)) {
       return true;
   }
 
   return false;
+}
+
+function getIOSVersion() {
+  const userAgent = navigator.userAgent;
+  
+  // 1. Verificar si es un dispositivo iOS (iPhone, iPad, iPod)
+  if (!/(iPhone|iPad|iPod)/i.test(userAgent)) {
+    return null; // No es iOS
+  }
+
+  // 2. Usar una expresión regular para encontrar el patrón 'OS X_Y(_Z)'
+  // El grupo de captura (\d+) extrae los números de versión.
+  const versionMatch = userAgent.match(/OS (\d+)_(\d+)_?(\d+)?/);
+
+  if (versionMatch) {
+    // versionMatch[1] = Major (ej: 17)
+    // versionMatch[2] = Minor (ej: 1)
+    
+    const major = parseInt(versionMatch[1], 10);
+    const minor = parseInt(versionMatch[2] || 0, 10); // Usa 0 si no hay versión menor
+    
+    return [major, minor];
+  }
+
+  return null;
+}
+
+export function checkAndWarnIOSVersion(requiredMajor, requiredMinor) {
+  const iosVersion = getIOSVersion();
+
+  if (iosVersion) {
+    const [userMajor, userMinor] = iosVersion;
+    const isBelowRequired = 
+      userMajor < requiredMajor || 
+      (userMajor === requiredMajor && userMinor < requiredMinor);
+
+    if (isBelowRequired) {
+        console.log(`Versión de iOS (${userMajor}.${userMinor}) No es compatible.`);
+        return false;
+    } else {
+        console.log(`Versión de iOS (${userMajor}.${userMinor}) compatible.`);
+        return true;
+    }
+  } else {
+    console.log("No es un dispositivo iOS o no se pudo determinar la versión.");
+  }
 }
