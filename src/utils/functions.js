@@ -100,3 +100,17 @@ export function isWebView() {
 
   return false;
 }
+
+export function isRunningAsPWA() {
+  if (window.matchMedia('(display-mode: standalone)').matches) {
+    return true;
+  }
+  
+
+
+  if (isIosSafari() && ('standalone' in window.navigator) && (window.navigator.standalone)) {
+      return true;
+  }
+
+  return false;
+}
