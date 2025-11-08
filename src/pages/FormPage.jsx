@@ -48,8 +48,9 @@ function FormPage() {
         toast.info("Estás en un In-App Browser o WebView, pasarse a un navegador nativo para usar esta funcionalidad");
         return;
       }
-      if(!isRunningAsPWA){
+      if(!isRunningAsPWA()){
         toast.info("Para activar notificaciones debes usar la página web desde la pantalla de inicio");
+        return;
       }
       if (isIosSafari()) {
         toast.info("Usando OneSignal para las notificaiones...");
