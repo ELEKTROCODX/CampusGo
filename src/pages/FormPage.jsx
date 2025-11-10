@@ -43,11 +43,12 @@ function FormPage() {
     setLoading(true);
 
     try {
+      /*
       if(isWebView()){
         console.log("Estas usando un In App Browser");
         toast.info("Estás en un In-App Browser o WebView, pasarse a un navegador nativo para usar esta funcionalidad");
         return;
-      }
+      }*/
       if(!isRunningAsPWA()){
         toast.info("Para activar notificaciones debes usar la página web desde la pantalla de inicio");
         return;
