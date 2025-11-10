@@ -49,7 +49,7 @@ export async function handleSubscriptionSuccess(navigate, userId, tokenOrId) {
     try {
         const userRef = doc(db, "Usuarios", userId);
 
-        await updateDoc(userRef, { ffcmToken: tokenOrId });
+        await updateDoc(userRef, { fcmToken: tokenOrId });
 
         localStorage.setItem('userLog', userId);
 

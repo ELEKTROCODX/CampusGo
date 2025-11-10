@@ -2,16 +2,14 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./FormPage.css";
 import Sticker1 from "../assets/stickers/elemento1.png";
-import { generateToken, db, messaging, requestNotificationPermission } from "../firebase/firebase";
+import { generateToken, db } from "../firebase/firebase";
 import { doc, updateDoc } from "firebase/firestore";
 import FormLayout from "../layouts/FormLayout/FormLayout";
 import Modal from "../components/Modal/Modal";
 import Footer from "../components/Footer/Footer";
 import { toast } from "react-toastify";
 import { checkAndWarnIOSVersion, isIosSafari, isRunningAsPWA, isWebView, logToFirestore } from "../utils/functions";
-import { handleSubscriptionSuccess } from "../utils/functions";
-import { getMessaging, isSupported } from "firebase/messaging"
-import firebase from "firebase/compat/app";
+import { isSupported } from "firebase/messaging"
 import OneSignal from "react-onesignal";
 const infoSound = "/duca/sounds/noti.mp3";
 
@@ -32,6 +30,8 @@ function FormPage() {
   const [status, setStatus] = useState("Esperando permiso...");
   const [loading, setLoading] = useState(false);
   const [showReloadOption] = useState(false);
+  const inAppBrowser = isWebView();
+  const iosNeedsPWA = isIosSafari() && !isRunningAsPWA();
   const handleManualReload = () => {
     toast.info("Reiniciando la página para completar la activación...");
     //window.location.reload();
@@ -44,28 +44,29 @@ function FormPage() {
     setLoading(true);
 
     try {
-      /*
-      if(isWebView()){
-        console.log("Estas usando un In App Browser");
-        toast.info("Estás en un In-App Browser o WebView, pasarse a un navegador nativo para usar esta funcionalidad");
-        return;
-      }*/
-      if(!isRunningAsPWA()){
-        toast.info("Para activar notificaciones debes usar la página web desde la pantalla de inicio");
-        return;
-      }
-      if(isIosSafari() && !checkAndWarnIOSVersion(16,4)){
-        toast.info("Version de iOS no compatible, versión esperada 16.4+")
-      }
+
       if (isIosSafari()) {
+        if (!isRunningAsPWA()) {
+          toast.info("En iOS, usa la app desde la pantalla de inicio (PWA) para notificaciones.");
+          setLoading(false);
+          return;
+        }
+        if (!checkAndWarnIOSVersion(16,4)){
+          toast.info("Versión de iOS no compatible, se requiere 16.4+");
+          setLoading(false);
+          return;
+        }
         toast.info("Usando OneSignal para las notificaiones...");
 
-        await OneSignal.init({
-          appId: process.env.REACT_APP_ONESIGNAL_APPID,
-          safari_web_id: process.env.REACT_APP_ONESIGNAL_SAFARI_WEB_ID,
-          notifyButton: { enable: true },
-          allowLocalhostAsSecureOrigin: true,
-        });
+        if (!window._oneSignalInitialized) {
+          await OneSignal.init({
+            appId: process.env.REACT_APP_ONESIGNAL_APPID,
+            safari_web_id: process.env.REACT_APP_ONESIGNAL_SAFARI_WEB_ID,
+            notifyButton: { enable: false },
+            allowLocalhostAsSecureOrigin: true,
+          });
+          window._oneSignalInitialized = true;
+        }
 
         await OneSignal.Notifications.requestPermission(true);
         const permission = await OneSignal.Notifications.permission;
@@ -84,29 +85,25 @@ function FormPage() {
             } catch (error) {
               console.warn("Error al guardar OneSignal ID en Firestore:", error);
             }
-          } else if (!userLog) {
-            setStatus("Permiso otorgado. Continuar a registro");
-            navigate("/subscribe");
-          } else {
-            playSound(infoSound);
-            toast.error("Permiso de notificación denegado en Safari.");
-            navigate("/form");
           }
-
-
+          setStatus("Permiso otorgado.");
+          navigate("/subscribe");
+        } else {
+          playSound(infoSound);
+          toast.error("Permiso de notificación denegado en Safari.");
         }
-        
+        return;
+      }
+
+      const fcmSupported = await isSupported();
+      if (!fcmSupported) {
+        toast.info("Este navegador no soporta notificaciones push (FCM).");
+        setLoading(false);
+        navigate("/subscribe");
         return;
       }
 
       const result = await generateToken();
-      if (result.reload) {
-        playSound(infoSound);
-        toast.info("Activando servicio de notificaciones...");
-        setTimeout(() => window.location.reload(), 2000);
-        setLoading(false); // Asegúrate de detener la carga aquí
-        return;
-      }
 
       // 6. Lógica anterior: Maneja el ÉXITO
       if (result.success) {
@@ -136,8 +133,7 @@ function FormPage() {
         console.error("No se pudo generar el token de notificación.");
         toast.error("No se pudo activar el permiso. Inténtalo de nuevo.");
 
-        // 10. Lógica anterior: Se queda en /form si falla
-        navigate("/form");
+        // Permiso no otorgado: permanece en la página para reintentar
       }
     } catch (error) {
       // 11. Lógica anterior: Maneja errores inesperados
@@ -167,6 +163,27 @@ function FormPage() {
     toast.info("Permiso omitido.");
     setShowModal(false);
     navigate("/subscribe");
+  };
+
+  const handleOpenInBrowser = () => {
+    try {
+      const url = window.location.href;
+      window.open(url, '_blank', 'noopener');
+      toast.info("Si sigues dentro de la app, usa el menú ⋯ para abrir en navegador.");
+    } catch (e) {
+      console.warn("No se pudo abrir en navegador:", e);
+    }
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      const url = window.location.href;
+      await navigator.clipboard.writeText(url);
+      toast.success("Enlace copiado. Ábrelo manualmente en tu navegador.");
+    } catch (e) {
+      console.warn("No se pudo copiar el enlace:", e);
+      toast.error("No se pudo copiar el enlace.");
+    }
   };
 
   // 4. Pantalla de carga (si 'loading' es true)
@@ -205,10 +222,35 @@ function FormPage() {
           <p className="permissionScreen__text">
             Queremos guiarte en cada momento del evento, por lo que necesitamos tu permiso para enviarte notificaciones en tiempo real.
           </p>
+          {inAppBrowser && (
+            <p className="permissionScreen__text" style={{ marginTop: '0.5rem', color: '#ffd27d' }}>
+              Estás dentro de un navegador de una app (Instagram, Facebook, etc.).
+              Abre esta página en un navegador nativo (Chrome/Firefox en Android o Safari en iOS). En iOS, añade la app a la pantalla de inicio para activar las notificaciones.
+            </p>
+          )}
+          {iosNeedsPWA && (
+            <div style={{ marginTop: '0.75rem', color: '#ffd27d' }}>
+              <p className="permissionScreen__text" style={{ marginBottom: '0.5rem' }}>
+                Para activar notificaciones en iOS, primero añade esta página a la pantalla de inicio y ábrela desde ahí:
+              </p>
+              <ul style={{ textAlign: 'left', fontSize: '0.8em', lineHeight: 1.4, paddingLeft: '1rem' }}>
+                <li>1. Toca el botón Compartir (icono cuadrado con flecha arriba) en Safari.</li>
+                <li>2. Selecciona “Añadir a pantalla de inicio”.</li>
+                <li>3. Abre la app desde el icono en tu pantalla de inicio.</li>
+                <li>4. Vuelve a esta sección y acepta el permiso.</li>
+              </ul>
+            </div>
+          )}
         </div>
-        <button className="btn btn-acento" onClick={handlePermission} disabled={loading}>
+        <button className="btn btn-acento" onClick={handlePermission} disabled={loading || inAppBrowser}>
           {"Permitir"}
         </button>
+        {inAppBrowser && (
+          <div className="PermissionScreen__modal-buttons" style={{ marginTop: '0.5rem' }}>
+            <button className="btn btn-outline" onClick={handleOpenInBrowser}>Abrir en navegador</button>
+            <button className="btn btn-outline" onClick={handleCopyLink}>Copiar enlace</button>
+          </div>
+        )}
         <div className="PermissionScreen__progress-bottom">
           <span className="PermissionScreen__skip-text" onClick={handleSkip}>
             Saltar paso
