@@ -65,35 +65,33 @@ export async function handleSubscriptionSuccess(navigate, userId, tokenOrId) {
 export function isWebView() {
   const userAgent = navigator.userAgent || navigator.vendor || window.opera;
 
+  // Si es Safari en iOS, NO es un WebView
+  if (isIosSafari()) {
+    return false;
+  }
 
-  if (userAgent.includes('Android') && (userAgent.includes('wv') || userAgent.includes('WebView'))) {
+  // Indicadores de WebView en Android
+  const uaLower = userAgent.toLowerCase();
+  if (uaLower.includes('android') && (uaLower.includes('wv') || uaLower.includes('webview'))) {
     return true;
   }
 
-  // 2. Indicadores específicos de aplicaciones populares (ejemplos)
-  const specificAppIndicators = [
-    'FBAV', // Facebook (común en iOS y Android)
-    'FBBV', // Facebook App Version
-    'Messenger', // Facebook Messenger
-    'Instagram', // Instagram
-    'Line',      // Line
-    'Twitter',   // Twitter (X)
-    'VKSA',      // VKontakte
-    'QQ',        // QQ Browser
-    'MicroMessenger', // WeChat
-    'AlipayClient',   // Alipay
-    'DingTalk',       // DingTalk
-    'Safari/604.1', 
+  // Indicadores de apps comunes con navegadores embebidos
+  const appIndicators = [
+    'fbav',
+    'fbbv',
+    'instagram',
+    'messenger',
+    'line',
+    'micromessenger'
   ];
-  
-  const uaLower = userAgent.toLowerCase();
-
-  for (const indicator of specificAppIndicators) {
-    if (uaLower.includes(indicator.toLowerCase())) {
+  for (const indicator of appIndicators) {
+    if (uaLower.includes(indicator)) {
       return true;
     }
   }
 
+  // iOS WebView (WKWebView) sin cadena 'Safari'
   if (/(iPhone|iPad|iPod).*AppleWebKit(?!.*Safari)/i.test(userAgent)) {
     return true;
   }
