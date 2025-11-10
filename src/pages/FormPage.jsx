@@ -8,7 +8,7 @@ import FormLayout from "../layouts/FormLayout/FormLayout";
 import Modal from "../components/Modal/Modal";
 import Footer from "../components/Footer/Footer";
 import { toast } from "react-toastify";
-import { checkAndWarnIOSVersion, isIosSafari, isRunningAsPWA, isWebView, logToFirestore } from "../utils/functions";
+import { checkAndWarnIOSVersion, isIosNotPwa, isIosSafari, isRunningAsPWA, isWebView, logToFirestore } from "../utils/functions";
 import { handleSubscriptionSuccess } from "../utils/functions";
 import { getMessaging, isSupported } from "firebase/messaging"
 import firebase from "firebase/compat/app";
@@ -50,7 +50,7 @@ function FormPage() {
         toast.info("Estás en un In-App Browser o WebView, pasarse a un navegador nativo para usar esta funcionalidad");
         return;
       }*/
-      if(!isRunningAsPWA()){
+      if(isIosNotPwa()){
         toast.info("Para activar notificaciones debes usar la página web desde la pantalla de inicio");
         return;
       }

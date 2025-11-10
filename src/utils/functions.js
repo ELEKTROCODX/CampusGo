@@ -101,16 +101,14 @@ export function isWebView() {
   return false;
 }
 
-export function isRunningAsPWA() {
-  if (window.matchMedia('(display-mode: standalone)').matches) {
-    return true;
-  }
-  
-  if (isIosSafari() && ('standalone' in window.navigator) && (window.navigator.standalone)) {
-      return true;
-  }
+export function isIosNotPwa() {
+  const ua = window.navigator.userAgent.toLowerCase();
+  const isIos =
+    /iphone|ipad|ipod/.test(ua) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1); 
 
-  return false;
+  const isStandalone = window.navigator.standalone === true;
+  return isIos && !isStandalone;
 }
 
 function getIOSVersion() {
