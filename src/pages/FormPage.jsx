@@ -8,7 +8,7 @@ import FormLayout from "../layouts/FormLayout/FormLayout";
 import Modal from "../components/Modal/Modal";
 import Footer from "../components/Footer/Footer";
 import { toast } from "react-toastify";
-import { checkAndWarnIOSVersion, isIosSafari, isRunningAsPWA, isWebView, logToFirestore } from "../utils/functions";
+import { checkAndWarnIOSVersion, isIosSafari, isIosNotPwa, isWebView, logToFirestore } from "../utils/functions";
 import { isSupported } from "firebase/messaging"
 import OneSignal from "react-onesignal";
 const infoSound = "/duca/sounds/noti.mp3";
@@ -31,7 +31,7 @@ function FormPage() {
   const [loading, setLoading] = useState(false);
   const [showReloadOption] = useState(false);
   const inAppBrowser = isWebView();
-  const iosNeedsPWA = isIosSafari() && !isRunningAsPWA();
+  const iosNeedsPWA = isIosNotPwa();
   const handleManualReload = () => {
     toast.info("Reiniciando la página para completar la activación...");
     //window.location.reload();
@@ -46,7 +46,7 @@ function FormPage() {
     try {
 
       if (isIosSafari()) {
-        if (!isRunningAsPWA()) {
+        if (isIosNotPwa()) {
           toast.info("En iOS, usa la app desde la pantalla de inicio (PWA) para notificaciones.");
           setLoading(false);
           return;
