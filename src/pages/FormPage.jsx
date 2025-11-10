@@ -34,7 +34,8 @@ function FormPage() {
   const [showReloadOption] = useState(false);
   const handleManualReload = () => {
     toast.info("Reiniciando la página para completar la activación...");
-    window.location.reload();
+    //window.location.reload();
+    navigate('/');
   };
   const handlePermission = async () => {
     if (loading) return;
