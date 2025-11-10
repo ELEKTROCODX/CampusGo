@@ -24,7 +24,7 @@ const playSound = (soundFile) => {
 };
 
 function FormPage() {
-  const publicUrl = "https://fia.uca.edu.sv/duca";
+  const publicUrl = "duca";
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const userLog = localStorage.getItem('userLog');
