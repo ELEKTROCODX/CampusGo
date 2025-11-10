@@ -57,55 +57,7 @@ function FormPage() {
           setLoading(false);
           return;
         }
-        toast.info("Usando OneSignal para las notificaiones...");
 
-        if (!window._oneSignalInitialized) {
-          await OneSignal.init({
-            appId: process.env.REACT_APP_ONESIGNAL_APPID,
-            safari_web_id: process.env.REACT_APP_ONESIGNAL_SAFARI_WEB_ID,
-            notifyButton: { enable: false },
-            allowLocalhostAsSecureOrigin: true,
-            serviceWorkerPath: `https://fia.uca.edu.sv/duca/OneSignalSDKWorker.js`,
-            serviceWorkerScope: 'https://fia.uca.edu.sv/duca',
-          });
-          window._oneSignalInitialized = true;
-        }
-
-        // Solicita permiso y espera a que el estado se asiente
-        await OneSignal.Notifications.requestPermission(true);
-        const permission = await waitForIosPermissionState(3500);
-        console.log("Permission (iOS) detectada:", permission, "| Notification.permission:", typeof Notification !== 'undefined' ? Notification.permission : 'n/a');
-        if (permission === "granted") {
-          playSound(infoSound);
-          toast.success("Permiso concedido");
-
-          let playerId = null;
-          try {
-            if (OneSignal.User && typeof OneSignal.User.getId === 'function') {
-              playerId = await OneSignal.User.getId();
-            } else if (typeof OneSignal.getUserId === 'function') {
-              playerId = await OneSignal.getUserId();
-            }
-          } catch (e) {
-            console.warn("No se pudo obtener OneSignal User ID:", e);
-          }
-
-          if (userLog && playerId) {
-            try {
-              const userRef = doc(db, "Usuarios", userLog);
-              await updateDoc(userRef, { oneSignalId: playerId });
-              console.log("OneSignal ID guardado en Firestore.");
-            } catch (error) {
-              console.warn("Error al guardar OneSignal ID en Firestore:", error);
-            }
-          }
-          setStatus("Permiso otorgado.");
-          navigate("/subscribe");
-        } else {
-          playSound(infoSound);
-          toast.error("Permiso de notificación denegado en Safari.");
-        }
-        return;
       }
 
       const fcmSupported = await isSupported();
