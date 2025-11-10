@@ -68,9 +68,10 @@ function FormPage() {
           window._oneSignalInitialized = true;
         }
 
+        // Solicita permiso y espera a que el estado se asiente
         await OneSignal.Notifications.requestPermission(true);
-        const permission = await OneSignal.Notifications.permission;
-        console.log("Permission OneSignal: ", permission);
+        const permission = await waitForIosPermissionState(3500);
+        console.log("Permission (iOS) detectada:", permission, "| Notification.permission:", typeof Notification !== 'undefined' ? Notification.permission : 'n/a');
         if (permission === "granted") {
           playSound(infoSound);
           toast.success("Permiso concedido");
@@ -271,6 +272,27 @@ function FormPage() {
       <Footer />
     </FormLayout>
   );
+}
+
+// Helper: espera a que el permiso en iOS/PWA se estabilice (OneSignal y API nativa)
+async function waitForIosPermissionState(timeoutMs = 3000) {
+  const end = Date.now() + timeoutMs;
+  while (Date.now() < end) {
+    try {
+      const osPerm = await OneSignal.Notifications.permission;
+      const nativePerm = typeof Notification !== 'undefined' ? Notification.permission : undefined;
+      if (osPerm === 'granted' || nativePerm === 'granted') return 'granted';
+      if (osPerm === 'denied' || nativePerm === 'denied') return 'denied';
+    } catch (e) {
+      // Ignorar y seguir intentando
+    }
+    await new Promise(r => setTimeout(r, 250));
+  }
+  try {
+    return await OneSignal.Notifications.permission;
+  } catch {
+    return typeof Notification !== 'undefined' ? Notification.permission : 'default';
+  }
 }
 
 export default FormPage;
