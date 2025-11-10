@@ -65,8 +65,8 @@ function FormPage() {
             safari_web_id: process.env.REACT_APP_ONESIGNAL_SAFARI_WEB_ID,
             notifyButton: { enable: false },
             allowLocalhostAsSecureOrigin: true,
-            serviceWorkerPath: `${publicUrl}/OneSignalSDKWorker.js`,
-            serviceWorkerScope: publicUrl || "/",
+            serviceWorkerPath: `https://fia.uca.edu.sv/duca/OneSignalSDKWorker.js`,
+            serviceWorkerScope: 'https://fia.uca.edu.sv/duca',
           });
           window._oneSignalInitialized = true;
         }
