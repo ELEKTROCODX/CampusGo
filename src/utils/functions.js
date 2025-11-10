@@ -22,23 +22,43 @@ export const isSubscribed = async () => {
 
 export const logToFirestore = async (source, message, data = {}) => {
     try {
-        // Obtenemos la URL actual para contextualizar el log.
         const currentUrl = window.location.href;
-        
-        await addDoc(collection(db, "onesignal_logs"), {
+
+        const isError = message instanceof Error;
+        const safeMessage = isError ? message.message : typeof message === 'string' ? message : String(message);
+        const safeStack = isError && message.stack ? String(message.stack) : undefined;
+
+        const safeData = serializeForFirestore(data);
+
+        const payload = {
             source,
-            message,
-            ...data,
+            message: safeMessage,
+            ...(safeStack ? { stack: safeStack } : {}),
             timestamp: serverTimestamp(),
-            userAgent: navigator.userAgent, // Útil para saber el dispositivo exacto
+            userAgent: navigator.userAgent,
             url: currentUrl,
-        });
-        console.log(`[LOG SENT] ${source}: ${message}`);
+            ...(safeData ? { data: safeData } : {}),
+        };
+
+        await addDoc(collection(db, "onesignal_logs"), payload);
+        console.log(`[LOG SENT] ${source}: ${safeMessage}`);
     } catch (error) {
-        // Este error es crítico si falla la escritura del log.
         console.error("ERROR CRÍTICO: No se pudo enviar el log a Firestore.", error);
     }
 };
+
+function serializeForFirestore(obj) {
+  if (!obj) return null;
+  try {
+    if (obj instanceof Error) {
+      return { message: obj.message, stack: obj.stack };
+    }
+    // Intenta JSON.stringify y devuelve string para evitar tipos no soportados
+    return JSON.stringify(obj);
+  } catch {
+    return String(obj);
+  }
+}
 
 export async function handleSubscriptionSuccess(navigate, userId, tokenOrId) {
     if (!userId || !tokenOrId) {

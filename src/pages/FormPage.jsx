@@ -24,6 +24,7 @@ const playSound = (soundFile) => {
 };
 
 function FormPage() {
+  const publicUrl = process.env.PUBLIC_URL || "https://fia.uca.edu.sv/duca";
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const userLog = localStorage.getItem('userLog');
@@ -64,6 +65,8 @@ function FormPage() {
             safari_web_id: process.env.REACT_APP_ONESIGNAL_SAFARI_WEB_ID,
             notifyButton: { enable: false },
             allowLocalhostAsSecureOrigin: true,
+            serviceWorkerPath: `${publicUrl}/OneSignalSDKWorker.js`,
+            serviceWorkerScope: publicUrl || "/",
           });
           window._oneSignalInitialized = true;
         }
@@ -76,7 +79,16 @@ function FormPage() {
           playSound(infoSound);
           toast.success("Permiso concedido");
 
-          const playerId = await OneSignal.User.getId();
+          let playerId = null;
+          try {
+            if (OneSignal.User && typeof OneSignal.User.getId === 'function') {
+              playerId = await OneSignal.User.getId();
+            } else if (typeof OneSignal.getUserId === 'function') {
+              playerId = await OneSignal.getUserId();
+            }
+          } catch (e) {
+            console.warn("No se pudo obtener OneSignal User ID:", e);
+          }
 
           if (userLog && playerId) {
             try {
@@ -140,7 +152,7 @@ function FormPage() {
       // 11. Lógica anterior: Maneja errores inesperados
       playSound(infoSound);
       console.error("Error en handlePermission:", error);
-      logToFirestore("FORMPAGE", error);
+      logToFirestore("FORMPAGE", error, { context: "handlePermission" });
       toast.error("Ocurrió un error inesperado.");
       // No navegues si hay un error, quédate en la página
     } finally {
