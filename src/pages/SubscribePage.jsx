@@ -143,7 +143,6 @@ function SubscribePage() {
 
             // 3. Reproduce sonido ANTES del toast
             playSound();
-            toast.info("Por favor, acepta los permisos de notificación (solicitud externa).");
 
             const [tokenResult, assignedTopic] = await Promise.all([
                 generateToken(),
@@ -151,6 +150,7 @@ function SubscribePage() {
             ]);
 
             const fcmToken = tokenResult.success ? tokenResult.token : null;
+            /*
             if (fcmToken) {
                 playSound(); // 3. Reproduce sonido
                 toast.success("¡Permiso aceptado y token obtenido!");
@@ -158,6 +158,7 @@ function SubscribePage() {
                 playSound(); // 3. Reproduce sonido
                 toast.warn("No se aceptaron las notificaciones. Puedes activarlas luego.");
             }
+                */
 
             const registrationDate = new Date().toISOString();
             const userData = {

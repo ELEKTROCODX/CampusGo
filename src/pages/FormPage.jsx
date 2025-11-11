@@ -216,7 +216,7 @@ function FormPage() {
           {inAppBrowser && (
             <p className="permissionScreen__text" style={{ marginTop: '0.5rem', color: '#ffd27d' }}>
               Estás dentro de un navegador de una app (Instagram, Facebook, etc.).
-              Abre esta página en un navegador nativo (Chrome/Firefox en Android o Safari en iOS). En iOS, añade la app a la pantalla de inicio para activar las notificaciones.
+              Abre esta página en un navegador nativo (Chrome/Firefox en Android o Safari en iOS).
             </p>
           )}
           {iosNeedsPWA && (
@@ -233,12 +233,13 @@ function FormPage() {
             </div>
           )}
         </div>
-        <button className="btn btn-acento" onClick={handlePermission} disabled={loading || inAppBrowser}>
+        {!inAppBrowser && !iosNeedsPWA && (
+          <button className="btn btn-acento" onClick={handlePermission} disabled={loading || inAppBrowser}>
           {"Permitir"}
         </button>
+        )}
         {inAppBrowser && (
           <div className="PermissionScreen__modal-buttons" style={{ marginTop: '0.5rem' }}>
-            <button className="btn btn-outline" onClick={handleOpenInBrowser}>Abrir en navegador</button>
             <button className="btn btn-outline" onClick={handleCopyLink}>Copiar enlace</button>
           </div>
         )}
