@@ -11,35 +11,42 @@ import LandingPage from "./pages/LandingPage.jsx";
 import MapPage from "./pages/MapPage.jsx";
 import PostEventPage from "./pages/PostEventPage.jsx";
 import SubscribePage from "./pages/SubscribePage.jsx";
-import { messaging } from "./firebase/firebase.js";
-import { onMessage } from "firebase/messaging";
+import { getMessagingSafe } from "./firebase/firebase.js";
+import { onMessage, isSupported } from "firebase/messaging";
 
 function App() {
 
   useEffect(() => {
-    const soundPath = "/duca/sounds/noti.mp3";
+    const publicUrl = (process.env.PUBLIC_URL || "/").startsWith("/")
+      ? (process.env.PUBLIC_URL || "/")
+      : `/${process.env.PUBLIC_URL || ""}`;
+    const soundPath = `${publicUrl}/sounds/noti.mp3`;
 
-    // 1. onMessage devuelve una función 'unsubscribe' para limpiar
-    const unsubscribe = onMessage(messaging, (payload) => {
-      console.log("Mensaje recibido en primer plano: ", payload);
-
-      // 2. Crea la instancia de Audio AQUÍ, dentro del evento
-      const audio = new Audio(soundPath);
-      
-      // 3. Intenta reproducir el sonido
-      audio.play().catch(e => console.warn("El audio no se pudo reproducir automáticamente:", e));
-
-      toast.info(
-        <div>
-          <strong>{payload.notification.title}</strong>
-          <p>{payload.notification.body}</p>
-        </div>
-      ); 
-    });
+    let unsubscribe = () => {};
     
-    // 4. Limpia el 'listener' cuando el componente se desmonte
-    return () => unsubscribe();
+    (async () => {
+      const supported = await isSupported().catch(() => false);
+      if (!supported) {
+        // No configures onMessage en navegadores no soportados (ej. Instagram iOS WebView)
+        return;
+      }
+      const messagingInstance = await getMessagingSafe();
+      if (!messagingInstance) return;
 
+      unsubscribe = onMessage(messagingInstance, (payload) => {
+        console.log("Mensaje recibido en primer plano: ", payload);
+        const audio = new Audio(soundPath);
+        audio.play().catch(e => console.warn("El audio no se pudo reproducir automáticamente:", e));
+        toast.info(
+          <div>
+            <strong>{payload?.notification?.title}</strong>
+            <p>{payload?.notification?.body}</p>
+          </div>
+        );
+      });
+    })();
+
+    return () => unsubscribe();
   }, []);
 
   const now = new Date();

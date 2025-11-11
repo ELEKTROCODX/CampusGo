@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-import { getMessaging, getToken } from "firebase/messaging";
+import { getMessaging, getToken, isSupported } from "firebase/messaging";
 import { getFunctions } from 'firebase/functions';
 import { toast } from 'react-toastify';
 
@@ -21,15 +21,37 @@ const firebaseConfig = {
 // Inicialización de servicios
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
-export const messaging = getMessaging(app);
 export const db = getFirestore(app);
 export const functions = getFunctions(app, 'us-central1');
+
+// Obtiene una instancia de Messaging de forma segura (solo si el navegador soporta FCM)
+export const getMessagingSafe = async () => {
+  try {
+    const supported = await isSupported();
+    if (!supported) return null;
+    return getMessaging(app);
+  } catch (e) {
+    return null;
+  }
+};
 
 /**
  * Registra el Service Worker, espera a que esté activo y obtiene el token de FCM.
  * @returns {object} { success: boolean, token: string | null }
  */
 export const generateToken = async () => {
+    // 0. Verificar soporte del navegador para FCM (Service Workers + Push API)
+    try {
+        const supported = await isSupported();
+        if (!supported) {
+            console.log("FCM: Navegador no soportado (sin Service Worker/Push API).");
+            toast.info("Este navegador no soporta notificaciones push.");
+            return { success: false, token: null };
+        }
+    } catch (e) {
+        console.warn("FCM: No se pudo comprobar soporte del navegador:", e);
+        return { success: false, token: null };
+    }
     // 1. OPTIMIZACIÓN CLAVE: Verificar si el token ya existe
     const cachedToken = localStorage.getItem("fcmToken");
     if (cachedToken) {
@@ -49,8 +71,11 @@ export const generateToken = async () => {
     }
 
     try {
-        const swPath = "/duca/firebase-messaging-sw.js";
-        const scope = "/duca/";
+        const publicUrl = (process.env.PUBLIC_URL || "/").startsWith("/")
+          ? (process.env.PUBLIC_URL || "/")
+          : `/${process.env.PUBLIC_URL || ""}`;
+        const swPath = `${publicUrl}/firebase-messaging-sw.js`;
+        const scope = `${publicUrl}/`;
         let registration;
 
         // 2. INICIO: Registro y espera de Service Worker (rápido)
@@ -85,7 +110,8 @@ export const generateToken = async () => {
         const tokenReqStart = performance.now();
         console.log("FCM: INICIO de la solicitud de token a los servidores de Google...");
 
-        const fcmToken = await getToken(messaging, {
+        const messagingInstance = getMessaging(app);
+        const fcmToken = await getToken(messagingInstance, {
             serviceWorkerRegistration: registration,
             vapidKey: vapidKey,
         });
@@ -121,7 +147,13 @@ export const requestNotificationPermission = async () =>{
         console.log("✅ Permiso de notificación concedido. Solicitando token.");
 
         // 2. Obtener el token de registro de FCM
-        let token = await messaging.getToken({ vapidKey: process.env.REACT_APP_VAPID_KEY});
+        const supported = await isSupported();
+        if (!supported) {
+          toast.info("Este navegador no soporta notificaciones push.");
+          return { success: false };
+        }
+        const messagingInstance = getMessaging(app);
+        let token = await getToken(messagingInstance, { vapidKey: process.env.REACT_APP_VAPID_KEY});
         console.log("🔑 FCM Token:", token);
         return{success: true}
       } else {
