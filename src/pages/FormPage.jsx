@@ -10,7 +10,6 @@ import Footer from "../components/Footer/Footer";
 import { toast } from "react-toastify";
 import { checkAndWarnIOSVersion, isIosSafari, isIosNotPwa, isWebView, logToFirestore } from "../utils/functions";
 import { isSupported } from "firebase/messaging"
-import OneSignal from "react-onesignal";
 const infoSound = "/duca/sounds/noti.mp3";
 
 // 2. Crea una función de ayuda para reproducir el sonido
@@ -236,27 +235,6 @@ function FormPage() {
       <Footer />
     </FormLayout>
   );
-}
-
-// Helper: espera a que el permiso en iOS/PWA se estabilice (OneSignal y API nativa)
-async function waitForIosPermissionState(timeoutMs = 3000) {
-  const end = Date.now() + timeoutMs;
-  while (Date.now() < end) {
-    try {
-      const osPerm = await OneSignal.Notifications.permission;
-      const nativePerm = typeof Notification !== 'undefined' ? Notification.permission : undefined;
-      if (osPerm === 'granted' || nativePerm === 'granted') return 'granted';
-      if (osPerm === 'denied' || nativePerm === 'denied') return 'denied';
-    } catch (e) {
-      // Ignorar y seguir intentando
-    }
-    await new Promise(r => setTimeout(r, 250));
-  }
-  try {
-    return await OneSignal.Notifications.permission;
-  } catch {
-    return typeof Notification !== 'undefined' ? Notification.permission : 'default';
-  }
 }
 
 export default FormPage;
