@@ -18,10 +18,14 @@ import { toast } from "react-toastify";
 
 // --- INICIO DE CAMBIOS PARA SONIDO ---
 
-// 1. Define la ruta de tu sonido (debe estar en public/sounds/noti.mp3)
-const soundPath = "/duca/sounds/noti.mp3";
+// 1. Define la ruta de tu sonido (consciente de PUBLIC_URL)
+const publicUrlSound = (process.env.PUBLIC_URL || "/").startsWith("/")
+  ? (process.env.PUBLIC_URL || "/")
+  : `/${process.env.PUBLIC_URL || ""}`;
+const soundPath = `${publicUrlSound}/sounds/noti.mp3`;
 
 // 2. Crea una función de ayuda para reproducir el sonido
+let audioUnlocked = false;
 const playSound = () => {
     try {
         // Crea una nueva instancia cada vez para evitar errores de interrupción
@@ -30,6 +34,21 @@ const playSound = () => {
     } catch (e) {
         console.error("Error al crear el objeto Audio:", e);
     }
+};
+
+// Desbloquear audio al primer gesto del usuario (submit)
+const unlockAudio = async () => {
+  if (audioUnlocked) return;
+  try {
+    const a = new Audio(soundPath);
+    a.muted = true;
+    await a.play().catch(() => {});
+    a.pause();
+    a.currentTime = 0;
+    audioUnlocked = true;
+  } catch {
+    // Ignorar
+  }
 };
 // --- FIN DE CAMBIOS PARA SONIDO ---
 
@@ -112,6 +131,8 @@ function SubscribePage() {
 
     const handleRegistration = async (e) => {
         e.preventDefault();
+        // Desbloquear audio en el gesto del usuario antes de operaciones async
+        await unlockAudio();
         setLoading(true);
         setError(null);
         const { email, name, company } = formData;

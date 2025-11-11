@@ -10,9 +10,14 @@ import Footer from "../components/Footer/Footer";
 import { toast } from "react-toastify";
 import { checkAndWarnIOSVersion, isIosSafari, isIosNotPwa, isWebView, logToFirestore } from "../utils/functions";
 import { isSupported } from "firebase/messaging"
-const infoSound = "/duca/sounds/noti.mp3";
+// Ruta de sonido consciente de PUBLIC_URL
+const publicUrlSound = (process.env.PUBLIC_URL || "/").startsWith("/")
+  ? (process.env.PUBLIC_URL || "/")
+  : `/${process.env.PUBLIC_URL || ""}`;
+const infoSound = `${publicUrlSound}/sounds/noti.mp3`;
 
 // 2. Crea una función de ayuda para reproducir el sonido
+let audioUnlocked = false;
 const playSound = (soundFile) => {
   try {
     const audio = new Audio(soundFile);
@@ -22,8 +27,25 @@ const playSound = (soundFile) => {
   }
 };
 
+// Desbloquea la reproducción de audio en el primer gesto del usuario
+const unlockAudio = async () => {
+  if (audioUnlocked) return;
+  try {
+    const a = new Audio(infoSound);
+    a.muted = true;
+    await a.play().catch(() => {});
+    a.pause();
+    a.currentTime = 0;
+    audioUnlocked = true;
+  } catch {
+    // Ignorar
+  }
+};
+
 function FormPage() {
-  const publicUrl = "duca";
+  const publicUrl = (process.env.PUBLIC_URL || "/").startsWith("/")
+    ? (process.env.PUBLIC_URL || "/")
+    : `/${process.env.PUBLIC_URL || ""}`;
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const userLog = localStorage.getItem('userLog');
@@ -42,6 +64,9 @@ function FormPage() {
 
     setShowModal(false);
     setLoading(true);
+
+    // Desbloquear audio al inicio del gesto del usuario
+    await unlockAudio();
 
     try {
 
@@ -122,6 +147,8 @@ function FormPage() {
   };
 
   const handleConfirmSkip = () => {
+    // Desbloquear audio antes de reproducir
+    unlockAudio();
     localStorage.removeItem('fcmToken');
     playSound(infoSound);
     toast.info("Permiso omitido.");
