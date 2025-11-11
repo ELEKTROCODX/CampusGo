@@ -73,15 +73,16 @@ function CountdownPage() {
                     <span className="CountdownPage__time-label">Seg</span>
                 </div>
             </div>
-
-            <button
+            {!Logged && (
+                <button
                 className="btn btn-acento"
                 onClick={() => {
                     navigate("/welcome");
                 }}>
                 {new Date() >= eventStartDate ? "Entrar al evento" :(Logged ? "Muy pronto" : "¡Inscríbete Ya!") }
-            </button>
-
+                </button>
+            )}
+            
             <p className="CountdownPage__message">
                 Te invitamos a que descubras la nueva experiencia que hemos <br /> <b>diseñado</b> para ti.
             </p>
