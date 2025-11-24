@@ -139,31 +139,31 @@
 }
 
 /* Card 1: izquierda (arriba normal) */
-.speakers-section__grid > .SpeakerCard:nth-child(1) {
+.speakers-section__grid>.SpeakerCard:nth-child(1) {
   grid-column: 1 / 2;
   margin-top: 0;
 }
 
 /* Card 2: derecha, baja mucho */
-.speakers-section__grid > .SpeakerCard:nth-child(2) {
+.speakers-section__grid>.SpeakerCard:nth-child(2) {
   grid-column: 2 / 3;
   margin-top: 180px;
 }
 
 /* Card 3: izquierda, sube para quedar frente al 2 */
-.speakers-section__grid > .SpeakerCard:nth-child(3) {
+.speakers-section__grid>.SpeakerCard:nth-child(3) {
   grid-column: 1 / 2;
   margin-top: -120px;
 }
 
 /* Card 4: derecha, baja moderado para cruzarse con el 3 */
-.speakers-section__grid > .SpeakerCard:nth-child(4) {
+.speakers-section__grid>.SpeakerCard:nth-child(4) {
   grid-column: 2 / 3;
   margin-top: -40px;
 }
 
 /* Card 5: izquierda, nivelado para cerrar el zigzag */
-.speakers-section__grid > .SpeakerCard:nth-child(5) {
+.speakers-section__grid>.SpeakerCard:nth-child(5) {
   grid-column: 1 / 2;
   margin-top: -150px;
 }
@@ -214,6 +214,10 @@
     grid-template-columns: 1fr 1fr;
     max-width: 700px;
     gap: 3rem;
+  }
+
+  .SpeakerCard {
+    width: 400px;
   }
 
   .speakers-section__grid>.SpeakerCard:nth-child(2) {
