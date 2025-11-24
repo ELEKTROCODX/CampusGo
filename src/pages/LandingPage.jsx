@@ -23,17 +23,18 @@ import Mapa from "../assets/stickers/elemento2.png";
 import SpeakerImg1 from "../assets/ponents/ponente1.jpeg";
 import SpeakerImg2 from "../assets/ponents/ponente2.jpeg";
 import SpeakerImg3 from "../assets/ponents/ponente3.jpeg";
-import SpeakerImg4 from "../assets/ponents/ponente4.jpeg"; // Asegúrate que este import esté
+import SpeakerImg4 from "../assets/ponents/ponente4.jpeg";
+import SpeakerImg5 from "../assets/ponents/ponente5.jpeg";
 
 // --- INICIO DE CAMBIOS PARA SONIDO ---
 
 // 1. Define la ruta de tu sonido (debe estar en public/sounds/noti.mp3)
-const soundPath = "/duca/sounds/noti.mp3"; 
+const soundPath = "/duca/sounds/noti.mp3";
 
 // 2. Crea una función de ayuda para reproducir el sonido
 const playSound = () => {
   try {
-    const audio = new Audio(soundPath); 
+    const audio = new Audio(soundPath);
     audio.play().catch(e => console.warn("No se pudo reproducir el sonido:", e));
   } catch (e) {
     console.error("Error al crear el objeto Audio:", e);
@@ -105,7 +106,7 @@ function LandingPage() {
 
         </div>
         <div className="welcome-section__greeting">
-          <div className="welcome-section__user-name"></div> 
+          <div className="welcome-section__user-name"></div>
           <div className="welcome-section__subtitle">¡Eres parte de nuestro primer</div>
           <div className="welcome-section__subtitle">networking de Diseño!</div>
         </div>
@@ -136,9 +137,9 @@ function LandingPage() {
         <h2 className="speakers-section__title">Conoce a nuestros ponentes</h2>
         <div className="speakers-section__grid">
           <SpeakerCard
-            name={<>José<br />Moz</>} 
+            name={<>José<br />Moz</>}
             role="Gerente de Diseño de Experiencias"
-            imgSrc={SpeakerImg1} 
+            imgSrc={SpeakerImg1}
             style={{ gridColumn: '1 / 2' }}
           />
           <SpeakerCard
@@ -158,7 +159,15 @@ function LandingPage() {
             role="Fundadora y Presidenta Susana Díaz"
             imgSrc={SpeakerImg4}
             style={{ gridColumn: '2 / 3', marginTop: '0px' }}
-          />       </div>
+          />
+          <SpeakerCard
+            name={<>Luis<br />Domínguez</>}
+            role="Gerente de IDi | Casa Susana Díaz"
+            imgSrc={SpeakerImg5}
+            style={{ gridColumn: '1 / 2' }}
+          />
+
+        </div>
       </section>
 
       <section className="page-section info-section">
